@@ -44,34 +44,42 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const ListenerInfo = ({ user, options, onClose }) => {
+const ListenerInfo = ({ userID, rowID, options, onClose }) => {
   const dispatch = useDispatch()
 
   const data = useSelector((state) => state.courses.listenerInfo)
+
   const selectedCourseID = useSelector(
     (state) => state.courses.selectedCourse.ID
   )
 
   React.useEffect(() => {
-    dispatch(allActions.coursesActions.getListenerInfo(user.id))
-  }, [dispatch, user.id])
+    dispatch(allActions.coursesActions.getListenerInfo(userID, rowID))
+  }, [dispatch, userID, rowID])
 
-  const initialValues = {
-    cathedraAllow: Boolean(user.cathedraAllow),
-    instituteAllow: Boolean(user.instituteAllow),
-    documents: data.documents,
-    Comment: user.comment,
-    CathedraComment: user.checks.cathedra.comment,
-    CathedraLabel: user.checks.cathedra.label,
-    InstituteComment: user.checks.institute.comment,
-    InstituteLabel: user.checks.institute.label,
-    work: data.work,
-    workCheck: data.workCheck,
-  }
+  const initialValues = data.fullname
+    ? {
+        cathedraAllow: Boolean(data.cathedraAllow),
+        instituteAllow: Boolean(data.instituteAllow),
+        documents: data.documents,
+        comment: data.comment,
+        cathedraComment: data.checks.cathedra.comment,
+        cathedraLabel: data.checks ? data.checks.cathedra.label : null,
+        instituteComment: data.checks ? data.checks.institute.comment : null,
+        instituteLabel: data.checks ? data.checks.institute.label : null,
+        work: data.work,
+        workCheck: data.workCheck,
+      }
+    : {}
 
   const handleSubmit = (values) => {
     dispatch(
-      allActions.coursesActions.saveCheckData(user.id, selectedCourseID, values)
+      allActions.coursesActions.saveCheckData(
+        userID,
+        rowID,
+        values,
+        selectedCourseID
+      )
     )
   }
 
@@ -83,7 +91,7 @@ const ListenerInfo = ({ user, options, onClose }) => {
       cancelText="Отмена"
       onApprove={() => dispatch(submit('listenerInfoForm'))}
       onClose={onClose}
-      title={`Слушатель «${user.fullname}»`}
+      title={`Слушатель «${data.fullname}»`}
     >
       {data.isListenerInfoLoading ? (
         <Grid container direction="row" justify="center">
@@ -153,19 +161,19 @@ let ListenerInfoForm = (props) => {
       </FormGroup>
       <Typography className={classes.typography}>Рецензии</Typography>
       <Field
-        name="Comment"
+        name="comment"
         component={Textarea}
         label="Примечание (видно только рецензентам!)"
       />
       <Field
-        name="CathedraComment"
+        name="cathedraComment"
         component={Textarea}
-        label={`Рецензия от кафедры${values.CathedraLabel}`}
+        label={`Рецензия от кафедры${values.cathedraLabel}`}
       />
       <Field
-        name="InstituteComment"
+        name="instituteComment"
         component={Textarea}
-        label={`Рецензия от института ДПО${values.InstituteLabel}`}
+        label={`Рецензия от института ДПО${values.instituteLabel}`}
       />
       <Typography className={classes.typography}>Документы</Typography>
       {values.documents.map((document, index) => {

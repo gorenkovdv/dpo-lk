@@ -25,11 +25,15 @@ const changeRequestStatus = (data) => {
 const courseRequestRemoved = (data) => {
   return { type: 'COURSE_REQUEST_REMOVED', payload: data }
 }
+const checkDataSaved = (data) => {
+  return { type: 'COURSE_CHECK_DATA_SAVED', payload: data }
+}
 
 const requestCourses = (page, count, filters) => async (dispatch) => {
   dispatch(setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
 
+  console.log(response.data)
   if (response.data.response)
     dispatch(
       loadingSuccess({
@@ -103,10 +107,11 @@ const removeCourseRequest = (courseID, userID) => async (dispatch) => {
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
-const getListenerInfo = (userID, courseID) => async (dispatch) => {
+const getListenerInfo = (userID, rowID) => async (dispatch) => {
   dispatch(setListenerInfoLoading())
-  const response = await coursesAPI.getListenerInfo(userID, courseID)
+  const response = await coursesAPI.getListenerInfo(userID, rowID)
 
+  console.log(response.data)
   if (response.data.response) {
     dispatch(
       setListenerInfo({
@@ -117,18 +122,34 @@ const getListenerInfo = (userID, courseID) => async (dispatch) => {
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
-const saveCheckData = (userID, courseID, data) => async (dispatch) => {
+const saveCheckData = (userID, rowID, data, courseID) => async (dispatch) => {
+  const simpleDocumentsCheck = data.documents.map((document) => {
+    return {
+      id: document.id,
+      check: document.documentCheck,
+    }
+  })
+
   const sendingData = {
     ...data,
-    documents: data.documents.map((document) => {
-      return {
-        id: document.id,
-        check: document.documentCheck,
-      }
-    }),
+    documents: simpleDocumentsCheck,
   }
-  const response = await coursesAPI.saveCheckData(userID, courseID, sendingData)
-  console.log(response.data)
+
+  const response = await coursesAPI.saveCheckData(userID, rowID, sendingData)
+
+  if (response.data.response) {
+    dispatch(
+      checkDataSaved({
+        ...data,
+        documents: simpleDocumentsCheck,
+        currentDatetime: response.data.currentDatetime,
+        userFullname: response.data.userFullname,
+        rowID,
+        courseID,
+      })
+    )
+    dispatch(snackbarActions.showSuccess('Изменения сохранены'))
+  } else dispatch(snackbarActions.showError(response.data.error))
 }
 
 export default {

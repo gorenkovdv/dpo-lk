@@ -156,7 +156,8 @@ const ListenerWindowContent = ({ options, onClose }) => {
       </TableContainer>
       {selectedListener && (
         <ListenerInfoWindow
-          user={selectedListener}
+          userID={selectedListener.id}
+          rowID={selectedListener.rowID}
           options={{ open: listenerInfoWindowOpen }}
           onClose={closeListenerInfoWindow}
         />

@@ -123,6 +123,10 @@ export function coursesReducer(state = initialState, action) {
           isListenerInfoLoading: false,
         },
       }
+    case 'COURSE_CHECK_DATA_SAVED':
+      return {
+        ...state,
+      }
     default:
       return state
   }
