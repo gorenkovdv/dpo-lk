@@ -1,0 +1,13 @@
+.btn {
+  border-radius: 0;
+  border: 1px solid #282828;
+  margin: 1px;
+  min-height: 40px;
+  min-width: 40px;
+  display: block;
+  float: left;
+}
+
+.board-row, .game-info{
+  clear: both;
+}
