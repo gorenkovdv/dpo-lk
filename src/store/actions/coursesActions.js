@@ -107,11 +107,10 @@ const removeCourseRequest = (courseID, userID) => async (dispatch) => {
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
-const getListenerInfo = (userID, rowID) => async (dispatch) => {
+const getListenerInfo = (userID) => async (dispatch) => {
   dispatch(setListenerInfoLoading())
-  const response = await coursesAPI.getListenerInfo(userID, rowID)
+  const response = await coursesAPI.getListenerInfo(userID)
 
-  console.log(response.data)
   if (response.data.response) {
     dispatch(
       setListenerInfo({
@@ -122,7 +121,7 @@ const getListenerInfo = (userID, rowID) => async (dispatch) => {
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
-const saveCheckData = (userID, rowID, data, courseID) => async (dispatch) => {
+const saveCheckData = (userID, rowID, data) => async (dispatch) => {
   const simpleDocumentsCheck = data.documents.map((document) => {
     return {
       id: document.id,
@@ -141,11 +140,8 @@ const saveCheckData = (userID, rowID, data, courseID) => async (dispatch) => {
     dispatch(
       checkDataSaved({
         ...data,
-        documents: simpleDocumentsCheck,
         currentDatetime: response.data.currentDatetime,
-        userFullname: response.data.userFullname,
         rowID,
-        courseID,
       })
     )
     dispatch(snackbarActions.showSuccess('Изменения сохранены'))

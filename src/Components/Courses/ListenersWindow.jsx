@@ -38,7 +38,7 @@ const ListenerWindowContent = ({ options, onClose }) => {
 
   const course = useSelector((state) =>
     state.courses.list.find(
-      (course) => course.ID === state.courses.selectedCourse.ID
+      (item) => item.ID === state.courses.selectedCourse.ID
     )
   )
 
@@ -49,19 +49,6 @@ const ListenerWindowContent = ({ options, onClose }) => {
 
   const closeListenerInfoWindow = () => {
     setListenerInfoWindowOpen(false)
-  }
-
-  const showCheckInfo = (checkArr) => {
-    return (
-      checkArr.date && (
-        <Grid container direction="column" className={classes.checkGrid}>
-          {checkArr.comment.length > 0 && (
-            <Typography>{checkArr.comment}</Typography>
-          )}
-          <small>{`${checkArr.date} рецензент от ${checkArr.text}: ${checkArr.person}`}</small>
-        </Grid>
-      )
-    )
   }
 
   // dialogParams
@@ -126,8 +113,30 @@ const ListenerWindowContent = ({ options, onClose }) => {
                     {user.comment && (
                       <Typography gutterBottom>{user.comment}</Typography>
                     )}
-                    {showCheckInfo(checks.cathedra)}
-                    {showCheckInfo(checks.institute)}
+                    {checks.cathedra.date && (
+                      <Grid
+                        container
+                        direction="column"
+                        className={classes.checkGrid}
+                      >
+                        {checks.cathedra.comment.length > 0 && (
+                          <Typography>{checks.cathedra.comment}</Typography>
+                        )}
+                        <small>{`${checks.cathedra.date} рецензент от кафедры: ${checks.cathedra.person}`}</small>
+                      </Grid>
+                    )}
+                    {checks.institute.date && (
+                      <Grid
+                        container
+                        direction="column"
+                        className={classes.checkGrid}
+                      >
+                        {checks.institute.comment.length > 0 && (
+                          <Typography>{checks.institute.comment}</Typography>
+                        )}
+                        <small>{`${checks.institute.date} рецензент от института ДПО: ${checks.institute.person}`}</small>
+                      </Grid>
+                    )}
                   </TableCell>
                   <TableCell style={{ minWidth: 150 }}>
                     <Grid container direction="row" justify="center">
@@ -156,8 +165,7 @@ const ListenerWindowContent = ({ options, onClose }) => {
       </TableContainer>
       {selectedListener && (
         <ListenerInfoWindow
-          userID={selectedListener.id}
-          rowID={selectedListener.rowID}
+          user={selectedListener}
           options={{ open: listenerInfoWindowOpen }}
           onClose={closeListenerInfoWindow}
         />

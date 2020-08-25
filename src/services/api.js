@@ -192,10 +192,8 @@ export const coursesAPI = {
       qs.stringify({ uid: userAPI.getUID(), page, count, filters })
     )
   },
-  async getListenerInfo(userId, rowID) {
-    return await instance.get(
-      `get_listener_info.php?uid=${userId}&rid=${rowID}`
-    )
+  async getListenerInfo(userId) {
+    return await instance.get(`get_listener_info.php?uid=${userId}`)
   },
 
   async saveCheckData(userID, rowID, data) {

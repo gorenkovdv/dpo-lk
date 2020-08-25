@@ -220,6 +220,12 @@ const CoursesList = () => {
     setListenersWindowOpen(false)
   }
 
+  const approveFilterDate = (value, filter) => {
+    let currentDate = parseDate(value)
+    if (currentDate !== data.filters[filter] && currentDate)
+      handleFilterChange(filter, currentDate)
+  }
+
   if (data.isLoading)
     return (
       <Grid container direction="row" justify="center">
@@ -356,11 +362,8 @@ const CoursesList = () => {
                   placeholder="дд-мм-гггг"
                   label="Начало периода"
                   onChange={(value) => setStartDate(parseDate(value))}
-                  onAccept={(value) => {
-                    let currentDate = parseDate(value)
-                    if (currentDate !== data.filters.startDate)
-                      handleFilterChange('startDate', currentDate)
-                  }}
+                  onAccept={(value) => approveFilterDate(value, 'startDate')}
+                  onBlur={(e) => approveFilterDate(e.target.value, 'startDate')}
                 />
               </Grid>
               <Grid item className={classes.inlineDateField}>
@@ -373,11 +376,8 @@ const CoursesList = () => {
                   placeholder="дд-мм-гггг"
                   label="Окончание периода"
                   onChange={(value) => setEndDate(parseDate(value))}
-                  onAccept={(value) => {
-                    let currentDate = parseDate(value)
-                    if (currentDate !== data.filters.endDate)
-                      handleFilterChange('endDate', currentDate)
-                  }}
+                  onAccept={(value) => approveFilterDate(value, 'endDate')}
+                  onBlur={(e) => approveFilterDate(e.target.value, 'endDate')}
                 />
               </Grid>
             </Grid>

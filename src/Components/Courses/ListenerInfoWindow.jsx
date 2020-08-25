@@ -44,42 +44,31 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const ListenerInfo = ({ userID, rowID, options, onClose }) => {
+const ListenerInfo = ({ user, options, onClose }) => {
   const dispatch = useDispatch()
 
   const data = useSelector((state) => state.courses.listenerInfo)
 
-  const selectedCourseID = useSelector(
-    (state) => state.courses.selectedCourse.ID
-  )
-
   React.useEffect(() => {
-    dispatch(allActions.coursesActions.getListenerInfo(userID, rowID))
-  }, [dispatch, userID, rowID])
+    dispatch(allActions.coursesActions.getListenerInfo(user.id))
+  }, [dispatch, user.id])
 
-  const initialValues = data.fullname
-    ? {
-        cathedraAllow: Boolean(data.cathedraAllow),
-        instituteAllow: Boolean(data.instituteAllow),
-        documents: data.documents,
-        comment: data.comment,
-        cathedraComment: data.checks.cathedra.comment,
-        cathedraLabel: data.checks ? data.checks.cathedra.label : null,
-        instituteComment: data.checks ? data.checks.institute.comment : null,
-        instituteLabel: data.checks ? data.checks.institute.label : null,
-        work: data.work,
-        workCheck: data.workCheck,
-      }
-    : {}
+  const initialValues = {
+    cathedraAllow: Boolean(user.cathedraAllow),
+    instituteAllow: Boolean(user.instituteAllow),
+    documents: data.documents,
+    comment: user.comment,
+    cathedraComment: user.checks.cathedra.comment,
+    cathedraLabel: user.checks.cathedra.label,
+    instituteComment: user.checks.institute.comment,
+    instituteLabel: user.checks.institute.label,
+    work: data.work,
+    workCheck: data.workCheck,
+  }
 
   const handleSubmit = (values) => {
     dispatch(
-      allActions.coursesActions.saveCheckData(
-        userID,
-        rowID,
-        values,
-        selectedCourseID
-      )
+      allActions.coursesActions.saveCheckData(user.id, user.rowID, values)
     )
   }
 
@@ -91,7 +80,7 @@ const ListenerInfo = ({ userID, rowID, options, onClose }) => {
       cancelText="Отмена"
       onApprove={() => dispatch(submit('listenerInfoForm'))}
       onClose={onClose}
-      title={`Слушатель «${data.fullname}»`}
+      title={`Слушатель «${user.fullname}»`}
     >
       {data.isListenerInfoLoading ? (
         <Grid container direction="row" justify="center">

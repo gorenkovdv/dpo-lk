@@ -126,6 +126,64 @@ export function coursesReducer(state = initialState, action) {
     case 'COURSE_CHECK_DATA_SAVED':
       return {
         ...state,
+        listenerInfo: {
+          ...state.listenerInfo,
+          workCheck: action.payload.workCheck
+            ? action.payload.workCheck
+            : state.listenerInfo.workCheck,
+          documents: action.payload.documents,
+        },
+        list: state.list.map((course) => {
+          return {
+            ...course,
+            users: course.users.map((user) => {
+              if (
+                course.ID !== state.selectedCourse.ID ||
+                user.rowID !== action.payload.rowID
+              )
+                return user
+
+              return {
+                ...user,
+                comment: action.payload.comment
+                  ? action.payload.comment
+                  : user.comment,
+                cathedraAllow:
+                  action.payload.cathedraAllow !== undefined
+                    ? action.payload.cathedraAllow
+                      ? 1
+                      : 0
+                    : user.cathedraAllow,
+                instituteAllow:
+                  action.payload.instituteAllow !== undefined
+                    ? action.payload.instituteAllow
+                      ? 1
+                      : 0
+                    : user.instituteAllow,
+                checks: {
+                  cathedra:
+                    action.payload.cathedraAllow !== undefined
+                      ? {
+                          date: action.payload.currentDatetime,
+                          comment: action.payload.cathedraComment,
+                          person: state.listenerInfo.fullname,
+                          label: `: ${action.payload.currentDatetime} ${state.listenerInfo.fullname}`,
+                        }
+                      : user.checks.cathedra,
+                  institute:
+                    action.payload.instituteAllow !== undefined
+                      ? {
+                          date: action.payload.currentDatetime,
+                          comment: action.payload.instituteComment,
+                          person: state.listenerInfo.fullname,
+                          label: `: ${action.payload.currentDatetime} ${state.listenerInfo.fullname}`,
+                        }
+                      : user.checks.institute,
+                },
+              }
+            }),
+          }
+        }),
       }
     default:
       return state
