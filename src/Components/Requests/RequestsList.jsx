@@ -75,6 +75,7 @@ const RequestsList = () => {
                 <TableCell align="center" style={{ maxWidth: 125 }}>
                   Учебные материалы на платформе Moodle
                 </TableCell>
+                <TableCell align="center">Заявка с портала НМО</TableCell>
                 <TableCell align="center" style={{ maxWidth: 100 }}>
                   Личная карточка
                 </TableCell>

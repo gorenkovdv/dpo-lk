@@ -99,15 +99,16 @@ export const Select = ({ input, children, ...props }) => {
 export const MaskedInput = ({ input, meta: { touched, error }, ...props }) => {
   const classes = useStyles()
   const hasError = touched && error !== undefined
+
   return (
-    <InputMask {...input} {...props}>
+    <InputMask mask={props.mask} {...input}>
       {() => (
         <TextField
           {...props}
-          autoFocus={props.autoFocus ? props.autoFocus : false}
+          error={hasError}
           fullWidth={props.fullWidth ? props.fullWidth : false}
           className={classes.textField}
-          error={hasError}
+          helperText={hasError && error}
           autoComplete="off"
           margin="dense"
           variant={props.variant ? props.variant : 'outlined'}
@@ -151,6 +152,14 @@ export const PasswordInput = ({ input, ...props }) => {
 }
 
 export const DateInput = ({ input, ...props }) => {
+  const maxDate = props.maxDate
+    ? `${moment(props.maxDate).format('YYYY-MM-DD')}`
+    : '2100-01-01'
+
+  const minDate = props.minDate
+    ? `${moment(props.minDate).format('YYYY-MM-DD')}`
+    : '1900-01-01'
+
   const classes = useStyles()
   return (
     <MuiPickersUtilsProvider utils={MomentUtils} locale={`ru`}>
@@ -165,8 +174,8 @@ export const DateInput = ({ input, ...props }) => {
         maskChar={'0'}
         format={props.dateformat}
         invalidDateMessage="Неверный формат даты"
-        maxDateMessage="Дата не должна быть позднее максимальной"
-        minDateMessage="Дата не должна быть ранее минимальной"
+        maxDateMessage={`Дата не должна быть позднее максимальной (${maxDate})`}
+        minDateMessage={`Дата не должна быть ранее минимальной (${minDate})`}
         inputVariant="outlined"
         margin={props.margin ? props.margin : 'dense'}
         InputAdornmentProps={{ position: 'start' }}

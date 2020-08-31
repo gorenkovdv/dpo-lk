@@ -18,8 +18,6 @@ const entityRootsConfirmed = (data) => {
 const addEntityRepresentative = (ITN) => async (dispatch) => {
   const response = await entityAPI.addEntityRepresentative(ITN)
 
-  //console.log(response.data)
-
   if (response.data.response) history.push('/profile')
   else dispatch(snackbarActions.showError(response.data.error))
 }
@@ -27,14 +25,13 @@ const addEntityRepresentative = (ITN) => async (dispatch) => {
 const checkEntityRoots = () => async (dispatch) => {
   const response = await entityAPI.checkEntityRoots()
 
-  console.log(response.data)
   dispatch(entityRootsConfirmed(response.data.entities))
 }
 
 const requestEntityData = () => async (dispatch) => {
   dispatch(setLoading())
   const response = await entityAPI.getEntityData()
-  console.log(response.data)
+
   if (response.data.response)
     dispatch(
       loadingSuccess({ ...response.data.entity, roots: response.data.roots })
@@ -45,7 +42,6 @@ const requestEntityData = () => async (dispatch) => {
 const updateEntityData = (data) => async (dispatch) => {
   const response = await entityAPI.setEntityData(data)
 
-  console.log(response.data)
   if (response.data.response) {
     dispatch(updatingSuccess(data))
     dispatch(snackbarActions.showSuccess('Данные успешно обновлены'))

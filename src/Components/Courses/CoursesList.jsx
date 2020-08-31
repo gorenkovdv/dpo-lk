@@ -33,7 +33,7 @@ import ListenersWindow from './ListenersWindow'
 import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
 import styles from '../../styles.js'
-import { parseDate } from '../../utils/parse.js'
+import { parseDate, parseCourseDate } from '../../utils/parse.js'
 import Course from './Course'
 
 const useStyles = makeStyles((theme) => ({
@@ -92,6 +92,11 @@ const CoursesList = () => {
   const [startDate, setStartDate] = useState(data.filters.startDate)
   const [endDate, setEndDate] = useState(data.filters.endDate)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const minStartDate = data.filters.minStartDate
+  const maxEndDate = data.filters.maxEndDate
+
+  const actions = allActions.coursesActions
+  const pageCountVariants = [5, 10, 20, 50]
 
   let roots = {}
 
@@ -99,10 +104,6 @@ const CoursesList = () => {
     roots.rootGroup = parseInt(data.rootGroup)
     if (roots.rootGroup === 3) roots.rootCathedra = data.rootCathedra
   }
-
-  const actions = allActions.coursesActions
-  const pageCountVariants = [5, 10, 20, 50]
-  const now = new Date()
 
   React.useEffect(() => {
     const filters = data.filters
@@ -220,9 +221,19 @@ const CoursesList = () => {
     setListenersWindowOpen(false)
   }
 
-  const approveFilterDate = (value, filter) => {
-    let currentDate = parseDate(value)
-    if (currentDate !== data.filters[filter] && currentDate)
+  const minDateLimits = (value) => {
+    if (value < minStartDate || value > maxEndDate) return minStartDate
+    return value
+  }
+
+  const maxDateLimits = (value) => {
+    if (value > maxEndDate || value < minStartDate) return maxEndDate
+    return value
+  }
+
+  const approveFilterDate = (value, minDate, maxDate, filter) => {
+    let currentDate = parseCourseDate(value, minDate, maxDate)
+    if (currentDate && currentDate !== data.filters[filter])
       handleFilterChange(filter, currentDate)
   }
 
@@ -349,40 +360,69 @@ const CoursesList = () => {
                 </TextField>
               </Grid>
             </Grid>
-            <Typography>Диапазон даты начала программы курса:</Typography>
-            <Grid container direction="row" alignItems="flex-start">
-              <Grid item className={classes.inlineDateField}>
-                <DateInput
-                  input={{ value: startDate }}
-                  name="startDate"
-                  views={['year', 'date']}
-                  minDate={new Date(now.getFullYear())}
-                  maxDate={endDate}
-                  dateformat="DD-MM-YYYY"
-                  placeholder="дд-мм-гггг"
-                  label="Начало периода"
-                  onChange={(value) => setStartDate(parseDate(value))}
-                  onAccept={(value) => approveFilterDate(value, 'startDate')}
-                  onBlur={(e) => approveFilterDate(e.target.value, 'startDate')}
-                />
-              </Grid>
-              <Grid item className={classes.inlineDateField}>
-                <DateInput
-                  input={{ value: endDate }}
-                  name="endDate"
-                  views={['year', 'date']}
-                  maxDate={now.setFullYear(now.getFullYear() + 3)}
-                  dateformat="DD-MM-YYYY"
-                  placeholder="дд-мм-гггг"
-                  label="Окончание периода"
-                  onChange={(value) => setEndDate(parseDate(value))}
-                  onAccept={(value) => approveFilterDate(value, 'endDate')}
-                  onBlur={(e) => approveFilterDate(e.target.value, 'endDate')}
-                />
-              </Grid>
-            </Grid>
           </Box>
         </Collapse>
+        <Typography>Диапазон даты начала программы курса:</Typography>
+        <Grid container direction="row" alignItems="flex-start">
+          <Grid item className={classes.inlineDateField}>
+            <DateInput
+              input={{ value: startDate }}
+              name="startDate"
+              views={['year', 'date']}
+              minDate={minStartDate}
+              maxDate={maxDateLimits(endDate)}
+              dateformat="DD-MM-YYYY"
+              placeholder="дд-мм-гггг"
+              label="Начало периода"
+              onChange={(value) => setStartDate(parseDate(value))}
+              onAccept={(value) =>
+                approveFilterDate(
+                  value,
+                  minStartDate,
+                  maxDateLimits(endDate),
+                  'startDate'
+                )
+              }
+              onBlur={(e) =>
+                approveFilterDate(
+                  e.target.value,
+                  minStartDate,
+                  endDate,
+                  'startDate'
+                )
+              }
+            />
+          </Grid>
+          <Grid item className={classes.inlineDateField}>
+            <DateInput
+              input={{ value: endDate }}
+              name="endDate"
+              views={['year', 'date']}
+              minDate={minDateLimits(startDate)}
+              maxDate={maxEndDate}
+              dateformat="DD-MM-YYYY"
+              placeholder="дд-мм-гггг"
+              label="Окончание периода"
+              onChange={(value) => setEndDate(parseDate(value))}
+              onAccept={(value) =>
+                approveFilterDate(
+                  value,
+                  minDateLimits(startDate),
+                  maxEndDate,
+                  'endDate'
+                )
+              }
+              onBlur={(e) =>
+                approveFilterDate(
+                  e.target.value,
+                  startDate,
+                  maxEndDate,
+                  'endDate'
+                )
+              }
+            />
+          </Grid>
+        </Grid>
         <Grid container direction="column" alignItems="flex-start">
           <Grid item>
             <Typography className={classes.bold}>

@@ -64,6 +64,7 @@ const ListenerInfo = ({ user, options, onClose }) => {
     instituteLabel: user.checks.institute.label,
     work: data.work,
     workCheck: data.workCheck,
+    requestCME: user.requestCME,
   }
 
   const handleSubmit = (values) => {
@@ -129,6 +130,9 @@ let ListenerInfoForm = (props) => {
   let work = null
   if (values.work) work = JSON.parse(values.work)
 
+  let requestCME = null
+  if (values.requestCME) requestCME = JSON.parse(values.requestCME)
+
   const radioButtons = [
     { value: '0', label: 'Не верно' },
     { value: '1', label: 'Верно' },
@@ -136,6 +140,7 @@ let ListenerInfoForm = (props) => {
 
   const username = userAPI.getUserName().toLowerCase()
   const [workInfoOpen, setWorkInfoOpen] = React.useState(false)
+  const [requestCMEInfoOpen, setRequestCMEInfoOpen] = React.useState(false)
 
   return (
     <form onSubmit={props.handleSubmit}>
@@ -164,16 +169,51 @@ let ListenerInfoForm = (props) => {
         component={Textarea}
         label={`Рецензия от института ДПО${values.instituteLabel}`}
       />
-      <Typography className={classes.typography}>Документы</Typography>
-      {values.documents.map((document, index) => {
-        return (
-          <ListenerInfoDocument
-            key={document.id}
-            document={document}
-            index={index}
-          />
-        )
-      })}
+      {requestCME && (
+        <>
+          <Grid
+            container
+            alignItems="center"
+            onClick={() => setRequestCMEInfoOpen(!requestCMEInfoOpen)}
+            className={classes.pointer}
+            direction="row"
+            style={{ margin: '4px 0' }}
+          >
+            <Grid item>
+              <IconButton size="small" className={classes.startIcon}>
+                {requestCMEInfoOpen ? (
+                  <KeyboardArrowUpIcon />
+                ) : (
+                  <KeyboardArrowDownIcon />
+                )}
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <Typography>Заявка с портала НМО</Typography>
+            </Grid>
+          </Grid>
+          <Collapse in={requestCMEInfoOpen} timeout="auto" unmountOnExit>
+            <Box margin={0.5}>
+              <TableContainer component={Paper}>
+                <Table size="small">
+                  <TableBody>
+                    <TableRow>
+                      <TableCell style={{ width: '25%' }} align="right">
+                        Специальность
+                      </TableCell>
+                      <TableCell align="left">{requestCME[0]}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="right">Номер документа</TableCell>
+                      <TableCell align="left">{requestCME[1]}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          </Collapse>
+        </>
+      )}
       {work && (
         <>
           <Grid
@@ -247,6 +287,16 @@ let ListenerInfoForm = (props) => {
           </Collapse>
         </>
       )}
+      <Typography className={classes.typography}>Документы</Typography>
+      {values.documents.map((document, index) => {
+        return (
+          <ListenerInfoDocument
+            key={document.id}
+            document={document}
+            index={index}
+          />
+        )
+      })}
     </form>
   )
 }

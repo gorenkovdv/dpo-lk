@@ -22,6 +22,21 @@ export function requestsReducer(state = initialState, action) {
         list: action.payload,
         isLoading: false,
       }
+    case 'REQUESTS_CME_REQUEST_UPDATE':
+      return {
+        ...state,
+        list: state.list.map((request) => {
+          if (request.rowID !== action.payload.rowID) return request
+
+          return {
+            ...request,
+            RequestCME: JSON.stringify([
+              action.payload.speciality,
+              action.payload.number,
+            ]),
+          }
+        }),
+      }
     default:
       return state
   }

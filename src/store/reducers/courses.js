@@ -3,7 +3,7 @@ import * as moment from 'moment'
 const initialState = {
   list: {},
   filters: {
-    searchString: '',
+    searchString: 'общая физиотерапия',
     enrolPossible: true,
     CME: true,
     traditional: true,
@@ -16,6 +16,8 @@ const initialState = {
     currentVolume: 0,
     startDate: moment().add(-60, 'day').format('YYYY-MM-DD'),
     endDate: moment().add(2, 'years').format('YYYY-MM-DD'),
+    minStartDate: moment().startOf('year').format('YYYY-MM-DD'),
+    maxEndDate: moment().add(3, 'years').format('YYYY-MM-DD'),
   },
   volumeList: {},
   isLoading: false,

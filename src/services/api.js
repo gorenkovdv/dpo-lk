@@ -222,4 +222,8 @@ export const requestsAPI = {
       qs.stringify({ courseID, uid })
     )
   },
+
+  async updateCMERequest(data) {
+    return await instance.post(`update_CME_request.php`, qs.stringify(data))
+  },
 }

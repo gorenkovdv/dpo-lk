@@ -34,6 +34,7 @@ const requestCourses = (page, count, filters) => async (dispatch) => {
   const response = await coursesAPI.getCoursesList(page, count, filters)
 
   console.log(response.data)
+
   if (response.data.response)
     dispatch(
       loadingSuccess({
@@ -87,15 +88,15 @@ const createCancelRequest = async (
 }
 
 const createRequest = (course) => async (dispatch) => {
-  const message = `Подана заявка на обучение по программе «${course.name}»`
+  const message = `Подана заявка на обучение по программе «${course.Name}»`
   const apiMethod = requestsAPI.createRequest
-  createCancelRequest(dispatch, course.id, apiMethod, 1, message)
+  createCancelRequest(dispatch, course.ID, apiMethod, 1, message)
 }
 
 const cancelRequest = (course) => async (dispatch) => {
-  const message = `Заявка на обучение по программе «${course.name}» отменена`
+  const message = `Заявка на обучение по программе «${course.Name}» отменена`
   const apiMethod = requestsAPI.cancelRequest
-  createCancelRequest(dispatch, course.id, apiMethod, 0, message)
+  createCancelRequest(dispatch, course.ID, apiMethod, 0, message)
 }
 
 const removeCourseRequest = (courseID, userID) => async (dispatch) => {

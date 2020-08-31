@@ -7,9 +7,9 @@ import { makeStyles } from '@material-ui/core/styles'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import { MaskedInput } from '../Commons/FormsControls/FormsControls'
+import { required, isStringContainsUnderscore } from '../../utils/validate.js'
 import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
-import { isStringContainsUnderscore } from '../../utils/validate.js'
 import styles from '../../styles.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -118,8 +118,8 @@ const ChooseType = () => {
         options={selectEntityDialogParams}
         onClose={selectEntityDialogClose}
         onApprove={() => dispatch(submit('ITNForm'))}
-        approveButtonText="Подтвердить"
-        cancelButtonText="Отмена"
+        approveText="Подтвердить"
+        cancelText="Отмена"
         title="Вход в личный кабинет"
         text="Для входа в личный кабинет представителя юридического лица необходимо указать ИНН юридического лица"
       >
@@ -130,17 +130,24 @@ const ChooseType = () => {
 }
 
 let ITNForm = (props) => {
+  const ITNFieldRef = React.useRef(null)
+
+  React.useEffect(() => {
+    ITNFieldRef.current.focus()
+  }, [])
+
   return (
     <form onSubmit={props.handleSubmit}>
       <Field
-        autoFocus
         fullWidth
+        inputRef={ITNFieldRef}
         name="ITN"
         variant="standard"
         label="Введите ИНН юридического лица"
         mask={`99999999999`}
-        validate={[isStringContainsUnderscore]}
         component={MaskedInput}
+        validate={[required, isStringContainsUnderscore]}
+        required
       />
     </form>
   )
