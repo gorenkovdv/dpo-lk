@@ -25,8 +25,7 @@ const initialState = {
   totalCount: 0,
   pageSize: 5,
   currentPage: 1,
-  rootGroup: null,
-  rootCathedra: null,
+  roots: { group: null, cathedra: null },
   listenerInfo: {},
   isListenerInfoLoading: false,
   selectedCourse: null,
@@ -44,7 +43,7 @@ export function coursesReducer(state = initialState, action) {
         ...state,
         isPageLoading: true,
       }
-    case 'COURSE_SET_LISTENER_INFO_LOADING':
+    case 'COURSES_SET_LISTENER_INFO_LOADING':
       return {
         ...state,
         listenerInfo: {
@@ -57,7 +56,7 @@ export function coursesReducer(state = initialState, action) {
         ...state,
         selectedCourse: action.payload,
       }
-    case 'COURSE_CHANGE_REQUEST_STATUS':
+    case 'COURSES_CHANGE_REQUEST_STATUS':
       return {
         ...state,
         isPageLoading: false,
@@ -76,7 +75,7 @@ export function coursesReducer(state = initialState, action) {
           return course
         }),
       }
-    case 'COURSE_REQUEST_REMOVED':
+    case 'COURSES_REQUEST_REMOVED':
       return {
         ...state,
         list: state.list.map((course, index) => {
@@ -112,12 +111,14 @@ export function coursesReducer(state = initialState, action) {
         pageSize: action.payload.pageSize
           ? action.payload.pageSize
           : state.pageSize,
-        rootGroup: action.payload.rootGroup,
-        rootCathedra: action.payload.rootCathedra,
+        roots: {
+          group: action.payload.rootGroup,
+          cathedra: action.payload.rootCathedra,
+        },
         isLoading: false,
         isPageLoading: false,
       }
-    case 'COURSE_SET_LISTENER_INFO':
+    case 'COURSES_SET_LISTENER_INFO':
       return {
         ...state,
         listenerInfo: {
@@ -125,7 +126,7 @@ export function coursesReducer(state = initialState, action) {
           isListenerInfoLoading: false,
         },
       }
-    case 'COURSE_CHECK_DATA_SAVED':
+    case 'COURSES_CHECK_DATA_SAVED':
       return {
         ...state,
         listenerInfo: {

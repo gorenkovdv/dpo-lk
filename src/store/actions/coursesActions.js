@@ -8,7 +8,7 @@ const setPageLoading = () => {
   return { type: 'COURSES_SET_PAGE_LOADING' }
 }
 const setListenerInfoLoading = () => {
-  return { type: 'COURSE_SET_LISTENER_INFO_LOADING' }
+  return { type: 'COURSES_SET_LISTENER_INFO_LOADING' }
 }
 const loadingSuccess = (data) => {
   return { type: 'COURSES_LOADING_SUCCESS', payload: data }
@@ -17,23 +17,23 @@ const setSelectedCourse = (data) => {
   return { type: 'COURSES_SET_SELECTED_COURSE', payload: data }
 }
 const setListenerInfo = (data) => {
-  return { type: 'COURSE_SET_LISTENER_INFO', payload: data }
+  return { type: 'COURSES_SET_LISTENER_INFO', payload: data }
 }
 const changeRequestStatus = (data) => {
-  return { type: 'COURSE_CHANGE_REQUEST_STATUS', payload: data }
+  return { type: 'COURSES_CHANGE_REQUEST_STATUS', payload: data }
 }
 const courseRequestRemoved = (data) => {
-  return { type: 'COURSE_REQUEST_REMOVED', payload: data }
+  return { type: 'COURSES_REQUEST_REMOVED', payload: data }
 }
 const checkDataSaved = (data) => {
-  return { type: 'COURSE_CHECK_DATA_SAVED', payload: data }
+  return { type: 'COURSES_CHECK_DATA_SAVED', payload: data }
 }
 
 const requestCourses = (page, count, filters) => async (dispatch) => {
   dispatch(setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
 
-  console.log(response.data)
+  //console.log(response.data)
 
   if (response.data.response)
     dispatch(

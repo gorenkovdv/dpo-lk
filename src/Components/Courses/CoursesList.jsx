@@ -98,13 +98,6 @@ const CoursesList = () => {
   const actions = allActions.coursesActions
   const pageCountVariants = [5, 10, 20, 50]
 
-  let roots = {}
-
-  if (data.rootGroup) {
-    roots.rootGroup = parseInt(data.rootGroup)
-    if (roots.rootGroup === 3) roots.rootCathedra = data.rootCathedra
-  }
-
   React.useEffect(() => {
     const filters = data.filters
     dispatch(actions.requestCourses(data.currentPage, data.pageSize, filters))
@@ -520,7 +513,7 @@ const CoursesList = () => {
                     <TableCell style={{ minWidth: 185 }} align="center">
                       Подача заявки
                     </TableCell>
-                    {data.rootGroup ? (
+                    {data.roots.group ? (
                       <TableCell align="center">
                         Слушатели, подавшие заявки
                       </TableCell>
@@ -533,7 +526,7 @@ const CoursesList = () => {
                       onSubmitRequest={submitRequestDialogOpen}
                       onCancelRequest={cancelRequestDialogOpen}
                       onModalOpen={openListenersWindow}
-                      roots={roots}
+                      roots={data.roots}
                       key={course.ID}
                       course={course}
                     />

@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const Course = ({
-  roots: { rootGroup, rootCathedra },
+  roots,
   course,
   onModalOpen,
   onSubmitRequest,
@@ -50,18 +50,19 @@ const Course = ({
   const [open, setOpen] = React.useState(false)
   const isListener = sessionStorage.pagesType === 'listener'
   let currentCourse = { ID: course.ID, Name: course.Name }
+  const rootsGroup = parseInt(roots.group)
 
   const isRequestDateExpired =
     moment().format('YYYY-MM-DD') <=
     moment(course.RequestDate).format('YYYY-MM-DD')
 
   const showUsers = (course) => {
-    if (!rootGroup) return false
+    if (!rootsGroup) return false
 
     return (
       course.users.length &&
-      ([1, 2].includes(rootGroup) ||
-        (rootGroup === 3 && course.DepartmentGUID === rootCathedra))
+      ([1, 2].includes(rootsGroup) ||
+        (rootsGroup === 3 && course.DepartmentGUID === roots.cathedra))
     )
   }
 
@@ -153,7 +154,7 @@ const Course = ({
             </small>
           )}
         </TableCell>
-        {rootGroup ? (
+        {rootsGroup ? (
           <TableCell align="center">
             <Typography>{course.users.length}</Typography>
             {showUsers(course) ? (
@@ -167,7 +168,7 @@ const Course = ({
       <TableRow>
         <TableCell
           style={{ paddingBottom: 0, paddingTop: 0 }}
-          colSpan={rootGroup ? 8 : 7}
+          colSpan={rootsGroup ? 8 : 7}
         >
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>

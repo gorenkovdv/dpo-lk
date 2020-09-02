@@ -100,8 +100,11 @@ export const MaskedInput = ({ input, meta: { touched, error }, ...props }) => {
   const classes = useStyles()
   const hasError = touched && error !== undefined
 
+  let maskProps = { ...props }
+  if (maskProps.inputRef) delete maskProps.inputRef
+
   return (
-    <InputMask mask={props.mask} {...input}>
+    <InputMask {...maskProps} {...input}>
       {() => (
         <TextField
           {...props}

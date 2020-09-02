@@ -46,28 +46,39 @@ const useStyles = makeStyles((theme) => ({
 
 const ListenerInfo = ({ user, options, onClose }) => {
   const dispatch = useDispatch()
-
   const data = useSelector((state) => state.courses.listenerInfo)
+
+  const roots = useSelector((state) => state.courses.roots)
+  const rootsGroup = parseInt(roots.group)
+  const cathedraRoots = rootsGroup === 3
+  const instituteRoots = [1, 2].includes(rootsGroup)
 
   React.useEffect(() => {
     dispatch(allActions.coursesActions.getListenerInfo(user.id))
   }, [dispatch, user.id])
 
   const initialValues = {
-    cathedraAllow: Boolean(user.cathedraAllow),
-    instituteAllow: Boolean(user.instituteAllow),
     documents: data.documents,
     comment: user.comment,
-    cathedraComment: user.checks.cathedra.comment,
-    cathedraLabel: user.checks.cathedra.label,
-    instituteComment: user.checks.institute.comment,
-    instituteLabel: user.checks.institute.label,
     work: data.work,
     workCheck: data.workCheck,
     requestCME: user.requestCME,
   }
 
+  if (cathedraRoots || instituteRoots) {
+    initialValues.cathedraAllow = Boolean(user.cathedraAllow)
+    initialValues.cathedraComment = user.checks.cathedra.comment
+    initialValues.cathedraLabel = user.checks.cathedra.label
+  }
+
+  if (instituteRoots) {
+    initialValues.instituteAllow = Boolean(user.instituteAllow)
+    initialValues.instituteComment = user.checks.institute.comment
+    initialValues.instituteLabel = user.checks.institute.label
+  }
+
   const handleSubmit = (values) => {
+    console.log(values)
     dispatch(
       allActions.coursesActions.saveCheckData(user.id, user.rowID, values)
     )
@@ -126,6 +137,8 @@ const ListenerInfo = ({ user, options, onClose }) => {
 let ListenerInfoForm = (props) => {
   const classes = useStyles()
   const values = props.initialValues
+  const [workInfoOpen, setWorkInfoOpen] = React.useState(false)
+  const [requestCMEInfoOpen, setRequestCMEInfoOpen] = React.useState(false)
 
   let work = null
   if (values.work) work = JSON.parse(values.work)
@@ -139,19 +152,21 @@ let ListenerInfoForm = (props) => {
   ]
 
   const username = userAPI.getUserName().toLowerCase()
-  const [workInfoOpen, setWorkInfoOpen] = React.useState(false)
-  const [requestCMEInfoOpen, setRequestCMEInfoOpen] = React.useState(false)
 
   return (
     <form onSubmit={props.handleSubmit}>
       <Typography className={classes.typography}>Допуск к курсу</Typography>
       <FormGroup row>
-        <Field name="cathedraAllow" component={Switcher} label="Кафедра" />
-        <Field
-          name="instituteAllow"
-          component={Switcher}
-          label="Институт ДПО"
-        />
+        {props.initialValues.cathedraAllow !== undefined && (
+          <Field name="cathedraAllow" component={Switcher} label="Кафедра" />
+        )}
+        {props.initialValues.instituteAllow !== undefined && (
+          <Field
+            name="instituteAllow"
+            component={Switcher}
+            label="Институт ДПО"
+          />
+        )}
       </FormGroup>
       <Typography className={classes.typography}>Рецензии</Typography>
       <Field
@@ -159,16 +174,20 @@ let ListenerInfoForm = (props) => {
         component={Textarea}
         label="Примечание (видно только рецензентам!)"
       />
-      <Field
-        name="cathedraComment"
-        component={Textarea}
-        label={`Рецензия от кафедры${values.cathedraLabel}`}
-      />
-      <Field
-        name="instituteComment"
-        component={Textarea}
-        label={`Рецензия от института ДПО${values.instituteLabel}`}
-      />
+      {props.initialValues.cathedraComment !== undefined && (
+        <Field
+          name="cathedraComment"
+          component={Textarea}
+          label={`Рецензия от кафедры${values.cathedraLabel}`}
+        />
+      )}
+      {props.initialValues.instituteComment !== undefined && (
+        <Field
+          name="instituteComment"
+          component={Textarea}
+          label={`Рецензия от института ДПО${values.instituteLabel}`}
+        />
+      )}
       {requestCME && (
         <>
           <Grid
