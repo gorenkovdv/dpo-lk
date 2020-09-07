@@ -8,23 +8,16 @@ const initialState = {
     sertificates: {},
     others: {},
   },
-  isLoading: false,
   selectedTab: 0,
   documentsTab: 0,
 }
 
 export function listenerDataReducer(state = initialState, action) {
   switch (action.type) {
-    case 'LISTENER_DATA_LOAD_REQUEST':
-      return {
-        ...state,
-        isLoading: true,
-      }
     case 'LISTENER_DATA_LOAD_SUCCESS':
       return {
         ...state,
         list: action.payload,
-        isLoading: false,
       }
     case 'LISTENER_DATA_SET_SELECTED_TAB':
       return {

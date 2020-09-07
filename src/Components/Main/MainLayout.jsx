@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { CssBaseline } from '@material-ui/core'
+import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import {
   ThemeProvider,
   createMuiTheme,
@@ -11,7 +12,7 @@ import DrawerLayout from './DrawerLayout'
 import { userAPI } from '../../services/api'
 import { DRAWER_WIDTH } from '../../store/const.js'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
   content: {
     [theme.breakpoints.up('sm')]: {
@@ -22,7 +23,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const MainLayout = Component => props => {
+const MainLayout = (Component) => (props) => {
   const { container } = props
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -73,6 +74,8 @@ const MainLayout = Component => props => {
           <div className={classes.toolbar} />
           <Component {...props} pagesType={pagesType} />
         </main>
+
+        <LoaderLayout />
       </div>
     </ThemeProvider>
   )

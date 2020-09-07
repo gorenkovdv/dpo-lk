@@ -3,13 +3,7 @@ import { Redirect, withRouter } from 'react-router-dom'
 import { compose } from 'redux'
 import { Field, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  Grid,
-  Typography,
-  InputAdornment,
-  MenuItem,
-  Button,
-} from '@material-ui/core'
+import { Typography, InputAdornment, MenuItem, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Save as SaveIcon } from '@material-ui/icons'
 import {
@@ -22,7 +16,6 @@ import {
   localityTooltip,
   streetTooltip,
 } from '../Commons/Tooltips/AddressTooltips'
-import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import MainLayout from '../Main/MainLayout'
 import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
@@ -35,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
 
 const EntityData = (props) => {
   const dispatch = useDispatch()
+  const isLoading = useSelector((state) => state.loader.isLoading)
   const data = useSelector((state) => state.entityData)
   const actions = allActions.entityDataActions
 
@@ -48,12 +42,7 @@ const EntityData = (props) => {
 
   if (props.pagesType === 'listener') return <Redirect to="/listener/data" />
 
-  if (data.isLoading)
-    return (
-      <Grid container direction="row" justify="center">
-        <LoaderLayout />
-      </Grid>
-    )
+  if (isLoading) return null
 
   return data.list.roots ? (
     <EntityDataForm onSubmit={handleSubmit} initialValues={data.list} />

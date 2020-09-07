@@ -28,7 +28,6 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import MainLayout from '../Main/MainLayout'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import { DateInput } from '../Commons/FormsControls/FormsControls'
-import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import ListenersWindow from './ListenersWindow'
 import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
@@ -87,6 +86,7 @@ const CheckboxInput = ({ checked, onFilterChange, edited, label }) => {
 const CoursesList = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const isLoading = useSelector((state) => state.loader.isLoading)
   const data = useSelector((state) => state.courses)
   const [searchString, setSearchString] = useState(data.filters.searchString)
   const [startDate, setStartDate] = useState(data.filters.startDate)
@@ -230,12 +230,7 @@ const CoursesList = () => {
       handleFilterChange(filter, currentDate)
   }
 
-  if (data.isLoading)
-    return (
-      <Grid container direction="row" justify="center">
-        <LoaderLayout />
-      </Grid>
-    )
+  if (isLoading) return null
 
   return (
     <>
@@ -538,11 +533,7 @@ const CoursesList = () => {
         ) : (
           <Typography>Список программ пуст</Typography>
         )
-      ) : (
-        <Grid container direction="row" justify="center">
-          <LoaderLayout />
-        </Grid>
-      )}
+      ) : null}
       <DialogLayout
         options={submitRequestDialogParams}
         onClose={submitRequestDialogClose}

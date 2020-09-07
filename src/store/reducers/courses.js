@@ -20,8 +20,6 @@ const initialState = {
     maxEndDate: moment().add(3, 'years').format('YYYY-MM-DD'),
   },
   volumeList: {},
-  isLoading: false,
-  isPageLoading: false,
   totalCount: 0,
   pageSize: 5,
   currentPage: 1,
@@ -33,17 +31,7 @@ const initialState = {
 
 export function coursesReducer(state = initialState, action) {
   switch (action.type) {
-    case 'COURSES_SET_LOADING':
-      return {
-        ...state,
-        isLoading: true,
-      }
-    case 'COURSES_SET_PAGE_LOADING':
-      return {
-        ...state,
-        isPageLoading: true,
-      }
-    case 'COURSES_SET_LISTENER_INFO_LOADING':
+    case 'COURSE_SET_LISTENER_INFO_LOADING':
       return {
         ...state,
         listenerInfo: {
@@ -59,7 +47,6 @@ export function coursesReducer(state = initialState, action) {
     case 'COURSES_CHANGE_REQUEST_STATUS':
       return {
         ...state,
-        isPageLoading: false,
         list: state.list.map((course, index) => {
           if (course.ID === action.payload.course) {
             return {
@@ -115,15 +102,13 @@ export function coursesReducer(state = initialState, action) {
           group: action.payload.rootGroup,
           cathedra: action.payload.rootCathedra,
         },
-        isLoading: false,
-        isPageLoading: false,
       }
     case 'COURSES_SET_LISTENER_INFO':
       return {
         ...state,
         listenerInfo: {
-          ...action.payload,
           isListenerInfoLoading: false,
+          ...action.payload,
         },
       }
     case 'COURSES_CHECK_DATA_SAVED':

@@ -78,7 +78,6 @@ const ListenerInfo = ({ user, options, onClose }) => {
   }
 
   const handleSubmit = (values) => {
-    console.log(values)
     dispatch(
       allActions.coursesActions.saveCheckData(user.id, user.rowID, values)
     )

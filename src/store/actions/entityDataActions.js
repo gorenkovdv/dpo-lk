@@ -1,10 +1,8 @@
 import { entityAPI } from '../../services/api'
 import snackbarActions from './snackbarActions'
+import loaderActions from './loaderActions'
 import history from '../../history'
 
-const setLoading = () => {
-  return { type: 'ENTITY_DATA_LOAD_REQUEST' }
-}
 const loadingSuccess = (data) => {
   return { type: 'ENTITY_DATA_LOAD_SUCCESS', payload: data }
 }
@@ -29,14 +27,15 @@ const checkEntityRoots = () => async (dispatch) => {
 }
 
 const requestEntityData = () => async (dispatch) => {
-  dispatch(setLoading())
+  dispatch(loaderActions.setLoading())
   const response = await entityAPI.getEntityData()
 
-  if (response.data.response)
+  if (response.data.response) {
     dispatch(
       loadingSuccess({ ...response.data.entity, roots: response.data.roots })
     )
-  else dispatch(snackbarActions.showError(response.data.error))
+    dispatch(loaderActions.loadingSuccess())
+  } else dispatch(snackbarActions.showError(response.data.error))
 }
 
 const updateEntityData = (data) => async (dispatch) => {

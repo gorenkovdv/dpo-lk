@@ -1,14 +1,9 @@
 import { coursesAPI, requestsAPI, userAPI } from '../../services/api'
 import snackbarActions from './snackbarActions'
+import loaderActions from './loaderActions'
 
-const setLoading = () => {
-  return { type: 'COURSES_SET_LOADING' }
-}
-const setPageLoading = () => {
-  return { type: 'COURSES_SET_PAGE_LOADING' }
-}
 const setListenerInfoLoading = () => {
-  return { type: 'COURSES_SET_LISTENER_INFO_LOADING' }
+  return { type: 'COURSE_SET_LISTENER_INFO_LOADING' }
 }
 const loadingSuccess = (data) => {
   return { type: 'COURSES_LOADING_SUCCESS', payload: data }
@@ -30,12 +25,10 @@ const checkDataSaved = (data) => {
 }
 
 const requestCourses = (page, count, filters) => async (dispatch) => {
-  dispatch(setLoading())
+  dispatch(loaderActions.setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
 
-  //console.log(response.data)
-
-  if (response.data.response)
+  if (response.data.response) {
     dispatch(
       loadingSuccess({
         courses: response.data.courses,
@@ -45,15 +38,15 @@ const requestCourses = (page, count, filters) => async (dispatch) => {
         rootCathedra: response.data.rootCathedra,
       })
     )
-  else dispatch(snackbarActions.showError(response.data.error))
+    dispatch(loaderActions.loadingSuccess())
+  } else dispatch(snackbarActions.showError(response.data.error))
 }
 
 const changeListParams = (page, count, filters) => async (dispatch) => {
-  dispatch(setPageLoading())
+  dispatch(loaderActions.setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
 
-  console.log(response.data)
-  if (response.data.response)
+  if (response.data.response) {
     dispatch(
       loadingSuccess({
         courses: response.data.courses,
@@ -65,7 +58,8 @@ const changeListParams = (page, count, filters) => async (dispatch) => {
         rootCathedra: response.data.rootCathedra,
       })
     )
-  else dispatch(snackbarActions.showError(response.data.error))
+    dispatch(loaderActions.loadingSuccess())
+  } else dispatch(snackbarActions.showError(response.data.error))
 }
 
 const createCancelRequest = async (
@@ -75,7 +69,7 @@ const createCancelRequest = async (
   haveRequest,
   successMessage
 ) => {
-  dispatch(setPageLoading())
+  dispatch(loaderActions.setLoading())
   const response = await apiMethod(course)
   console.log(response.data)
   const users = response.data.users
@@ -84,6 +78,7 @@ const createCancelRequest = async (
     const uid = userAPI.getUID()
     dispatch(changeRequestStatus({ course, users, haveRequest, uid }))
     dispatch(snackbarActions.showSuccess(successMessage))
+    dispatch(loaderActions.loadingSuccess())
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
@@ -119,6 +114,7 @@ const getListenerInfo = (userID) => async (dispatch) => {
         documents: response.data.documents,
       })
     )
+    dispatch(loaderActions.loadingSuccess())
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 

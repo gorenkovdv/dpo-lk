@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { compose } from 'redux'
 import { Field, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { Grid, Button, Typography, InputAdornment } from '@material-ui/core'
+import { Button, Typography, InputAdornment } from '@material-ui/core'
 import {
   Save as SaveIcon,
   Phone as PhoneIcon,
@@ -12,7 +12,6 @@ import {
 import { makeStyles } from '@material-ui/core/styles'
 import MainLayout from '../Main/MainLayout'
 import withAuth from '../Authorization/withAuth'
-import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import {
   Input,
   MaskedInput,
@@ -37,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
 const Profile = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const isLoading = useSelector((state) => state.loader.isLoading)
   const data = useSelector((state) => state.profile)
   const actions = allActions.profileActions
 
@@ -58,12 +58,7 @@ const Profile = (props) => {
     else dispatch(actions.updateProfile(values))
   }
 
-  if (data.isLoading)
-    return (
-      <Grid container direction="row" justify="center">
-        <LoaderLayout />
-      </Grid>
-    )
+  if (isLoading) return null
 
   return (
     <>

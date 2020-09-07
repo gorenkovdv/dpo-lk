@@ -1,9 +1,7 @@
 import { profileAPI, documentAPI } from '../../services/api'
 import snackbarActions from './snackbarActions'
+import loaderActions from './loaderActions'
 
-const setLoading = () => {
-  return { type: 'LISTENER_DATA_LOAD_REQUEST' }
-}
 const loadingSuccess = (data) => {
   return { type: 'LISTENER_DATA_LOAD_SUCCESS', payload: data }
 }
@@ -17,12 +15,12 @@ const setDocumentsTab = (value) => {
 }
 
 const requestListenerData = (selectedTab) => async (dispatch) => {
-  dispatch(setLoading())
+  dispatch(loaderActions.setLoading())
 
   const response = await profileAPI.getListenerData(selectedTab)
-  console.log(response.data)
   if (response.data.response) {
     dispatch(loadingSuccess(response.data))
+    dispatch(loaderActions.loadingSuccess())
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
@@ -79,7 +77,6 @@ const dataUpdated = (data, type) => {
 const updateData = (data, type) => async (dispatch) => {
   const response = await profileAPI.setListenerData(data, type)
 
-  //console.log(response.data)
   if (response.data.response) {
     dispatch(dataUpdated(response.data.output, type))
     dispatch(snackbarActions.showSuccess('Данные успешно обновлены'))

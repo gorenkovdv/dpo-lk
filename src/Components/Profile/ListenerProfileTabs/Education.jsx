@@ -25,7 +25,6 @@ import {
   FileInput,
 } from '../../Commons/FormsControls/FormsControls'
 import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
-import LoaderLayout from '../../Commons/Loader/LoaderLayout'
 import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
 import DialogLayout from '../../Commons/Dialog/DialogLayout'
 import { SAVE_FILES_DIRECTORY } from '../../../store/const.js'
@@ -96,6 +95,7 @@ tooltips[5] = tooltips[4]
 const Education = ({ username }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const isLoading = useSelector((state) => state.loader.isLoading)
   const allData = useSelector((state) => state.listenerData)
   const data = allData.list
   const level = data.education.currentLevel || 0
@@ -202,12 +202,7 @@ const Education = ({ username }) => {
     )
   }
 
-  if (allData.isLoading)
-    return (
-      <Grid container direction="row" justify="center">
-        <LoaderLayout />
-      </Grid>
-    )
+  if (isLoading) return null
 
   return (
     <>

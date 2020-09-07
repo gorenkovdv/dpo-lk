@@ -1,9 +1,6 @@
 import { requestsAPI } from '../../services/api'
 import snackbarActions from './snackbarActions'
-
-const setLoading = () => {
-  return { type: 'REQUESTS_SET_LOADING' }
-}
+import loaderActions from './loaderActions'
 
 const loadingSuccess = (data) => {
   return { type: 'REQUESTS_LOADING_SUCCESS', payload: data }
@@ -18,16 +15,18 @@ const CMERequestUpdated = (data) => {
 }
 
 const getRequests = () => async (dispatch) => {
-  dispatch(setLoading())
+  dispatch(loaderActions.setLoading())
 
   const response = await requestsAPI.getRequests()
 
-  if (response.data.response) dispatch(loadingSuccess(response.data.requests))
-  else dispatch(snackbarActions.showError(response.data.error))
+  if (response.data.response) {
+    dispatch(loadingSuccess(response.data.requests))
+    dispatch(loaderActions.loadingSuccess())
+  } else dispatch(snackbarActions.showError(response.data.error))
 }
 
 const cancelRequest = (course, uid) => async (dispatch) => {
-  dispatch(setLoading())
+  dispatch(loaderActions.setLoading())
 
   const response = await requestsAPI.cancelRequest(course.id, uid)
   if (response.data.response) {
@@ -37,12 +36,12 @@ const cancelRequest = (course, uid) => async (dispatch) => {
         `Заявка на обучение по программе «${course.name}» отменена`
       )
     )
+    dispatch(loaderActions.loadingSuccess())
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
 const updateCMERequest = (data) => async (dispatch) => {
   const response = await requestsAPI.updateCMERequest(data)
-  console.log(response.data)
 
   if (response.data.response) dispatch(CMERequestUpdated(data))
   else dispatch(snackbarActions.showError(response.data.error))

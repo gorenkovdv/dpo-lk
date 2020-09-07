@@ -2,9 +2,8 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
-import { Grid, Typography } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import MainLayout from '../Main/MainLayout'
-import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -24,6 +23,7 @@ const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
 const RequestsList = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const isLoading = useSelector((state) => state.loader.isLoading)
   const data = useSelector((state) => state.requests)
   const actions = allActions.requestsActions
   const [selectedCourse, setSelectedCourse] = React.useState(null)
@@ -52,12 +52,7 @@ const RequestsList = () => {
     dispatch(actions.cancelRequest(selectedCourse, userAPI.getUID()))
   }
 
-  if (data.isLoading)
-    return (
-      <Grid container direction="row" justify="center">
-        <LoaderLayout />
-      </Grid>
-    )
+  if (isLoading) return null
 
   return (
     <>
