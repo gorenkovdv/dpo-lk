@@ -24,6 +24,18 @@ const checkDataSaved = (data) => {
   return { type: 'COURSES_CHECK_DATA_SAVED', payload: data }
 }
 
+const setListenersOptionsLoading = () => {
+  return { type: 'COURSES_LISTENERS_OPTIONS_LOADING' }
+}
+
+const setListenersOptions = (data) => {
+  return { type: 'COURSES_SET_LISTENERS_OPTIONS', payload: data }
+}
+
+const addListenerToList = (data) => {
+  return { type: 'COURSES_ADD_LISTENER_TO_LIST', payload: data }
+}
+
 const requestCourses = (page, count, filters) => async (dispatch) => {
   dispatch(loaderActions.setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
@@ -114,8 +126,21 @@ const getListenerInfo = (userID) => async (dispatch) => {
         documents: response.data.documents,
       })
     )
-    dispatch(loaderActions.loadingSuccess())
   } else dispatch(snackbarActions.showError(response.data.error))
+}
+
+const getListenersOptions = (value) => async (dispatch) => {
+  dispatch(setListenersOptionsLoading())
+
+  if (value.length > 3) {
+    const response = await coursesAPI.getListenersOptions(value)
+
+    if (response.data.response)
+      dispatch(setListenersOptions(response.data.listeners))
+    else dispatch(snackbarActions.showError(response.data.error))
+  } else {
+    dispatch(setListenersOptions([]))
+  }
 }
 
 const saveCheckData = (userID, rowID, data) => async (dispatch) => {
@@ -154,4 +179,6 @@ export default {
   getListenerInfo,
   removeCourseRequest,
   saveCheckData,
+  getListenersOptions,
+  addListenerToList,
 }

@@ -202,6 +202,9 @@ export const coursesAPI = {
       qs.stringify({ userID, rowID, data })
     )
   },
+  async getListenersOptions(value) {
+    return await instance.get(`get_listeners_options.php?value=${value}`)
+  },
 }
 
 export const requestsAPI = {

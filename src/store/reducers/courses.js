@@ -24,9 +24,15 @@ const initialState = {
   pageSize: 5,
   currentPage: 1,
   roots: { group: null, cathedra: null },
-  listenerInfo: {},
-  isListenerInfoLoading: false,
+  listenerInfo: {
+    isListenerInfoLoading: false,
+  },
   selectedCourse: null,
+  listenersAddition: {
+    isLoading: false,
+    options: [],
+    list: [],
+  },
 }
 
 export function coursesReducer(state = initialState, action) {
@@ -107,8 +113,8 @@ export function coursesReducer(state = initialState, action) {
       return {
         ...state,
         listenerInfo: {
-          isListenerInfoLoading: false,
           ...action.payload,
+          isListenerInfoLoading: false,
         },
       }
     case 'COURSES_CHECK_DATA_SAVED':
@@ -172,6 +178,48 @@ export function coursesReducer(state = initialState, action) {
             }),
           }
         }),
+      }
+    case 'COURSES_LISTENERS_OPTIONS_LOADING':
+      return {
+        ...state,
+        listenersAddition: {
+          ...state.listenersAddition,
+          isLoading: true,
+        },
+      }
+    case 'COURSES_SET_LISTENERS_OPTIONS':
+      return {
+        ...state,
+        listenersAddition: {
+          ...state.listenersAddition,
+          isLoading: false,
+          options: action.payload.map((user) => {
+            let isUserAdded = false
+
+            state.listenersAddition.list.map((addedUser) => {
+              if (addedUser.id === user.id) isUserAdded = true
+              return null
+            })
+
+            return {
+              id: user.id,
+              name: user.fullname,
+              isUserAdded,
+            }
+          }),
+        },
+      }
+    case 'COURSES_ADD_LISTENER_TO_LIST':
+      return {
+        ...state,
+        listenersAddition: {
+          ...state.listenersAddition,
+          list: state.listenersAddition.list
+            .map((user) => {
+              return user
+            })
+            .concat(action.payload),
+        },
       }
     default:
       return state

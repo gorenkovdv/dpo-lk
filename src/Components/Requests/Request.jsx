@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { Field, reduxForm, submit } from 'redux-form'
 import { makeStyles } from '@material-ui/core/styles'
 import { Typography, Tooltip, IconButton } from '@material-ui/core'
-import { Clear as ClearIcon } from '@material-ui/icons'
+import { Clear as ClearIcon, Edit as EditIcon } from '@material-ui/icons'
 import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
@@ -92,7 +92,7 @@ const Request = ({ course, onCancelRequest }) => {
         <TableCell align="center">
           {course.MoodleID && (
             <Tooltip title="Курс на платформе внеаудиторной учебной работы (Moodle)">
-              <IconButton size="small">
+              <IconButton>
                 <a
                   href={`http://do.asmu.ru/enrol/index.php?id=${course.MoodleID}`}
                   rel="noopener noreferrer"
@@ -109,22 +109,23 @@ const Request = ({ course, onCancelRequest }) => {
           )}
         </TableCell>
         <TableCell align="center">
-          {course.RequestCME && (
-            <Tooltip title="Заявка с портала НМО">
-              <IconButton
-                size="small"
-                onClick={() => {
-                  setRequestCMEDialogParams({ open: true, disabled: false })
-                }}
-              >
+          <Tooltip title="Заявка с портала НМО">
+            <IconButton
+              onClick={() => {
+                setRequestCMEDialogParams({ open: true, disabled: false })
+              }}
+            >
+              {!course.RequestCME ? (
                 <img style={{ width: 35 }} src={sertIcon} alt="moodleIcon" />
-              </IconButton>
-            </Tooltip>
-          )}
+              ) : (
+                <EditIcon />
+              )}
+            </IconButton>
+          </Tooltip>
         </TableCell>
         <TableCell align="center">
           <Tooltip title="Личная карточка">
-            <IconButton size="small">
+            <IconButton>
               <a
                 href={`http://localhost/files/templates/personal_card.php?uid=${uid}&course=${course.ID}`}
                 rel="noopener noreferrer"

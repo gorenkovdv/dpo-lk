@@ -2,7 +2,6 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Field, reduxForm, submit } from 'redux-form'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
-import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import allActions from '../../store/actions'
 import {
   Grid,
@@ -47,7 +46,6 @@ const useStyles = makeStyles((theme) => ({
 const ListenerInfo = ({ user, options, onClose }) => {
   const dispatch = useDispatch()
   const data = useSelector((state) => state.courses.listenerInfo)
-
   const roots = useSelector((state) => state.courses.roots)
   const rootsGroup = parseInt(roots.group)
   const cathedraRoots = rootsGroup === 3
@@ -83,6 +81,8 @@ const ListenerInfo = ({ user, options, onClose }) => {
     )
   }
 
+  if (data.isListenerInfoLoading) return null
+
   return (
     <DialogLayout
       largeSize
@@ -93,42 +93,36 @@ const ListenerInfo = ({ user, options, onClose }) => {
       onClose={onClose}
       title={`Слушатель «${user.fullname}»`}
     >
-      {data.isListenerInfoLoading ? (
-        <Grid container direction="row" justify="center">
-          <LoaderLayout />
-        </Grid>
-      ) : (
-        <>
-          <TableContainer component={Paper}>
-            <Table size="small">
-              <TableBody>
-                <TableRow>
-                  <TableCell style={{ width: '30%' }} align="right">
-                    ФИО
-                  </TableCell>
-                  <TableCell align="left">{`${data.fullname}`}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell align="right">Дата рождения</TableCell>
-                  <TableCell align="left">{`${data.birthdate}`}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell align="right">Телефон</TableCell>
-                  <TableCell align="left">{`${data.phone}`}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell align="right">E-mail</TableCell>
-                  <TableCell align="left">{`${data.email}`}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <ListenerInfoForm
-            onSubmit={handleSubmit}
-            initialValues={initialValues}
-          />
-        </>
-      )}
+      <>
+        <TableContainer component={Paper}>
+          <Table size="small">
+            <TableBody>
+              <TableRow>
+                <TableCell style={{ width: '30%' }} align="right">
+                  ФИО
+                </TableCell>
+                <TableCell align="left">{`${data.fullname}`}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell align="right">Дата рождения</TableCell>
+                <TableCell align="left">{`${data.birthdate}`}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell align="right">Телефон</TableCell>
+                <TableCell align="left">{`${data.phone}`}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell align="right">E-mail</TableCell>
+                <TableCell align="left">{`${data.email}`}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <ListenerInfoForm
+          onSubmit={handleSubmit}
+          initialValues={initialValues}
+        />
+      </>
     </DialogLayout>
   )
 }

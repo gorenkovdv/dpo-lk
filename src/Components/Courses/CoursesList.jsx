@@ -29,6 +29,7 @@ import MainLayout from '../Main/MainLayout'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import { DateInput } from '../Commons/FormsControls/FormsControls'
 import ListenersWindow from './ListenersWindow'
+import AddListenersWindow from './AddListenersWindow'
 import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
 import styles from '../../styles.js'
@@ -207,11 +208,24 @@ const CoursesList = () => {
     setListenersWindowOpen(true)
   }
 
+  const openAddListenersWindow = (course) => {
+    dispatch(actions.setSelectedCourse(course))
+    setAddListenersWindowOpen(true)
+  }
+
   const [isListenersWindowOpen, setListenersWindowOpen] = React.useState(false)
+  const [isAddListenersWindowOpen, setAddListenersWindowOpen] = React.useState(
+    false
+  )
 
   const closeListenersWindow = () => {
     dispatch(actions.setSelectedCourse(null))
     setListenersWindowOpen(false)
+  }
+
+  const closeAddListenersWindow = () => {
+    dispatch(actions.setSelectedCourse(null))
+    setAddListenersWindowOpen(false)
   }
 
   const minDateLimits = (value) => {
@@ -520,7 +534,8 @@ const CoursesList = () => {
                     <Course
                       onSubmitRequest={submitRequestDialogOpen}
                       onCancelRequest={cancelRequestDialogOpen}
-                      onModalOpen={openListenersWindow}
+                      onWindowOpen={openListenersWindow}
+                      onAddWindowOpen={openAddListenersWindow}
                       roots={data.roots}
                       key={course.ID}
                       course={course}
@@ -553,11 +568,16 @@ const CoursesList = () => {
         }?`}
       />
       {data.selectedCourse && (
-        <ListenersWindow
-          options={{ open: isListenersWindowOpen }}
-          onClose={closeListenersWindow}
-          cancelText="Закрыть"
-        />
+        <>
+          <ListenersWindow
+            options={{ open: isListenersWindowOpen }}
+            onClose={closeListenersWindow}
+          />
+          <AddListenersWindow
+            options={{ open: isAddListenersWindowOpen }}
+            onClose={closeAddListenersWindow}
+          />
+        </>
       )}
     </>
   )

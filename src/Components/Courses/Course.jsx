@@ -7,7 +7,7 @@ import {
   Grid,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Check as CheckIcon } from '@material-ui/icons/'
+import { Check as CheckIcon, Add as AddIcon } from '@material-ui/icons/'
 import Box from '@material-ui/core/Box'
 import Collapse from '@material-ui/core/Collapse'
 import Table from '@material-ui/core/Table'
@@ -42,7 +42,8 @@ const useStyles = makeStyles((theme) => ({
 const Course = ({
   roots,
   course,
-  onModalOpen,
+  onWindowOpen,
+  onAddWindowOpen,
   onSubmitRequest,
   onCancelRequest,
 }) => {
@@ -158,9 +159,18 @@ const Course = ({
           <TableCell align="center">
             <Typography>{course.users.length}</Typography>
             {showUsers(course) ? (
-              <IconButton onClick={() => onModalOpen(currentCourse)}>
-                <PeopleIcon fontSize="large" />
-              </IconButton>
+              <Grid container direction="column" alignItems="center">
+                <Grid item>
+                  <IconButton onClick={() => onWindowOpen(currentCourse)}>
+                    <PeopleIcon fontSize="large" />
+                  </IconButton>
+                </Grid>
+                <Grid item>
+                  <IconButton onClick={() => onAddWindowOpen(currentCourse)}>
+                    <AddIcon size="large" />
+                  </IconButton>
+                </Grid>
+              </Grid>
             ) : null}
           </TableCell>
         ) : null}
