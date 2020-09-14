@@ -57,13 +57,12 @@ const Course = ({
     moment().format('YYYY-MM-DD') <=
     moment(course.RequestDate).format('YYYY-MM-DD')
 
-  const showUsers = (course) => {
+  const haveRoots = (course) => {
     if (!rootsGroup) return false
 
     return (
-      course.users.length &&
-      ([1, 2].includes(rootsGroup) ||
-        (rootsGroup === 3 && course.DepartmentGUID === roots.cathedra))
+      [1, 2].includes(rootsGroup) ||
+      (rootsGroup === 3 && course.DepartmentGUID === roots.cathedra)
     )
   }
 
@@ -158,13 +157,15 @@ const Course = ({
         {rootsGroup ? (
           <TableCell align="center">
             <Typography>{course.users.length}</Typography>
-            {showUsers(course) ? (
+            {haveRoots(course) ? (
               <Grid container direction="column" alignItems="center">
-                <Grid item>
-                  <IconButton onClick={() => onWindowOpen(currentCourse)}>
-                    <PeopleIcon fontSize="large" />
-                  </IconButton>
-                </Grid>
+                {course.users.length > 0 && (
+                  <Grid item>
+                    <IconButton onClick={() => onWindowOpen(currentCourse)}>
+                      <PeopleIcon fontSize="large" />
+                    </IconButton>
+                  </Grid>
+                )}
                 <Grid item>
                   <IconButton onClick={() => onAddWindowOpen(currentCourse)}>
                     <AddIcon size="large" />

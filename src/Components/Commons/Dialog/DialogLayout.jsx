@@ -27,9 +27,9 @@ const styles = (theme) => ({
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    minWidth: 800,
-    maxHeight: 700,
-    minHeight: 350,
+    minWidth: 1200,
+    maxHeight: 750,
+    minHeight: 750,
     [theme.breakpoints.down('sm')]: {
       minWidth: 'auto',
       minHeight: 'auto',
@@ -78,7 +78,7 @@ const DialogLayout = ({
       fullScreen={fullScreen}
       open={options.open}
       onClose={onClose}
-      classes={largeSize ? { paper: classes.paper } : null}
+      classes={largeSize && !fullScreen ? { paper: classes.paper } : null}
     >
       <DialogTitle onClose={onClose}>{title}</DialogTitle>
       <DialogContent>

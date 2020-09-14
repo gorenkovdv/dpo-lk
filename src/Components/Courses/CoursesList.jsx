@@ -203,6 +203,11 @@ const CoursesList = () => {
     dispatch(actions.cancelRequest(data.selectedCourse))
   }
 
+  const [isListenersWindowOpen, setListenersWindowOpen] = React.useState(false)
+  const [isAddListenersWindowOpen, setAddListenersWindowOpen] = React.useState(
+    false
+  )
+
   const openListenersWindow = (course) => {
     dispatch(actions.setSelectedCourse(course))
     setListenersWindowOpen(true)
@@ -213,10 +218,15 @@ const CoursesList = () => {
     setAddListenersWindowOpen(true)
   }
 
-  const [isListenersWindowOpen, setListenersWindowOpen] = React.useState(false)
-  const [isAddListenersWindowOpen, setAddListenersWindowOpen] = React.useState(
-    false
-  )
+  const approveAddListenersWindow = (listeners) => {
+    let listenersID = listeners.map((listener) => {
+      return listener.id
+    })
+
+    console.log(listenersID)
+    //dispatch(actions.createListenersRequests(listeners))
+    //setAddListenersWindowOpen(false)
+  }
 
   const closeListenersWindow = () => {
     dispatch(actions.setSelectedCourse(null))
@@ -225,6 +235,7 @@ const CoursesList = () => {
 
   const closeAddListenersWindow = () => {
     dispatch(actions.setSelectedCourse(null))
+    dispatch(actions.clearAdditionListeners())
     setAddListenersWindowOpen(false)
   }
 
@@ -576,6 +587,7 @@ const CoursesList = () => {
           <AddListenersWindow
             options={{ open: isAddListenersWindowOpen }}
             onClose={closeAddListenersWindow}
+            onApprove={approveAddListenersWindow}
           />
         </>
       )}

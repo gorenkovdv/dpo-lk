@@ -36,6 +36,14 @@ const addListenerToList = (data) => {
   return { type: 'COURSES_ADD_LISTENER_TO_LIST', payload: data }
 }
 
+const removeListenerFromList = (userID) => {
+  return { type: 'COURSES_REMOVE_LISTENER_FROM_LIST', payload: userID }
+}
+
+const clearAdditionListeners = () => {
+  return { type: 'COURSES_CLEAR_ADDITION_LISTENERS' }
+}
+
 const requestCourses = (page, count, filters) => async (dispatch) => {
   dispatch(loaderActions.setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
@@ -107,7 +115,7 @@ const cancelRequest = (course) => async (dispatch) => {
 }
 
 const removeCourseRequest = (courseID, userID) => async (dispatch) => {
-  const isUserAuthorized = userID === userAPI.getUID()
+  const isUserAuthorized = userID === parseInt(userAPI.getUID())
   const response = await requestsAPI.cancelRequest(courseID, userID)
 
   if (response.data.response) {
@@ -170,6 +178,8 @@ const saveCheckData = (userID, rowID, data) => async (dispatch) => {
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
+//const createListenersRequests = (listeners) => {}
+
 export default {
   setSelectedCourse,
   requestCourses,
@@ -181,4 +191,6 @@ export default {
   saveCheckData,
   getListenersOptions,
   addListenerToList,
+  removeListenerFromList,
+  clearAdditionListeners,
 }

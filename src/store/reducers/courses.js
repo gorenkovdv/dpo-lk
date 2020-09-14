@@ -3,7 +3,7 @@ import * as moment from 'moment'
 const initialState = {
   list: {},
   filters: {
-    searchString: 'общая физиотерапия',
+    searchString: '',
     enrolPossible: true,
     CME: true,
     traditional: true,
@@ -31,7 +31,10 @@ const initialState = {
   listenersAddition: {
     isLoading: false,
     options: [],
-    list: [],
+    list: [
+      { id: '1', name: 'Горенков Дмитрий Вячеславович', isUserAdded: false },
+      { id: '109', name: 'Толмачёв Владислав Сергеевич', isUserAdded: false },
+    ],
   },
 }
 
@@ -201,6 +204,13 @@ export function coursesReducer(state = initialState, action) {
               return null
             })
 
+            state.list
+              .find((item) => item.ID === state.selectedCourse.ID)
+              .users.map((addedUser) => {
+                if (addedUser.id === user.id) isUserAdded = true
+                return null
+              })
+
             return {
               id: user.id,
               name: user.fullname,
@@ -210,15 +220,36 @@ export function coursesReducer(state = initialState, action) {
         },
       }
     case 'COURSES_ADD_LISTENER_TO_LIST':
+      console.log()
       return {
         ...state,
         listenersAddition: {
           ...state.listenersAddition,
+          options: [],
           list: state.listenersAddition.list
             .map((user) => {
               return user
             })
             .concat(action.payload),
+        },
+      }
+    case 'COURSES_REMOVE_LISTENER_FROM_LIST':
+      return {
+        ...state,
+        listenersAddition: {
+          ...state.listenersAddition,
+          list: state.listenersAddition.list.filter(
+            (user) => user.id !== action.payload
+          ),
+        },
+      }
+    case 'COURSES_CLEAR_ADDITION_LISTENERS':
+      return {
+        ...state,
+        listenersAddition: {
+          ...state.listenersAddition,
+          options: [],
+          list: [],
         },
       }
     default:

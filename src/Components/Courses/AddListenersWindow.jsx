@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Typography, Button } from '@material-ui/core'
+import { Button, IconButton } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -13,7 +13,7 @@ import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
-import { Check as CheckIcon } from '@material-ui/icons/'
+import { Check as CheckIcon, Clear as ClearIcon } from '@material-ui/icons/'
 import allActions from '../../store/actions'
 import styles from '../../styles.js'
 
@@ -30,17 +30,29 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const AddListenersWindow = ({ options, onClose }) => {
+const AddListenersWindow = ({ options, onClose, onApprove }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const [open, setOpen] = React.useState(false)
-  const [currentValue, setCurrentValue] = React.useState(null)
+  const [inputValue, setInputValue] = React.useState('')
+  const [autocompleteValue, setAutocompleteValue] = React.useState(null)
   const data = useSelector((state) => state.courses.listenersAddition)
-  const course = useSelector((state) => state.courses.selectedCourse.ID)
+  const course = useSelector((state) => state.courses.selectedCourse)
+  const actions = allActions.coursesActions
   const loading = data.isLoading
 
-  const getOptions = (value) => {
-    dispatch(allActions.coursesActions.getListenersOptions(value))
+  const onInputChange = (e, value) => {
+    setInputValue(value)
+    dispatch(actions.getListenersOptions(value))
+  }
+
+  const onAddButtonClick = () => {
+    setAutocompleteValue(null)
+    dispatch(actions.addListenerToList(autocompleteValue))
+  }
+
+  const removeListener = (userID) => {
+    dispatch(actions.removeListenerFromList(userID))
   }
 
   return (
@@ -49,11 +61,10 @@ const AddListenersWindow = ({ options, onClose }) => {
       options={options}
       approveText="Сохранить изменения"
       cancelText="Отмена"
-      onApprove={onClose}
+      onApprove={() => onApprove(data.list)}
       onClose={onClose}
-      title={`Запись слушателей на курс`}
+      title={`Запись слушателей на курс «${course.Name}»`}
     >
-      <Typography className={classes.bold}>{course.Name}</Typography>
       <Autocomplete
         open={open}
         onOpen={() => setOpen(true)}
@@ -62,14 +73,14 @@ const AddListenersWindow = ({ options, onClose }) => {
         getOptionSelected={(option, value) => option.name === value.name}
         getOptionDisabled={(option) => option.isUserAdded}
         getOptionLabel={(option) => option.name}
-        onInputChange={(e, value) => {
-          getOptions(value)
-        }}
-        onChange={(e, value) => {
-          setCurrentValue(value)
-        }}
         options={data.options}
         loading={loading}
+        inputValue={inputValue}
+        value={autocompleteValue}
+        onInputChange={onInputChange}
+        onChange={(e, value) => {
+          setAutocompleteValue(value)
+        }}
         classes={{
           option: classes.option,
           noOptions: classes.option,
@@ -105,11 +116,8 @@ const AddListenersWindow = ({ options, onClose }) => {
         type="button"
         variant="contained"
         color="primary"
-        onClick={() => {
-          dispatch(allActions.coursesActions.addListenerToList(currentValue))
-          setCurrentValue('')
-        }}
-        disabled={!Boolean(currentValue)}
+        onClick={onAddButtonClick}
+        disabled={!Boolean(autocompleteValue)}
       >
         Добавить
       </Button>
@@ -122,14 +130,18 @@ const AddListenersWindow = ({ options, onClose }) => {
             <TableHead>
               <TableRow>
                 <TableCell>Фамилия</TableCell>
-                <TableCell></TableCell>
+                <TableCell style={{ width: 25 }}></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {data.list.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.name}</TableCell>
-                  <TableCell></TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => removeListener(user.id)}>
+                      <ClearIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
