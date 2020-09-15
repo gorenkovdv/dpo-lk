@@ -57,7 +57,7 @@ export function coursesReducer(state = initialState, action) {
       return {
         ...state,
         list: state.list.map((course, index) => {
-          if (course.ID === action.payload.course) {
+          if (course.ID === action.payload.courseID) {
             return {
               ...course,
               users: action.payload.haveRequest
@@ -79,7 +79,7 @@ export function coursesReducer(state = initialState, action) {
             return {
               ...course,
               users: state.list[index].users.filter(
-                (user) => user.id !== action.payload.userID
+                (user) => user.rowID !== action.payload.rowID
               ),
               haveRequest: action.payload.isUserAuthorized
                 ? 0

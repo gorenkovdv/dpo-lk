@@ -69,10 +69,11 @@ const ListenerWindowContent = ({ options, onClose }) => {
   }
 
   const removeRequest = () => {
+    console.log(selectedListener)
     dispatch(
       allActions.coursesActions.removeCourseRequest(
         course.ID,
-        selectedListener.id
+        selectedListener.rowID
       )
     )
     removeRequestDialogClose()

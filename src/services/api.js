@@ -205,6 +205,16 @@ export const coursesAPI = {
   async getListenersOptions(value) {
     return await instance.get(`get_listeners_options.php?value=${value}`)
   },
+
+  async createListenersRequests(courseID, listeners) {
+    return await instance.post(
+      `create_request.php`,
+      qs.stringify({
+        listeners: JSON.stringify(listeners),
+        courseID,
+      })
+    )
+  },
 }
 
 export const requestsAPI = {
@@ -213,16 +223,25 @@ export const requestsAPI = {
   },
 
   async createRequest(courseID) {
+    let uid = parseInt(userAPI.getUID())
     return await instance.post(
       `create_request.php`,
-      qs.stringify({ uid: userAPI.getUID(), courseID })
+      qs.stringify({
+        listeners: JSON.stringify([uid]),
+        courseID,
+      })
     )
   },
 
-  async cancelRequest(courseID, uid) {
+  async cancelRequest(courseID, rowID, userID) {
+    console.log(courseID, rowID, userID)
     return await instance.post(
       `cancel_request.php`,
-      qs.stringify({ courseID, uid })
+      qs.stringify({
+        courseID,
+        userID: userID ? userID : userAPI.getUID(),
+        rowID: rowID ? rowID : 0,
+      })
     )
   },
 

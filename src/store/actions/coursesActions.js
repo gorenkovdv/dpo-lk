@@ -84,19 +84,20 @@ const changeListParams = (page, count, filters) => async (dispatch) => {
 
 const createCancelRequest = async (
   dispatch,
-  course,
+  courseID,
   apiMethod,
   haveRequest,
   successMessage
 ) => {
   dispatch(loaderActions.setLoading())
-  const response = await apiMethod(course)
-  console.log(response.data)
+  const response = await apiMethod(courseID)
   const users = response.data.users
+
+  console.log(response.data)
 
   if (response.data.response) {
     const uid = userAPI.getUID()
-    dispatch(changeRequestStatus({ course, users, haveRequest, uid }))
+    dispatch(changeRequestStatus({ courseID, users, haveRequest, uid }))
     dispatch(snackbarActions.showSuccess(successMessage))
     dispatch(loaderActions.loadingSuccess())
   } else dispatch(snackbarActions.showError(response.data.error))
@@ -114,12 +115,14 @@ const cancelRequest = (course) => async (dispatch) => {
   createCancelRequest(dispatch, course.ID, apiMethod, 0, message)
 }
 
-const removeCourseRequest = (courseID, userID) => async (dispatch) => {
-  const isUserAuthorized = userID === parseInt(userAPI.getUID())
-  const response = await requestsAPI.cancelRequest(courseID, userID)
+const removeCourseRequest = (courseID, rowID) => async (dispatch) => {
+  const isUserAuthorized = parseInt(rowID) === parseInt(userAPI.getUID())
+  const response = await requestsAPI.cancelRequest(courseID, rowID)
+
+  console.log(response.data)
 
   if (response.data.response) {
-    dispatch(courseRequestRemoved({ courseID, userID, isUserAuthorized }))
+    dispatch(courseRequestRemoved({ courseID, rowID, isUserAuthorized }))
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
@@ -178,7 +181,29 @@ const saveCheckData = (userID, rowID, data) => async (dispatch) => {
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
-//const createListenersRequests = (listeners) => {}
+const createListenersRequests = (courseID, users) => async (dispatch) => {
+  dispatch(loaderActions.setLoading())
+  const response = await coursesAPI.createListenersRequests(courseID, users)
+  let currentUID = parseInt(userAPI.getUID())
+
+  if (response.data.response) {
+    let haveRequest = 0
+    response.data.users.map((user) => {
+      if (parseInt(user.id) === currentUID) haveRequest = 1
+      return null
+    })
+
+    dispatch(
+      changeRequestStatus({
+        courseID,
+        users: response.data.users,
+        haveRequest,
+      })
+    )
+    dispatch(snackbarActions.showSuccess('Слушатели добавлены на курс'))
+    dispatch(loaderActions.loadingSuccess())
+  } else dispatch(snackbarActions.showError(response.data.error))
+}
 
 export default {
   setSelectedCourse,
@@ -193,4 +218,5 @@ export default {
   addListenerToList,
   removeListenerFromList,
   clearAdditionListeners,
+  createListenersRequests,
 }

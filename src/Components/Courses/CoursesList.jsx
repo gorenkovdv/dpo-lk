@@ -220,12 +220,14 @@ const CoursesList = () => {
 
   const approveAddListenersWindow = (listeners) => {
     let listenersID = listeners.map((listener) => {
-      return listener.id
+      return parseInt(listener.id)
     })
 
-    console.log(listenersID)
-    //dispatch(actions.createListenersRequests(listeners))
-    //setAddListenersWindowOpen(false)
+    dispatch(
+      actions.createListenersRequests(data.selectedCourse.ID, listenersID)
+    )
+
+    setAddListenersWindowOpen(false)
   }
 
   const closeListenersWindow = () => {
