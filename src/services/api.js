@@ -233,14 +233,12 @@ export const requestsAPI = {
     )
   },
 
-  async cancelRequest(courseID, rowID, userID) {
-    console.log(courseID, rowID, userID)
+  async cancelRequest(courseID, rowID) {
     return await instance.post(
       `cancel_request.php`,
       qs.stringify({
         courseID,
-        userID: userID ? userID : userAPI.getUID(),
-        rowID: rowID ? rowID : 0,
+        rowID,
       })
     )
   },

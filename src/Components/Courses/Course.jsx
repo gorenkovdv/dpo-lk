@@ -46,12 +46,17 @@ const Course = ({
   onAddWindowOpen,
   onSubmitRequest,
   onCancelRequest,
+  currentUserID,
 }) => {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const isListener = sessionStorage.pagesType === 'listener'
   let currentCourse = { ID: course.ID, Name: course.Name }
   const rootsGroup = parseInt(roots.group)
+
+  const currentUserRequests = course.users.filter(
+    (user) => parseInt(user.id) === parseInt(currentUserID)
+  )
 
   const isRequestDateExpired =
     moment().format('YYYY-MM-DD') <=
@@ -130,14 +135,19 @@ const Course = ({
                   className={classes.button}
                   type="button"
                   size="small"
-                  variant={!course.haveRequest ? 'contained' : 'outlined'}
+                  variant={
+                    currentUserRequests.length > 0 ? 'outlined' : 'contained'
+                  }
                   color="primary"
                   onClick={() => {
-                    if (!course.haveRequest) onSubmitRequest(currentCourse)
-                    else onCancelRequest(currentCourse)
+                    if (currentUserRequests.length > 0)
+                      onCancelRequest(currentCourse)
+                    else onSubmitRequest(currentCourse)
                   }}
                 >
-                  {!course.haveRequest ? `Подать заявку` : `Отозвать заявку`}
+                  {currentUserRequests.length > 0
+                    ? `Отозвать заявку`
+                    : `Подать заявку`}
                 </Button>
               )}
               <small>

@@ -60,12 +60,12 @@ export function coursesReducer(state = initialState, action) {
           if (course.ID === action.payload.courseID) {
             return {
               ...course,
-              users: action.payload.haveRequest
-                ? state.list[index].users.concat(action.payload.users)
-                : state.list[index].users.filter(
-                    (user) => user.id !== action.payload.uid
-                  ),
-              haveRequest: action.payload.haveRequest,
+              users: action.payload.rowID
+                ? state.list[index].users.filter(
+                    (user) =>
+                      parseInt(user.rowID) !== parseInt(action.payload.rowID)
+                  )
+                : state.list[index].users.concat(action.payload.users),
             }
           }
           return course
@@ -81,9 +81,6 @@ export function coursesReducer(state = initialState, action) {
               users: state.list[index].users.filter(
                 (user) => user.rowID !== action.payload.rowID
               ),
-              haveRequest: action.payload.isUserAuthorized
-                ? 0
-                : state.list[index].haveRequest,
             }
           }
           return course

@@ -34,6 +34,7 @@ import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
 import styles from '../../styles.js'
 import { parseDate, parseCourseDate } from '../../utils/parse.js'
+import { userAPI } from '../../services/api'
 import Course from './Course'
 
 const useStyles = makeStyles((theme) => ({
@@ -87,6 +88,7 @@ const CheckboxInput = ({ checked, onFilterChange, edited, label }) => {
 const CoursesList = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const currentUserID = userAPI.getUID()
   const isLoading = useSelector((state) => state.loader.isLoading)
   const data = useSelector((state) => state.courses)
   const [searchString, setSearchString] = useState(data.filters.searchString)
@@ -199,8 +201,12 @@ const CoursesList = () => {
   }
 
   const cancelRequest = () => {
+    const rowID = data.list
+      .find((course) => course.ID === data.selectedCourse.ID)
+      .users.find((user) => parseInt(user.id) === parseInt(currentUserID)).rowID
+
     cancelRequestDialogClose()
-    dispatch(actions.cancelRequest(data.selectedCourse))
+    dispatch(actions.cancelRequest(data.selectedCourse, rowID))
   }
 
   const [isListenersWindowOpen, setListenersWindowOpen] = React.useState(false)
@@ -545,13 +551,14 @@ const CoursesList = () => {
                 <TableBody>
                   {data.list.map((course) => (
                     <Course
-                      onSubmitRequest={submitRequestDialogOpen}
-                      onCancelRequest={cancelRequestDialogOpen}
+                      key={course.ID}
+                      roots={data.roots}
+                      course={course}
                       onWindowOpen={openListenersWindow}
                       onAddWindowOpen={openAddListenersWindow}
-                      roots={data.roots}
-                      key={course.ID}
-                      course={course}
+                      onSubmitRequest={submitRequestDialogOpen}
+                      onCancelRequest={cancelRequestDialogOpen}
+                      currentUserID={currentUserID}
                     />
                   ))}
                 </TableBody>
