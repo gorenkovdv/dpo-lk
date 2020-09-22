@@ -1,20 +1,25 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Grid, Typography, IconButton, Tooltip } from '@material-ui/core'
+import {
+  Grid,
+  Typography,
+  IconButton,
+  Tooltip,
+  Paper,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableContainer,
+  TableHead,
+} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import {
   HowToReg as ListenerInfoIcon,
   Clear as ClearIcon,
 } from '@material-ui/icons'
-import Table from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableContainer from '@material-ui/core/TableContainer'
-import TableHead from '@material-ui/core/TableHead'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import ListenerInfoWindow from './ListenerInfoWindow'
-import TableRow from '@material-ui/core/TableRow'
-import Paper from '@material-ui/core/Paper'
 import allActions from '../../store/actions'
 import styles from '../../styles.js'
 
@@ -83,7 +88,7 @@ const ListenerWindowContent = ({ options, onClose }) => {
       largeSize
       options={options}
       onClose={onClose}
-      cancelText="Отмена"
+      cancelText="Закрыть"
       title={`Программа «${course.Name}»`}
     >
       {course.users.length > 0 ? (

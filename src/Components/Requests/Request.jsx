@@ -2,12 +2,16 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { Field, reduxForm, submit } from 'redux-form'
 import { makeStyles } from '@material-ui/core/styles'
-import { Typography, Tooltip, IconButton } from '@material-ui/core'
+import {
+  Typography,
+  Tooltip,
+  IconButton,
+  TableCell,
+  TableRow,
+} from '@material-ui/core'
 import { Clear as ClearIcon, Edit as EditIcon } from '@material-ui/icons'
-import TableCell from '@material-ui/core/TableCell'
-import TableRow from '@material-ui/core/TableRow'
-import DialogLayout from '../Commons/Dialog/DialogLayout'
 import { MaskedInput, Input } from '../Commons/FormsControls/FormsControls'
+import DialogLayout from '../Commons/Dialog/DialogLayout'
 import { required, isStringContainsUnderscore } from '../../utils/validate.js'
 import styles from '../../styles.js'
 import moodleIcon from '../../img/moodle.png'

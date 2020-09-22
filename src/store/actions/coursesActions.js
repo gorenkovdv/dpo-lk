@@ -158,8 +158,10 @@ const getListenerInfo = (userID) => async (dispatch) => {
 const getListenersOptions = (value) => async (dispatch) => {
   dispatch(setListenersOptionsLoading())
 
-  if (value.length > 3) {
+  if (value.length > 5) {
     const response = await coursesAPI.getListenersOptions(value)
+
+    //console.log(response.data)
 
     if (response.data.response)
       dispatch(setListenersOptions(response.data.listeners))
@@ -196,6 +198,12 @@ const saveCheckData = (userID, rowID, data) => async (dispatch) => {
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
+const addNewListener = (values) => async (dispatch) => {
+  const response = await coursesAPI.addNewListener(values)
+
+  console.log(response.data)
+}
+
 export default {
   setSelectedCourse,
   requestCourses,
@@ -210,4 +218,5 @@ export default {
   removeListenerFromList,
   clearAdditionListeners,
   createListenersRequests,
+  addNewListener,
 }

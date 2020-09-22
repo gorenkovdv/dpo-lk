@@ -91,6 +91,7 @@ const DialogLayout = ({
           {onApprove && (
             <Button
               color="primary"
+              variant="contained"
               disabled={options.disabled ? options.disabled : false}
               onClick={onApprove}
               autoFocus
@@ -99,7 +100,7 @@ const DialogLayout = ({
             </Button>
           )}
           {onClose && (
-            <Button onClick={onClose} color="primary">
+            <Button onClick={onClose} color="primary" variant="contained">
               {cancelText ? cancelText : 'Нет'}
             </Button>
           )}

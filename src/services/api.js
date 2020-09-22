@@ -215,6 +215,9 @@ export const coursesAPI = {
       })
     )
   },
+  async addNewListener(values) {
+    return await instance.post(`add_new_listener.php`, qs.stringify(values))
+  },
 }
 
 export const requestsAPI = {

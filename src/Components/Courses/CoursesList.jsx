@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import Pagination from '@material-ui/lab/Pagination'
 import { compose } from 'redux'
 import {
   Grid,
@@ -22,6 +21,7 @@ import {
   TableCell,
   TableRow,
 } from '@material-ui/core'
+import Pagination from '@material-ui/lab/Pagination'
 import { makeStyles } from '@material-ui/core/styles'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'

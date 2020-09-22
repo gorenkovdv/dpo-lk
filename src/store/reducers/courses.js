@@ -31,10 +31,7 @@ const initialState = {
   listenersAddition: {
     isLoading: false,
     options: [],
-    list: [
-      { id: '1', name: 'Горенков Дмитрий Вячеславович', isUserAdded: false },
-      { id: '109', name: 'Толмачёв Владислав Сергеевич', isUserAdded: false },
-    ],
+    list: [],
   },
 }
 
