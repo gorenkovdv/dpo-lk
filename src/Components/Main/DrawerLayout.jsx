@@ -27,6 +27,11 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
+  /*toolbar: {
+    position: 'fixed',
+    width: DRAWER_WIDTH,
+    zIndex: 100,
+  },*/
   drawer: {
     [theme.breakpoints.up('sm')]: {
       width: DRAWER_WIDTH,

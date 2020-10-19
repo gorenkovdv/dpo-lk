@@ -49,19 +49,19 @@ let AddNewListenerWindowForm = (props) => {
   return (
     <form onSubmit={props.handleSubmit}>
       <Field
-        name="lastName"
+        name="lastname"
         validate={[required]}
         component={Input}
         label="Фамилия"
       />
       <Field
-        name="firstName"
+        name="firstname"
         validate={[required]}
         component={Input}
         label="Имя"
       />
       <Field
-        name="middleName"
+        name="middlename"
         validate={[required]}
         component={Input}
         label="Отчество"

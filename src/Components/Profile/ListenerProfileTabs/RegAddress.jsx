@@ -102,9 +102,7 @@ let RegAddressForm = (props) => {
           name="locality"
           label="Населённый пункт"
           component={Input}
-          adornment={{
-            startAdornment: <InputAdornment>{localityTooltip}</InputAdornment>,
-          }}
+          adornment={<InputAdornment>{localityTooltip}</InputAdornment>}
         />
         <Field
           name="localityType"
@@ -127,9 +125,7 @@ let RegAddressForm = (props) => {
           name="street"
           label="Улица"
           component={Input}
-          adornment={{
-            startAdornment: <InputAdornment>{streetTooltip}</InputAdornment>,
-          }}
+          adornment={<InputAdornment>{streetTooltip}</InputAdornment>}
         />
         <Field name="house" label="Дом" component={Input} />
         <Field name="room" label="Квартира" component={Input} />

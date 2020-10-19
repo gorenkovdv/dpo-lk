@@ -55,13 +55,7 @@ let AuthForm = (props) => {
           component={Input}
           margin="normal"
           label="Логин"
-          adornment={{
-            endAdornment: (
-              <InputAdornment>
-                <PersonIcon className={classes.inputEndIcon} />
-              </InputAdornment>
-            ),
-          }}
+          endadornment={<InputAdornment><PersonIcon className={classes.inputEndIcon} /></InputAdornment>}
         />
         <Field
           name="password"

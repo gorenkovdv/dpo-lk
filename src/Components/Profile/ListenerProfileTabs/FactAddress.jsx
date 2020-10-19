@@ -143,9 +143,7 @@ let FactAddressForm = (props) => {
           name="locality"
           label="Населённый пункт"
           component={Input}
-          adornment={{
-            startAdornment: <InputAdornment>{localityTooltip}</InputAdornment>,
-          }}
+          adornment={<InputAdornment>{localityTooltip}</InputAdornment>}
           disabled={disable}
         />
         <Field
@@ -172,9 +170,7 @@ let FactAddressForm = (props) => {
           label="Улица"
           component={Input}
           disabled={disable}
-          adornment={{
-            startAdornment: <InputAdornment>{streetTooltip}</InputAdornment>,
-          }}
+          adornment={<InputAdornment>{streetTooltip}</InputAdornment>}
         />
         <Field name="house" label="Дом" component={Input} disabled={disable} />
         <Field

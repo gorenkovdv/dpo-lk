@@ -53,7 +53,11 @@ export const Input = ({ input, meta: { touched, error }, ...props }) => {
       error={hasError}
       helperText={hasError && error}
       margin={props.margin ? props.margin : 'dense'}
-      InputProps={props.adornment ? props.adornment : null}
+      InputProps={{
+        startAdornment: props.adornment ? props.adornment : null,
+        endAdornment: props.endadornment ? props.endadornment : null,
+        readOnly: props.readOnly ? props.readOnly : false
+      }}
       type={props.type ? props.type : 'text'}
       autoComplete="off"
       variant="outlined"
@@ -71,7 +75,9 @@ export const Textarea = ({ input, ...props }) => {
       multiline
       rows={2}
       rowsMax={5}
-      InputProps={props.adornment ? props.adornment : null}
+      InputProps={{
+        startAdornment: props.adornment ? props.adornment : null
+      }}
       autoComplete="off"
       margin="dense"
       variant="outlined"
@@ -116,7 +122,9 @@ export const MaskedInput = ({ input, meta: { touched, error }, ...props }) => {
           margin="dense"
           variant={props.variant ? props.variant : 'outlined'}
           label={props.label}
-          InputProps={props.adornment ? props.adornment : null}
+          InputProps={{
+            startAdornment: props.adornment ? props.adornment : null,
+          }}
         />
       )}
     </InputMask>

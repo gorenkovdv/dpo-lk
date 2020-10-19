@@ -45,7 +45,7 @@ const Sertificates = ({ username }) => {
   const data = allData.list
   const index = data.sertificates.currentDocument || 0
   const currentData = data.sertificates.documents
-  const currentDocument = currentData ? currentData[index] : 0
+  const currentDocument = currentData ? currentData[index] : null
   const isDocumentNew = currentDocument ? currentDocument.isDocumentNew : false
   const defaultFileURL = `sertificate${index}.pdf`
   const actions = allActions.listenerDataActions

@@ -10,6 +10,8 @@ const requestProfile = () => async (dispatch) => {
   dispatch(loaderActions.setLoading())
   const response = await profileAPI.getProfile()
 
+  console.log(response.data)
+
   if (response.data.response) {
     dispatch(updatingSuccess(response.data.profile))
     dispatch(loaderActions.loadingSuccess())

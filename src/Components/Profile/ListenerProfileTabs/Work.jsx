@@ -143,30 +143,28 @@ let WorkDataForm = (props) => {
         name="organization"
         label="Полное наименование организации"
         component={Textarea}
-        adornment={{
-          startAdornment: (
-            <InputAdornment>
-              <HtmlTooltip
-                title={
-                  <>
-                    <span>
-                      Необходимо ввести наименование как в регистрационных
-                      документах
-                    </span>
-                  </>
-                }
+        adornment={
+          <InputAdornment>
+            <HtmlTooltip
+              title={
+                <>
+                  <span>
+                    Необходимо ввести наименование как в регистрационных
+                    документах
+                  </span>
+                </>
+              }
+            >
+              <IconButton
+                className={classes.inputStartIcon}
+                size="small"
+                aria-label="help"
               >
-                <IconButton
-                  className={classes.inputStartIcon}
-                  size="small"
-                  aria-label="help"
-                >
-                  <HelpIcon />
-                </IconButton>
-              </HtmlTooltip>
-            </InputAdornment>
-          ),
-        }}
+                <HelpIcon />
+              </IconButton>
+            </HtmlTooltip>
+          </InputAdornment>
+         }
       />
       <Field name="country" label="Страна" component={Input} />
       <Field name="region" label="Регион (область, край)" component={Input} />
@@ -174,9 +172,7 @@ let WorkDataForm = (props) => {
         name="locality"
         label="Населённый пункт"
         component={Input}
-        adornment={{
-          startAdornment: <InputAdornment>{localityTooltip}</InputAdornment>,
-        }}
+        adornment={<InputAdornment>{localityTooltip}</InputAdornment>}
       />
       <Field
         name="localityType"
@@ -199,9 +195,7 @@ let WorkDataForm = (props) => {
         name="street"
         label="Улица"
         component={Input}
-        adornment={{
-          startAdornment: <InputAdornment>{streetTooltip}</InputAdornment>,
-        }}
+        adornment={<InputAdornment>{streetTooltip}</InputAdornment>}
       />
       <Field name="house" label="Номер дома" component={Input} />
       <Field

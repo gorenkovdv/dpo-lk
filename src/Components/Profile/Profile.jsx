@@ -50,12 +50,7 @@ const Profile = (props) => {
   }, [dispatch, actions])
 
   const handleSubmit = (values) => {
-    if (
-      !(values.lastName && values.lastName.length) &&
-      !(values.middleName && values.middleName.length)
-    )
-      dispatch(actions.showError('Необходимо указать фамилию или отчество'))
-    else dispatch(actions.updateProfile(values))
+    dispatch(actions.updateProfile(values))
   }
 
   if (isLoading) return null
@@ -75,22 +70,20 @@ let ProfileForm = (props) => {
   return (
     <form onSubmit={props.handleSubmit}>
       <>
-        <Field name="lastName" component={Input} label="Фамилия" />
-        <Field name="firstName" component={Input} label="Имя" required />
-        <Field name="middleName" component={Input} label="Отчество" />
+        <Field name="lastname" component={Input} label="Фамилия" readOnly />
+        <Field name="firstname" component={Input} label="Имя" readOnly />
+        <Field name="middlename" component={Input} label="Отчество" readOnly />
         <Field
           name="email"
           component={Input}
           validate={[isEmailValid]}
           label="Электронная почта (email)"
           placeholder="Электронная почта"
-          adornment={{
-            startAdornment: (
-              <InputAdornment>
-                <EmailIcon className={classes.inputStartIcon} />
-              </InputAdornment>
-            ),
-          }}
+          adornment={
+            <InputAdornment>
+              <EmailIcon className={classes.inputStartIcon} />
+            </InputAdornment>
+          }
           required
         />
         <Field
@@ -100,13 +93,11 @@ let ProfileForm = (props) => {
           mask={`8(999)9999999`}
           label="Телефон"
           placeholder="Телефон"
-          adornment={{
-            startAdornment: (
-              <InputAdornment>
-                <PhoneIcon className={classes.inputStartIcon} />
-              </InputAdornment>
-            ),
-          }}
+          adornment={
+            <InputAdornment>
+              <PhoneIcon className={classes.inputStartIcon} />
+            </InputAdornment>
+          }
           required
         />
         <Field
@@ -115,7 +106,6 @@ let ProfileForm = (props) => {
           validate={[isStringContainsUnderscore]}
           mask={`99999999999`}
           label="СНИЛС"
-          required
         />
         <Field
           name="birthDate"

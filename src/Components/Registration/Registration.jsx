@@ -20,10 +20,7 @@ const Registration = () => {
   const actions = allActions.regActions
 
   const handleSubmit = values => {
-    console.log(values)
-    if(!(values.lastName && values.lastName.length) && !(values.middleName && values.middleName.length))
-      dispatch(actions.showError("Необходимо указать фамилию или отчество"))
-    else dispatch(actions.addUser(values))
+    dispatch(actions.addUser(values))
   }
 
   return (
@@ -46,6 +43,7 @@ let RegistrationForm = props => {
         name="lastName"
         component={Input}
         label="Фамилия"
+        required
       />
       <Field
         name="firstName"
@@ -57,6 +55,7 @@ let RegistrationForm = props => {
         name="middleName"
         component={Input}
         label="Отчество"
+        required
       />
       <Field
         name="email"
@@ -64,12 +63,11 @@ let RegistrationForm = props => {
         validate={[isEmailValid]}
         label="Электронная почта (email)"
         placeholder="Электронная почта"
-        adornment={{ 
-          startAdornment:
-            <InputAdornment>
-              <EmailIcon className={classes.inputStartIcon} />
-            </InputAdornment>
-        }}
+        adornment={
+          <InputAdornment>
+            <EmailIcon className={classes.inputStartIcon} />
+          </InputAdornment>
+        }
         required
       />
       <Field
@@ -79,12 +77,11 @@ let RegistrationForm = props => {
         validate={[isStringContainsUnderscore]}
         label="Телефон"
         placeholder="Телефон"
-        adornment={{ 
-          startAdornment:
-            <InputAdornment>
-              <PhoneIcon className={classes.inputStartIcon} />
-            </InputAdornment>
-        }}
+        adornment={
+          <InputAdornment>
+            <PhoneIcon className={classes.inputStartIcon} />
+          </InputAdornment>
+        }
       />
       <Field
         name="snils"
@@ -92,7 +89,6 @@ let RegistrationForm = props => {
         mask={`999-999-999-99`}
         validate={[isStringContainsUnderscore]}
         label="СНИЛС"
-        required
       />
       <Field
         name="birthDate"
