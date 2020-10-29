@@ -15,16 +15,16 @@ const AddNewListenerWindow = ({ options, onClose }) => {
   const dispatch = useDispatch()
 
   const handleSubmit = (values) => {
+    console.log(values)
     dispatch(allActions.coursesActions.addNewListener(values))
-    onClose()
   }
 
   const initialValues = {
-    lastName: 'Горенков',
-    firstName: 'Дмитрий',
-    middleName: 'Вячеславович',
-    birthDate: '1995-12-27',
-    snils: '11111111111',
+    lastname: 'Горенков',
+    firstname: 'Дмитрий',
+    middlename: 'Вячеславович',
+    birthdate: '1995-12-27',
+    snils: '24234234234',
   }
 
   return (
@@ -53,21 +53,24 @@ let AddNewListenerWindowForm = (props) => {
         validate={[required]}
         component={Input}
         label="Фамилия"
+        required
       />
       <Field
         name="firstname"
         validate={[required]}
         component={Input}
         label="Имя"
+        required
       />
       <Field
         name="middlename"
         validate={[required]}
         component={Input}
         label="Отчество"
+        required
       />
       <Field
-        name="birthDate"
+        name="birthdate"
         component={DateInput}
         parse={parseDate}
         views={['year', 'date']}

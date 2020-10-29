@@ -21,6 +21,8 @@ const requestProfile = () => async (dispatch) => {
 const updateProfile = (data) => async (dispatch) => {
   const response = await profileAPI.setProfile(data)
 
+  console.log(response.data)
+
   if (response.data.response) {
     dispatch(updatingSuccess(data))
     dispatch(snackbarActions.showSuccess('Данные успешно обновлены'))

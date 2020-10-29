@@ -36,6 +36,10 @@ const addListenerToList = (data) => {
   return { type: 'COURSES_ADD_LISTENER_TO_LIST', payload: data }
 }
 
+const setAdditionDialogOpen = (status) => {
+  return { type: 'COURSES_SET_ADDITION_DIALOG_OPEN', payload: status }
+}
+
 const removeListenerFromList = (userID) => {
   return { type: 'COURSES_REMOVE_LISTENER_FROM_LIST', payload: userID }
 }
@@ -202,6 +206,11 @@ const addNewListener = (values) => async (dispatch) => {
   const response = await coursesAPI.addNewListener(values)
 
   console.log(response.data)
+
+  if (response.data.response) {
+    dispatch(addListenerToList(response.data.user))
+    dispatch(setAdditionDialogOpen(false))
+  } else dispatch(snackbarActions.showError(response.data.error))
 }
 
 export default {
@@ -214,6 +223,7 @@ export default {
   cancelCourseRequest,
   saveCheckData,
   getListenersOptions,
+  setAdditionDialogOpen,
   addListenerToList,
   removeListenerFromList,
   clearAdditionListeners,

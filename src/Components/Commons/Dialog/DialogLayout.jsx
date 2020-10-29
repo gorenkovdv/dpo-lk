@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     minWidth: 1200,
     maxHeight: 750,
-    minHeight: 750,
+    minHeight: 700,
     [theme.breakpoints.down('sm')]: {
       minWidth: 'auto',
       minHeight: 'auto',

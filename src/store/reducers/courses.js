@@ -29,6 +29,7 @@ const initialState = {
   },
   selectedCourse: null,
   listenersAddition: {
+    isDialogOpen: false,
     isLoading: false,
     options: [],
     list: [],
@@ -49,6 +50,14 @@ export function coursesReducer(state = initialState, action) {
       return {
         ...state,
         selectedCourse: action.payload,
+      }
+    case 'COURSES_SET_ADDITION_DIALOG_OPEN':
+      return {
+        ...state,
+        listenersAddition: {
+          ...state.listenersAddition,
+          isDialogOpen: action.payload,
+        },
       }
     case 'COURSES_CHANGE_REQUEST_STATUS':
       return {
@@ -207,6 +216,7 @@ export function coursesReducer(state = initialState, action) {
 
             return {
               id: user.id,
+              login: user.username.toLowerCase(),
               name: user.fullname,
               isUserAdded,
             }

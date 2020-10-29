@@ -3,7 +3,12 @@ import { withRouter } from 'react-router-dom'
 import { compose } from 'redux'
 import { Field, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { Button, Typography, InputAdornment } from '@material-ui/core'
+import {
+  Button,
+  Typography,
+  InputAdornment,
+  TextField,
+} from '@material-ui/core'
 import {
   Save as SaveIcon,
   Phone as PhoneIcon,
@@ -60,6 +65,30 @@ const Profile = (props) => {
       <Typography className={classes.h6} variant="h6">
         {title}
       </Typography>
+      <TextField
+        margin="dense"
+        autoComplete="off"
+        variant="outlined"
+        label="Фамилия"
+        value={data.list.lastname}
+        className={classes.textField}
+      />
+      <TextField
+        margin="dense"
+        autoComplete="off"
+        variant="outlined"
+        label="Имя"
+        value={data.list.firstname}
+        className={classes.textField}
+      />
+      <TextField
+        margin="dense"
+        autoComplete="off"
+        variant="outlined"
+        label="Отчество"
+        value={data.list.middlename}
+        className={classes.textField}
+      />
       <ProfileForm onSubmit={handleSubmit} initialValues={data.list} />
     </>
   )
@@ -70,9 +99,6 @@ let ProfileForm = (props) => {
   return (
     <form onSubmit={props.handleSubmit}>
       <>
-        <Field name="lastname" component={Input} label="Фамилия" readOnly />
-        <Field name="firstname" component={Input} label="Имя" readOnly />
-        <Field name="middlename" component={Input} label="Отчество" readOnly />
         <Field
           name="email"
           component={Input}
@@ -108,7 +134,7 @@ let ProfileForm = (props) => {
           label="СНИЛС"
         />
         <Field
-          name="birthDate"
+          name="birthdate"
           component={DateInput}
           parse={parseDate}
           views={['year', 'date']}

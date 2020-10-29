@@ -4,22 +4,33 @@ import { useDispatch } from 'react-redux'
 import { Field, reduxForm } from 'redux-form'
 import { Grid, Button, InputAdornment } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Save as SaveIcon, Email as EmailIcon, Phone as PhoneIcon} from '@material-ui/icons'
+import {
+  Save as SaveIcon,
+  Email as EmailIcon,
+  Phone as PhoneIcon,
+} from '@material-ui/icons'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
-import { Input, MaskedInput, DateInput } from '../Commons/FormsControls/FormsControls'
-import { isEmailValid, isStringContainsUnderscore } from '../../utils/validate.js'
+import {
+  Input,
+  MaskedInput,
+  DateInput,
+} from '../Commons/FormsControls/FormsControls'
+import {
+  isEmailValid,
+  isStringContainsUnderscore,
+} from '../../utils/validate.js'
 import { parseDate } from '../../utils/parse.js'
 import allActions from '../../store/actions'
 import styles from '../../styles.js'
 
-const useStyles = makeStyles(theme => ({ ...styles(theme) }))
+const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
 
 const Registration = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const actions = allActions.regActions
 
-  const handleSubmit = values => {
+  const handleSubmit = (values) => {
     dispatch(actions.addUser(values))
   }
 
@@ -27,7 +38,7 @@ const Registration = () => {
     <Grid container direction="column" justify="center" alignItems="center">
       <HeaderLayout />
       <h3 className={classes.h3}>Регистрация</h3>
-      <RegistrationForm onSubmit={handleSubmit}/>
+      <RegistrationForm onSubmit={handleSubmit} />
       <NavLink to="/auth" className={classes.link}>
         Перейти на страницу авторизации
       </NavLink>
@@ -35,28 +46,13 @@ const Registration = () => {
   )
 }
 
-let RegistrationForm = props => {
+let RegistrationForm = (props) => {
   const classes = useStyles()
-  return(
+  return (
     <form className={classes.form} onSubmit={props.handleSubmit}>
-      <Field
-        name="lastName"
-        component={Input}
-        label="Фамилия"
-        required
-      />
-      <Field
-        name="firstName"
-        component={Input}
-        label="Имя"
-        required
-      />
-      <Field
-        name="middleName"
-        component={Input}
-        label="Отчество"
-        required
-      />
+      <Field name="lastName" component={Input} label="Фамилия" required />
+      <Field name="firstName" component={Input} label="Имя" required />
+      <Field name="middleName" component={Input} label="Отчество" required />
       <Field
         name="email"
         component={Input}
@@ -91,7 +87,7 @@ let RegistrationForm = props => {
         label="СНИЛС"
       />
       <Field
-        name="birthDate"
+        name="birthdate"
         component={DateInput}
         parse={parseDate}
         views={['year', 'date']}

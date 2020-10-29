@@ -20,9 +20,10 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  useMediaQuery,
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import MainLayout from '../Main/MainLayout'
@@ -87,6 +88,8 @@ const CheckboxInput = ({ checked, onFilterChange, edited, label }) => {
 
 const CoursesList = () => {
   const classes = useStyles()
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   const dispatch = useDispatch()
   const currentUserID = userAPI.getUID()
   const isLoading = useSelector((state) => state.loader.isLoading)
@@ -524,46 +527,48 @@ const CoursesList = () => {
                 onChange={handlePageChange}
               />
             </Grid>
-            <TableContainer component={Paper}>
-              <Table /*stickyHeader*/ size="small" className={classes.table}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell></TableCell>
-                    <TableCell>Программа</TableCell>
-                    <TableCell align="left">Специальность</TableCell>
-                    <TableCell style={{ minWidth: 115 }} align="center">
-                      Дата начала
-                    </TableCell>
-                    <TableCell align="center">Объём (часов)</TableCell>
-                    <TableCell align="center">
-                      Стоимость на 1 чел. (руб)
-                    </TableCell>
-                    <TableCell style={{ minWidth: 185 }} align="center">
-                      Подача заявки
-                    </TableCell>
-                    {data.roots.group ? (
-                      <TableCell align="center">
-                        Слушатели, подавшие заявки
+            {!fullScreen && (
+              <TableContainer component={Paper}>
+                <Table /*stickyHeader*/ size="small" className={classes.table}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell></TableCell>
+                      <TableCell>Программа</TableCell>
+                      <TableCell align="left">Специальность</TableCell>
+                      <TableCell style={{ minWidth: 115 }} align="center">
+                        Дата начала
                       </TableCell>
-                    ) : null}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.list.map((course) => (
-                    <Course
-                      key={course.ID}
-                      roots={data.roots}
-                      course={course}
-                      onWindowOpen={openListenersWindow}
-                      onAddWindowOpen={openAddListenersWindow}
-                      onSubmitRequest={submitRequestDialogOpen}
-                      onCancelRequest={cancelRequestDialogOpen}
-                      currentUserID={currentUserID}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                      <TableCell align="center">Объём (часов)</TableCell>
+                      <TableCell align="center">
+                        Стоимость на 1 чел. (руб)
+                      </TableCell>
+                      <TableCell style={{ minWidth: 185 }} align="center">
+                        Подача заявки
+                      </TableCell>
+                      {data.roots.group ? (
+                        <TableCell align="center">
+                          Слушатели, подавшие заявки
+                        </TableCell>
+                      ) : null}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {data.list.map((course) => (
+                      <Course
+                        key={course.ID}
+                        roots={data.roots}
+                        course={course}
+                        onWindowOpen={openListenersWindow}
+                        onAddWindowOpen={openAddListenersWindow}
+                        onSubmitRequest={submitRequestDialogOpen}
+                        onCancelRequest={cancelRequestDialogOpen}
+                        currentUserID={currentUserID}
+                      />
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
           </>
         ) : (
           <Typography>Список программ пуст</Typography>

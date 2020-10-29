@@ -38,11 +38,11 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const [open, setOpen] = React.useState(false)
-  const [dialogOpen, setDialogOpen] = React.useState(false)
   const [inputValue, setInputValue] = React.useState('')
   const [autocompleteValue, setAutocompleteValue] = React.useState(null)
   const data = useSelector((state) => state.courses.listenersAddition)
   const course = useSelector((state) => state.courses.selectedCourse)
+  const dialogOpen = data.isDialogOpen
   const actions = allActions.coursesActions
   const loading = data.isLoading
 
@@ -61,11 +61,11 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
   }
 
   const onDialogOpen = () => {
-    setDialogOpen(true)
+    dispatch(actions.setAdditionDialogOpen(true))
   }
 
   const onDialogClose = () => {
-    setDialogOpen(false)
+    dispatch(actions.setAdditionDialogOpen(false))
   }
 
   return (
@@ -85,7 +85,7 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
         noOptionsText="Список пуст"
         getOptionSelected={(option, value) => option.name === value.name}
         getOptionDisabled={(option) => option.isUserAdded}
-        getOptionLabel={(option) => option.name}
+        getOptionLabel={(option) => `${option.name} (${option.login})`}
         options={data.options}
         loading={loading}
         inputValue={inputValue}
@@ -100,7 +100,7 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
         }}
         renderOption={(option) => (
           <>
-            <span>{option.name}</span>
+            <span>{`${option.name} (${option.login})`}</span>
             {option.isUserAdded && <CheckIcon className={classes.iconTitle} />}
           </>
         )}
@@ -153,6 +153,7 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
             <TableHead>
               <TableRow>
                 <TableCell>Фамилия</TableCell>
+                <TableCell>Логин</TableCell>
                 <TableCell style={{ width: 25 }}></TableCell>
               </TableRow>
             </TableHead>
@@ -160,6 +161,7 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
               {data.list.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.login}</TableCell>
                   <TableCell>
                     <IconButton onClick={() => removeListener(user.id)}>
                       <ClearIcon />
