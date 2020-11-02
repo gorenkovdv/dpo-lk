@@ -10,6 +10,7 @@ import {
   Button,
   Checkbox,
   FormGroup,
+  CircularProgress,
   FormControlLabel,
   Box,
   Collapse,
@@ -23,6 +24,8 @@ import {
   useMediaQuery,
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
+import Autocomplete from '@material-ui/lab/Autocomplete'
+import { Check as CheckIcon } from '@material-ui/icons/'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
@@ -37,14 +40,14 @@ import styles from '../../styles.js'
 import { parseDate, parseCourseDate } from '../../utils/parse.js'
 import { userAPI } from '../../services/api'
 import Course from './Course'
+import CourseMobile from './CourseMobile'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),
   inlineDateField: {
     width: 175,
-    margin: theme.spacing(0, 0.5),
     '&:first-child': {
-      marginLeft: 0,
+      marginRight: 10,
     },
   },
   filterPaper: {
@@ -89,7 +92,7 @@ const CheckboxInput = ({ checked, onFilterChange, edited, label }) => {
 const CoursesList = () => {
   const classes = useStyles()
   const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const fullScreen = useMediaQuery(theme.breakpoints.up('md'))
   const dispatch = useDispatch()
   const currentUserID = userAPI.getUID()
   const isLoading = useSelector((state) => state.loader.isLoading)
@@ -98,6 +101,10 @@ const CoursesList = () => {
   const [startDate, setStartDate] = useState(data.filters.startDate)
   const [endDate, setEndDate] = useState(data.filters.endDate)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [isListenersWindowOpen, setListenersWindowOpen] = React.useState(false)
+  const [isAddListenersWindowOpen, setAddListenersWindowOpen] = React.useState(
+    false
+  )
   const minStartDate = data.filters.minStartDate
   const maxEndDate = data.filters.maxEndDate
 
@@ -153,9 +160,15 @@ const CoursesList = () => {
       case 'forNursingStaff':
         if (!value && !data.filters.forDoctors) changes.forDoctors = true
         break
+      case 'searchString':
+        changes.searchString = value[0]
+        changes.searchUser = value[1]
+        break
       default:
         break
     }
+
+    console.log(changes)
 
     dispatch(
       actions.changeListParams(data.currentPage, data.pageSize, {
@@ -212,11 +225,6 @@ const CoursesList = () => {
     dispatch(actions.cancelRequest(data.selectedCourse, rowID))
   }
 
-  const [isListenersWindowOpen, setListenersWindowOpen] = React.useState(false)
-  const [isAddListenersWindowOpen, setAddListenersWindowOpen] = React.useState(
-    false
-  )
-
   const openListenersWindow = (course) => {
     dispatch(actions.setSelectedCourse(course))
     setListenersWindowOpen(true)
@@ -264,6 +272,16 @@ const CoursesList = () => {
     let currentDate = parseCourseDate(value, minDate, maxDate)
     if (currentDate && currentDate !== data.filters[filter])
       handleFilterChange(filter, currentDate)
+  }
+
+  const [autocompleteOpen, setAutocompleteOpen] = React.useState(false)
+  const [autocompleteValue, setAutocompleteValue] = React.useState(null)
+  const [inputValue, setInputValue] = React.useState('')
+  const loading = data.listenersAddition.isLoading
+
+  const onInputChange = (e, value) => {
+    setInputValue(value)
+    dispatch(actions.getListenersOptions(value))
   }
 
   if (isLoading) return null
@@ -386,7 +404,7 @@ const CoursesList = () => {
             </Grid>
           </Box>
         </Collapse>
-        <Typography>Диапазон даты начала программы курса:</Typography>
+        <Typography>Диапазон даты начала программы курса</Typography>
         <Grid container direction="row" alignItems="flex-start">
           <Grid item className={classes.inlineDateField}>
             <DateInput
@@ -466,6 +484,65 @@ const CoursesList = () => {
               }}
             />
           </Grid>
+          <Grid item style={{ marginTop: 10 }} className={classes.fullWidth}>
+            <Typography className={classes.bold}>
+              Поиск по ФИО слушателя
+            </Typography>
+            <Autocomplete
+              open={autocompleteOpen}
+              onOpen={() => setAutocompleteOpen(true)}
+              onClose={() => setAutocompleteOpen(false)}
+              noOptionsText="Список пуст"
+              getOptionSelected={(option, value) => option.name === value.name}
+              getOptionDisabled={(option) => option.isUserAdded}
+              getOptionLabel={(option) =>
+                `${option.name}${option.login ? ` (${option.login})` : ``}`
+              }
+              options={data.listenersAddition.options}
+              loading={loading}
+              inputValue={inputValue}
+              value={autocompleteValue}
+              onInputChange={onInputChange}
+              onChange={(e, value) => {
+                setAutocompleteValue(value)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter')
+                  handleFilterChange('searchFioString', e.target.value)
+              }}
+              classes={{
+                option: classes.option,
+                noOptions: classes.option,
+              }}
+              renderOption={(option) => (
+                <>
+                  <span>{`${option.name}${
+                    option.login ? ` (${option.login})` : ``
+                  }`}</span>
+                  {option.isUserAdded && (
+                    <CheckIcon className={classes.iconTitle} />
+                  )}
+                </>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Введите полностью или частично ФИО слушателя"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loading ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+            />
+          </Grid>
           <Grid container direction="row" alignItems="center">
             <Grid item>
               <Button
@@ -473,7 +550,12 @@ const CoursesList = () => {
                 type="button"
                 size="small"
                 color="primary"
-                onClick={() => handleFilterChange('searchString', searchString)}
+                onClick={() => {
+                  handleFilterChange('searchString', [
+                    searchString,
+                    autocompleteValue.id,
+                  ])
+                }}
               >
                 Поиск
               </Button>
@@ -486,7 +568,8 @@ const CoursesList = () => {
                 color="primary"
                 onClick={() => {
                   setSearchString('')
-                  handleFilterChange('searchString', '')
+                  setAutocompleteValue(null)
+                  handleFilterChange('searchString', ['', null])
                 }}
               >
                 Очистить
@@ -495,85 +578,102 @@ const CoursesList = () => {
           </Grid>
         </Grid>
       </Paper>
-      {!data.isPageLoading ? (
-        data.list.length ? (
-          <>
-            <Grid
-              container
-              className={classes.verticalMargin}
-              direction="row"
-              alignItems="center"
+      {data.list.length ? (
+        <>
+          <Grid
+            container
+            className={classes.verticalMargin}
+            direction="row"
+            alignItems="center"
+          >
+            <Typography component="span">На странице:</Typography>
+            <TextField
+              select
+              autoComplete="off"
+              margin="dense"
+              className={classes.smallSelect}
+              InputProps={{ disableUnderline: true }}
+              value={data.pageSize}
+              onChange={handlePageSizeChange}
             >
-              <Typography component="span">На странице:</Typography>
-              <TextField
-                select
-                autoComplete="off"
-                margin="dense"
-                className={classes.smallSelect}
-                InputProps={{ disableUnderline: true }}
-                value={data.pageSize}
-                onChange={handlePageSizeChange}
-              >
-                {pageCountVariants.map((count) => (
-                  <MenuItem key={count} value={count}>
-                    {count}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <Pagination
-                color="primary"
-                page={data.currentPage}
-                count={Math.ceil(data.totalCount / data.pageSize)}
-                onChange={handlePageChange}
-              />
-            </Grid>
-            {!fullScreen && (
-              <TableContainer component={Paper}>
-                <Table /*stickyHeader*/ size="small" className={classes.table}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell></TableCell>
-                      <TableCell>Программа</TableCell>
-                      <TableCell align="left">Специальность</TableCell>
-                      <TableCell style={{ minWidth: 115 }} align="center">
-                        Дата начала
-                      </TableCell>
-                      <TableCell align="center">Объём (часов)</TableCell>
+              {pageCountVariants.map((count) => (
+                <MenuItem key={count} value={count}>
+                  {count}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Pagination
+              color="primary"
+              page={data.currentPage}
+              count={Math.ceil(data.totalCount / data.pageSize)}
+              onChange={handlePageChange}
+            />
+          </Grid>
+          {fullScreen ? (
+            <TableContainer component={Paper}>
+              <Table size="small" className={classes.table}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell></TableCell>
+                    <TableCell>Программа</TableCell>
+                    <TableCell align="left">Специальность</TableCell>
+                    <TableCell style={{ minWidth: 115 }} align="center">
+                      Дата начала
+                    </TableCell>
+                    <TableCell align="center">Объём (часов)</TableCell>
+                    <TableCell align="center">
+                      Стоимость на 1 чел. (руб)
+                    </TableCell>
+                    <TableCell style={{ minWidth: 185 }} align="center">
+                      Подача заявки
+                    </TableCell>
+                    {data.roots.group ? (
                       <TableCell align="center">
-                        Стоимость на 1 чел. (руб)
+                        Слушатели, подавшие заявки
                       </TableCell>
-                      <TableCell style={{ minWidth: 185 }} align="center">
-                        Подача заявки
-                      </TableCell>
-                      {data.roots.group ? (
-                        <TableCell align="center">
-                          Слушатели, подавшие заявки
-                        </TableCell>
-                      ) : null}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {data.list.map((course) => (
-                      <Course
-                        key={course.ID}
-                        roots={data.roots}
-                        course={course}
-                        onWindowOpen={openListenersWindow}
-                        onAddWindowOpen={openAddListenersWindow}
-                        onSubmitRequest={submitRequestDialogOpen}
-                        onCancelRequest={cancelRequestDialogOpen}
-                        currentUserID={currentUserID}
-                      />
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </>
-        ) : (
-          <Typography>Список программ пуст</Typography>
-        )
-      ) : null}
+                    ) : null}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.list.map((course) => (
+                    <Course
+                      key={course.ID}
+                      roots={data.roots}
+                      course={course}
+                      onWindowOpen={openListenersWindow}
+                      onAddWindowOpen={openAddListenersWindow}
+                      onSubmitRequest={submitRequestDialogOpen}
+                      onCancelRequest={cancelRequestDialogOpen}
+                      currentUserID={currentUserID}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <TableContainer component={Paper}>
+              <Table size="small" className={classes.mobileTable}>
+                <TableBody>
+                  {data.list.map((course) => (
+                    <CourseMobile
+                      key={course.ID}
+                      roots={data.roots}
+                      course={course}
+                      onWindowOpen={openListenersWindow}
+                      onAddWindowOpen={openAddListenersWindow}
+                      onSubmitRequest={submitRequestDialogOpen}
+                      onCancelRequest={cancelRequestDialogOpen}
+                      currentUserID={currentUserID}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </>
+      ) : (
+        <Typography>Список программ пуст</Typography>
+      )}
       <DialogLayout
         options={submitRequestDialogParams}
         onClose={submitRequestDialogClose}

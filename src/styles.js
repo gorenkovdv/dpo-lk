@@ -94,6 +94,10 @@ const styles = (theme) => ({
     minWidth: 650,
     borderCollapse: 'collapse',
   },
+  mobileTable: {
+    width: '100%',
+    borderCollapse: 'collapse',
+  },
 })
 
 export default styles

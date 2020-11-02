@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 100,
   },*/
   drawer: {
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
       width: DRAWER_WIDTH,
       flexShrink: 0,
     },
@@ -174,7 +174,7 @@ const DrawerLayout = (props) => {
 
   return (
     <nav className={classes.drawer} aria-label="mailbox folders">
-      <Hidden smUp implementation="css">
+      <Hidden mdUp implementation="css">
         <Drawer
           container={props.container}
           variant="temporary"
@@ -187,7 +187,7 @@ const DrawerLayout = (props) => {
           {drawer}
         </Drawer>
       </Hidden>
-      <Hidden xsDown implementation="css">
+      <Hidden smDown implementation="css">
         <Drawer
           open
           classes={{ paper: classes.drawerPaper }}

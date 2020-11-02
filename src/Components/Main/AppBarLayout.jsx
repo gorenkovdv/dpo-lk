@@ -15,21 +15,22 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import {
   Menu as MenuIcon,
   MoreVert as MoreIcon,
-  ExitToApp as ExitToAppIcon} from '@material-ui/icons'
+  ExitToApp as ExitToAppIcon,
+} from '@material-ui/icons'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import allActions from '../../store/actions'
 import { DRAWER_WIDTH } from '../../store/const.js'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   appBar: {
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
       width: `calc(100% - ${DRAWER_WIDTH}px)`,
       marginLeft: DRAWER_WIDTH,
     },
   },
   menuButton: {
     marginRight: theme.spacing(2),
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
       display: 'none',
     },
   },
@@ -39,13 +40,13 @@ const useStyles = makeStyles(theme => ({
   },
   sectionDesktop: {
     display: 'none',
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
       display: 'flex',
     },
   },
   sectionMobile: {
     display: 'flex',
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
       display: 'none',
     },
   },
@@ -54,7 +55,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const AppBarLayout = props => {
+const AppBarLayout = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const theme = useTheme()
@@ -69,7 +70,7 @@ const AppBarLayout = props => {
   const mobileMenuId = 'primary-search-account-menu-mobile'
   const pagesType = props.pagesType
 
-  const handleMobileMenuOpen = event => {
+  const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget)
   }
 

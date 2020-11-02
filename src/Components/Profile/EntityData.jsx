@@ -95,9 +95,7 @@ let EntityDataForm = (props) => {
         name="locality"
         label="Населённый пункт"
         component={Input}
-        adornment={{
-          startAdornment: <InputAdornment>{localityTooltip}</InputAdornment>,
-        }}
+        adornment={<InputAdornment>{localityTooltip}</InputAdornment>}
       />
       <Field
         name="localityType"
@@ -120,9 +118,7 @@ let EntityDataForm = (props) => {
         name="street"
         label="Улица"
         component={Input}
-        adornment={{
-          startAdornment: <InputAdornment>{streetTooltip}</InputAdornment>,
-        }}
+        adornment={<InputAdornment>{streetTooltip}</InputAdornment>}
       />
       <Field name="house" label="Номер дома" component={Input} />
       <Field

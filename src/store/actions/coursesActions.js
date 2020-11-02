@@ -52,6 +52,8 @@ const requestCourses = (page, count, filters) => async (dispatch) => {
   dispatch(loaderActions.setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
 
+  console.log(response.data)
+
   if (response.data.response) {
     dispatch(
       loadingSuccess({
@@ -69,6 +71,8 @@ const requestCourses = (page, count, filters) => async (dispatch) => {
 const changeListParams = (page, count, filters) => async (dispatch) => {
   dispatch(loaderActions.setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
+
+  console.log(response.data)
 
   if (response.data.response) {
     dispatch(

@@ -90,11 +90,6 @@ const Course = ({
           {course.Territory && (
             <small className={classes.block}>({course.Territory})</small>
           )}
-          {parseInt(course.IsCME) === 1 && (
-            <Tooltip title="Непрерывное медицинское образование">
-              <img className={classes.imageIcon} src={cmeIcon} alt="cmeIcon" />
-            </Tooltip>
-          )}
           {course.MoodleID && (
             <Tooltip title="Курс на платформе внеаудиторной учебной работы (Moodle)">
               <a
@@ -108,6 +103,11 @@ const Course = ({
                   alt="moodleIcon"
                 />
               </a>
+            </Tooltip>
+          )}
+          {parseInt(course.IsCME) === 1 && (
+            <Tooltip title="Непрерывное медицинское образование">
+              <img className={classes.imageIcon} src={cmeIcon} alt="cmeIcon" />
             </Tooltip>
           )}
           {course.AdditionalSpecialities && (
@@ -194,7 +194,7 @@ const Course = ({
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
               <Typography variant="h6" gutterBottom component="div">
-                {`${course.Name} (${course.ID})`}
+                {course.Name}
               </Typography>
               <Table size="small">
                 <TableBody>
@@ -248,6 +248,10 @@ const Course = ({
                         ? course.Price
                         : 'за счёт средств бюджета'}
                     </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell align="right">Группа слушателей</TableCell>
+                    <TableCell align="left">{course.ListenersGroup}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell align="right">Форма обучения</TableCell>

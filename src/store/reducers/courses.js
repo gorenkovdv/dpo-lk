@@ -4,6 +4,7 @@ const initialState = {
   list: {},
   filters: {
     searchString: '',
+    searchUser: null,
     enrolPossible: true,
     CME: true,
     traditional: true,
@@ -207,16 +208,17 @@ export function coursesReducer(state = initialState, action) {
               return null
             })
 
-            state.list
-              .find((item) => item.ID === state.selectedCourse.ID)
-              .users.map((addedUser) => {
-                if (addedUser.id === user.id) isUserAdded = true
-                return null
-              })
+            if (state.selectedCourse)
+              state.list
+                .find((item) => item.ID === state.selectedCourse.ID)
+                .users.map((addedUser) => {
+                  if (addedUser.id === user.id) isUserAdded = true
+                  return null
+                })
 
             return {
               id: user.id,
-              login: user.username.toLowerCase(),
+              login: user.username ? user.username.toLowerCase() : null,
               name: user.fullname,
               isUserAdded,
             }

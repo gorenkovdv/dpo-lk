@@ -79,13 +79,16 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
       title={`Запись слушателей на курс «${course.Name}»`}
     >
       <Autocomplete
+        style={{ width: '100%' }}
         open={open}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
         noOptionsText="Список пуст"
         getOptionSelected={(option, value) => option.name === value.name}
         getOptionDisabled={(option) => option.isUserAdded}
-        getOptionLabel={(option) => `${option.name} (${option.login})`}
+        getOptionLabel={(option) =>
+          `${option.name}${option.login ? ` (${option.login})` : ``}`
+        }
         options={data.options}
         loading={loading}
         inputValue={inputValue}
@@ -100,15 +103,16 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
         }}
         renderOption={(option) => (
           <>
-            <span>{`${option.name} (${option.login})`}</span>
+            <span>{`${option.name}${
+              option.login ? ` (${option.login})` : ``
+            }`}</span>
             {option.isUserAdded && <CheckIcon className={classes.iconTitle} />}
           </>
         )}
         renderInput={(params) => (
           <TextField
             {...params}
-            variant="outlined"
-            label="Поиск слушателя"
+            label="Введите полностью или частично ФИО слушателя"
             InputProps={{
               ...params.InputProps,
               endAdornment: (
@@ -152,7 +156,7 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
           <Table size="small" stickyHeader className={classes.table}>
             <TableHead>
               <TableRow>
-                <TableCell>Фамилия</TableCell>
+                <TableCell>ФИО</TableCell>
                 <TableCell>Логин</TableCell>
                 <TableCell style={{ width: 25 }}></TableCell>
               </TableRow>
