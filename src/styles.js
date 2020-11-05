@@ -87,9 +87,6 @@ const styles = (theme) => ({
   fullWidth: {
     width: '100%',
   },
-  tableContainer: {
-    /*maxHeight: 500,*/
-  },
   table: {
     minWidth: 650,
     borderCollapse: 'collapse',

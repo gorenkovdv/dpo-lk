@@ -40,13 +40,27 @@ const RequestsList = () => {
     setCancelRequestDialogParams,
   ] = React.useState({ open: false, disabled: false })
 
+  const [documentsDialogParams, setDocumentsDialogParams] = React.useState({
+    open: false,
+    disabled: false,
+  })
+
   const cancelRequestDialogOpen = (course) => {
     setSelectedCourse(course)
     setCancelRequestDialogParams({ open: true, disabled: false })
   }
 
+  const documentsDialogOpen = (course) => {
+    setSelectedCourse(course)
+    setDocumentsDialogParams({ open: true, disabled: false })
+  }
+
   const cancelRequestDialogClose = () => {
     setCancelRequestDialogParams({ open: false, disabled: true })
+  }
+
+  const documentsDialogClose = () => {
+    setDocumentsDialogParams({ open: false, disabled: true })
   }
 
   const cancelRequest = () => {
@@ -64,18 +78,20 @@ const RequestsList = () => {
       </Typography>
       {data.list.length ? (
         <TableContainer className={classes.tableContainer} component={Paper}>
-          <Table /*stickyHeader*/ size="small" className={classes.table}>
+          <Table size="small" className={classes.table}>
             <TableHead>
               <TableRow>
                 <TableCell>Дата</TableCell>
                 <TableCell>Наименование программы</TableCell>
-                <TableCell align="center" style={{ maxWidth: 125 }}>
+                <TableCell align="center" style={{ maxWidth: 145 }}>
                   Учебные материалы на платформе Moodle
                 </TableCell>
+                <TableCell align="center">Оформление документов</TableCell>
                 <TableCell align="center">Заявка с портала НМО</TableCell>
                 <TableCell align="center" style={{ maxWidth: 100 }}>
                   Личная карточка
                 </TableCell>
+                <TableCell>Информация</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
@@ -84,6 +100,7 @@ const RequestsList = () => {
                 <Request
                   key={row.requestID}
                   onCancelRequest={cancelRequestDialogOpen}
+                  onDocumentsDialogOpen={documentsDialogOpen}
                   course={row}
                 />
               ))}
@@ -100,6 +117,11 @@ const RequestsList = () => {
         title="Отменить заявку"
         text={`Отменить заявку на обучение по программе «${selectedCourseName}»?`}
       />
+      <DialogLayout
+        options={documentsDialogParams}
+        onClose={documentsDialogClose}
+        title="Работа с документами"
+      ></DialogLayout>
     </>
   )
 }

@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { Field, reduxForm, submit } from 'redux-form'
 import { makeStyles } from '@material-ui/core/styles'
 import {
+  Grid,
   Typography,
   Tooltip,
   IconButton,
@@ -18,6 +19,7 @@ import moodleIcon from '../../img/moodle.png'
 import cmeIcon from '../../img/CME.png'
 import cardIcon from '../../img/personal_card.png'
 import moneyIcon from '../../img/money.png'
+import contrAnsIcon from '../../img/contr_ans.png'
 import sertIcon from '../../img/sert.png'
 import allActions from '../../store/actions'
 import { userAPI } from '../../services/api'
@@ -30,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Request = ({ course, onCancelRequest }) => {
+const Request = ({ course, onCancelRequest, onDocumentsDialogOpen }) => {
   const classes = useStyles()
   const uid = userAPI.getUID()
   const dispatch = useDispatch()
@@ -55,6 +57,7 @@ const Request = ({ course, onCancelRequest }) => {
     requestCMEDialogClose()
   }
 
+  const IsCME = parseInt(course.IsCME)
   let initialValues = {}
   if (course.RequestCME) {
     const parsedCME = JSON.parse(course.RequestCME)
@@ -71,12 +74,12 @@ const Request = ({ course, onCancelRequest }) => {
           <Typography
             noWrap
           >{`Заявка от ${course.RequestCreateDate}`}</Typography>
-          {parseInt(course.IsCME) === 1 && (
+          {IsCME ? (
             <Tooltip title="Непрерывное медицинское образование">
               <img className={classes.imageIcon} src={cmeIcon} alt="cmeIcon" />
             </Tooltip>
-          )}
-          {parseInt(course.Price) !== 0 && (
+          ) : null}
+          {parseInt(course.Price) > 0 && (
             <Tooltip title="Хозрасчётный курс">
               <img
                 className={classes.imageIcon}
@@ -113,19 +116,36 @@ const Request = ({ course, onCancelRequest }) => {
           )}
         </TableCell>
         <TableCell align="center">
-          <Tooltip title="Заявка с портала НМО">
-            <IconButton
-              onClick={() => {
-                setRequestCMEDialogParams({ open: true, disabled: false })
-              }}
-            >
-              {!course.RequestCME ? (
-                <img style={{ width: 35 }} src={sertIcon} alt="moodleIcon" />
-              ) : (
-                <EditIcon />
-              )}
+          {parseInt(course.Price) > 0 ? (
+            <IconButton onClick={onDocumentsDialogOpen}>
+              <img
+                style={{ width: 35 }}
+                src={contrAnsIcon}
+                alt="contrAnsIcon"
+              />
             </IconButton>
-          </Tooltip>
+          ) : (
+            'Оформление договора не требуется'
+          )}
+        </TableCell>
+        <TableCell align="center">
+          {IsCME ? (
+            <Tooltip title="Заявка с портала НМО">
+              <IconButton
+                onClick={() => {
+                  setRequestCMEDialogParams({ open: true, disabled: false })
+                }}
+              >
+                {!course.RequestCME ? (
+                  <img style={{ width: 35 }} src={sertIcon} alt="moodleIcon" />
+                ) : (
+                  <EditIcon />
+                )}
+              </IconButton>
+            </Tooltip>
+          ) : (
+            'Традиционный курс'
+          )}
         </TableCell>
         <TableCell align="center">
           <Tooltip title="Личная карточка">
@@ -139,6 +159,52 @@ const Request = ({ course, onCancelRequest }) => {
               </a>
             </IconButton>
           </Tooltip>
+        </TableCell>
+        <TableCell>
+          {IsCME && !course.RequestCME ? (
+            <Grid
+              container
+              direction="row"
+              alignItems="flex-start"
+              className={classes.pointer}
+              onClick={() => {
+                setRequestCMEDialogParams({ open: true, disabled: false })
+              }}
+            >
+              <Grid item>
+                <img
+                  className={classes.imageIcon}
+                  src={sertIcon}
+                  alt="moodleIcon"
+                />
+              </Grid>
+              <Grid item>
+                <small>
+                  Укажите специальность и номер заявки с портала НМО!
+                </small>
+              </Grid>
+            </Grid>
+          ) : null}
+          {parseInt(course.Price) > 0 ? (
+            <Grid
+              container
+              direction="row"
+              alignItems="flex-start"
+              className={classes.pointer}
+              onClick={onDocumentsDialogOpen}
+            >
+              <Grid item>
+                <img
+                  className={classes.imageIcon}
+                  src={contrAnsIcon}
+                  alt="moodleIcon"
+                />
+              </Grid>
+              <Grid>
+                <small>Необходимо Ваше участие в оформлении документов</small>
+              </Grid>
+            </Grid>
+          ) : null}
         </TableCell>
         <TableCell>
           <Tooltip title="Отменить заявку">

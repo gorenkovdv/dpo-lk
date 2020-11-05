@@ -161,14 +161,16 @@ const CoursesList = () => {
         if (!value && !data.filters.forDoctors) changes.forDoctors = true
         break
       case 'searchString':
-        changes.searchString = value[0]
-        changes.searchUser = value[1]
+        changes.searchString = value
+        changes.searchUser = null
+        break
+      case 'searchUser':
+        changes.searchString = ''
+        changes.searchUser = value
         break
       default:
         break
     }
-
-    console.log(changes)
 
     dispatch(
       actions.changeListParams(data.currentPage, data.pageSize, {
@@ -277,11 +279,19 @@ const CoursesList = () => {
   const [autocompleteOpen, setAutocompleteOpen] = React.useState(false)
   const [autocompleteValue, setAutocompleteValue] = React.useState(null)
   const [inputValue, setInputValue] = React.useState('')
+  const [selectedFilter, setSelectedFilter] = React.useState('0')
+  const currentFilter = parseInt(selectedFilter)
   const loading = data.listenersAddition.isLoading
 
   const onInputChange = (e, value) => {
     setInputValue(value)
     dispatch(actions.getListenersOptions(value))
+  }
+
+  const onSelectedFilterChange = (e) => {
+    setSelectedFilter(e.target.value)
+    setSearchString('')
+    setAutocompleteValue(null)
   }
 
   if (isLoading) return null
@@ -466,83 +476,101 @@ const CoursesList = () => {
           </Grid>
         </Grid>
         <Grid container direction="column" alignItems="flex-start">
-          <Grid item>
-            <Typography className={classes.bold}>
-              Поиск по специальности, наименованию программы
-            </Typography>
+          <Grid container direction="row" alignItems="center">
+            <Grid item>
+              <Typography>Поиск по </Typography>
+            </Grid>
+            <Grid item>
+              <TextField
+                select
+                autoComplete="off"
+                margin="dense"
+                className={classes.smallSelect}
+                value={selectedFilter}
+                onChange={onSelectedFilterChange}
+              >
+                <MenuItem value="0">
+                  специальности, наименованию программы
+                </MenuItem>
+                <MenuItem value="1">ФИО слушателя</MenuItem>
+              </TextField>
+            </Grid>
           </Grid>
-          <Grid item className={classes.fullWidth}>
-            <TextField
-              name="search"
-              className={classes.fullWidth}
-              value={searchString}
-              placeholder="Введите полностью или частично наименование специальности или программы"
-              onChange={(e) => setSearchString(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter')
-                  handleFilterChange('searchString', e.target.value)
-              }}
-            />
-          </Grid>
-          <Grid item style={{ marginTop: 10 }} className={classes.fullWidth}>
-            <Typography className={classes.bold}>
-              Поиск по ФИО слушателя
-            </Typography>
-            <Autocomplete
-              open={autocompleteOpen}
-              onOpen={() => setAutocompleteOpen(true)}
-              onClose={() => setAutocompleteOpen(false)}
-              noOptionsText="Список пуст"
-              getOptionSelected={(option, value) => option.name === value.name}
-              getOptionDisabled={(option) => option.isUserAdded}
-              getOptionLabel={(option) =>
-                `${option.name}${option.login ? ` (${option.login})` : ``}`
-              }
-              options={data.listenersAddition.options}
-              loading={loading}
-              inputValue={inputValue}
-              value={autocompleteValue}
-              onInputChange={onInputChange}
-              onChange={(e, value) => {
-                setAutocompleteValue(value)
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter')
-                  handleFilterChange('searchFioString', e.target.value)
-              }}
-              classes={{
-                option: classes.option,
-                noOptions: classes.option,
-              }}
-              renderOption={(option) => (
-                <>
-                  <span>{`${option.name}${
-                    option.login ? ` (${option.login})` : ``
-                  }`}</span>
-                  {option.isUserAdded && (
-                    <CheckIcon className={classes.iconTitle} />
-                  )}
-                </>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="Введите полностью или частично ФИО слушателя"
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {loading ? (
-                          <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  }}
-                />
-              )}
-            />
-          </Grid>
+          {!parseInt(selectedFilter) ? (
+            <Grid item className={classes.fullWidth}>
+              <TextField
+                name="search"
+                className={classes.fullWidth}
+                value={searchString}
+                placeholder="Введите полностью или частично наименование специальности или программы"
+                onChange={(e) => setSearchString(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter')
+                    handleFilterChange('searchString', searchString)
+                }}
+              />
+            </Grid>
+          ) : (
+            <Grid className={classes.fullWidth}>
+              <Autocomplete
+                open={autocompleteOpen}
+                onOpen={() => setAutocompleteOpen(true)}
+                onClose={() => setAutocompleteOpen(false)}
+                noOptionsText="Список пуст"
+                getOptionSelected={(option, value) =>
+                  option.name === value.name
+                }
+                getOptionDisabled={(option) => option.isUserAdded}
+                getOptionLabel={(option) =>
+                  `${option.name}${option.login ? ` (${option.login})` : ``}`
+                }
+                options={data.listenersAddition.options}
+                loading={loading}
+                inputValue={inputValue}
+                value={autocompleteValue}
+                onInputChange={onInputChange}
+                onChange={(e, value) => {
+                  setAutocompleteValue(value)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && autocompleteValue) {
+                    handleFilterChange('searchUser', autocompleteValue.id)
+                  }
+                }}
+                classes={{
+                  option: classes.option,
+                  noOptions: classes.option,
+                }}
+                renderOption={(option) => (
+                  <>
+                    <span>{`${option.name}${
+                      option.login ? ` (${option.login})` : ``
+                    }`}</span>
+                    {option.isUserAdded && (
+                      <CheckIcon className={classes.iconTitle} />
+                    )}
+                  </>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Введите полностью или частично ФИО слушателя"
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {loading ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          )}
           <Grid container direction="row" alignItems="center">
             <Grid item>
               <Button
@@ -551,10 +579,10 @@ const CoursesList = () => {
                 size="small"
                 color="primary"
                 onClick={() => {
-                  handleFilterChange('searchString', [
-                    searchString,
-                    autocompleteValue.id,
-                  ])
+                  if (!currentFilter)
+                    handleFilterChange('searchString', searchString)
+                  else if (autocompleteValue)
+                    handleFilterChange('searchUser', autocompleteValue.id)
                 }}
               >
                 Поиск
@@ -567,9 +595,17 @@ const CoursesList = () => {
                 size="small"
                 color="primary"
                 onClick={() => {
-                  setSearchString('')
-                  setAutocompleteValue(null)
-                  handleFilterChange('searchString', ['', null])
+                  if (!currentFilter) {
+                    if (searchString.length) {
+                      setSearchString('')
+                      handleFilterChange('searchString', '')
+                    }
+                  } else {
+                    if (autocompleteValue) {
+                      setAutocompleteValue(null)
+                      handleFilterChange('searchUser', null)
+                    }
+                  }
                 }}
               >
                 Очистить
