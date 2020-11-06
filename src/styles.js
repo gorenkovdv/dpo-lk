@@ -95,6 +95,9 @@ const styles = (theme) => ({
     width: '100%',
     borderCollapse: 'collapse',
   },
+  block: {
+    display: 'block',
+  },
 })
 
 export default styles

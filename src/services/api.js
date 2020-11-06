@@ -236,12 +236,11 @@ export const requestsAPI = {
     )
   },
 
-  async cancelRequest(courseID, rowID) {
+  async cancelRequest(requestID) {
     return await instance.post(
       `cancel_request.php`,
       qs.stringify({
-        courseID,
-        rowID,
+        requestID,
       })
     )
   },

@@ -1,6 +1,7 @@
 import React from 'react'
 import { compose } from 'redux'
 import { useDispatch, useSelector } from 'react-redux'
+import { Field, reduxForm, submit } from 'redux-form'
 import {
   Typography,
   Paper,
@@ -13,7 +14,9 @@ import {
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import MainLayout from '../Main/MainLayout'
+import { MaskedInput, Input } from '../Commons/FormsControls/FormsControls'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
+import { required, isStringContainsUnderscore } from '../../utils/validate.js'
 import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
 import styles from '../../styles.js'
@@ -28,8 +31,6 @@ const RequestsList = () => {
   const isLoading = useSelector((state) => state.loader.isLoading)
   const data = useSelector((state) => state.requests)
   const actions = allActions.requestsActions
-  const [selectedCourse, setSelectedCourse] = React.useState(null)
-  const selectedCourseName = selectedCourse ? selectedCourse.name : ''
 
   React.useEffect(() => {
     dispatch(actions.getRequests())
@@ -45,27 +46,68 @@ const RequestsList = () => {
     disabled: false,
   })
 
-  const cancelRequestDialogOpen = (course) => {
-    setSelectedCourse(course)
+  const [requestCMEDialogParams, setRequestCMEDialogParams] = React.useState({
+    open: false,
+    disabled: true,
+  })
+
+  // onDialogOpen
+  const cancelRequestDialogOpen = (request) => {
+    dispatch(actions.setSelectedRequest(request))
     setCancelRequestDialogParams({ open: true, disabled: false })
   }
 
-  const documentsDialogOpen = (course) => {
-    setSelectedCourse(course)
+  const requestCMEDialogOpen = (request) => {
+    dispatch(actions.setSelectedRequest(request))
+    setRequestCMEDialogParams({ open: true, disabled: false })
+  }
+
+  const documentsDialogOpen = (request) => {
+    dispatch(actions.setSelectedRequest(request))
     setDocumentsDialogParams({ open: true, disabled: false })
   }
 
+  // onDialogClose
   const cancelRequestDialogClose = () => {
+    dispatch(actions.setSelectedRequest(null))
     setCancelRequestDialogParams({ open: false, disabled: true })
+  }
+
+  const requestCMEDialogClose = () => {
+    setRequestCMEDialogParams({ open: false, disabled: true })
   }
 
   const documentsDialogClose = () => {
     setDocumentsDialogParams({ open: false, disabled: true })
   }
 
+  // onDialogApprove
   const cancelRequest = () => {
     cancelRequestDialogClose()
-    dispatch(actions.cancelRequest(selectedCourse, userAPI.getUID()))
+    dispatch(actions.cancelRequest(data.selectedRequest))
+  }
+
+  const handleSubmit = (values) => {
+    dispatch(
+      allActions.requestsActions.updateCMERequest({
+        ...values,
+        rowID: data.selectedRequest.rowID,
+      })
+    )
+    requestCMEDialogClose()
+  }
+
+  let initialValues = {}
+  if (data.selectedRequest) {
+    const selectedRequest = data.list.find(
+      (request) => request.rowID === data.selectedRequest.rowID
+    )
+
+    const parsedCME = JSON.parse(selectedRequest.RequestCME)
+    initialValues = {
+      speciality: parsedCME[0],
+      number: parsedCME[1],
+    }
   }
 
   if (isLoading) return null
@@ -101,7 +143,8 @@ const RequestsList = () => {
                   key={row.requestID}
                   onCancelRequest={cancelRequestDialogOpen}
                   onDocumentsDialogOpen={documentsDialogOpen}
-                  course={row}
+                  onRequestCMEDialogOpen={requestCMEDialogOpen}
+                  row={row}
                 />
               ))}
             </TableBody>
@@ -110,20 +153,69 @@ const RequestsList = () => {
       ) : (
         <Typography>Нет активных заявок</Typography>
       )}
-      <DialogLayout
-        options={cancelRequestDialogParams}
-        onClose={cancelRequestDialogClose}
-        onApprove={cancelRequest}
-        title="Отменить заявку"
-        text={`Отменить заявку на обучение по программе «${selectedCourseName}»?`}
-      />
-      <DialogLayout
-        options={documentsDialogParams}
-        onClose={documentsDialogClose}
-        title="Работа с документами"
-      ></DialogLayout>
+      {data.selectedRequest && (
+        <>
+          <DialogLayout
+            options={cancelRequestDialogParams}
+            onClose={cancelRequestDialogClose}
+            onApprove={cancelRequest}
+            title="Отменить заявку"
+            text={`Отменить заявку на обучение по программе «${data.selectedRequest.courseName}»?`}
+          />
+          <DialogLayout
+            options={requestCMEDialogParams}
+            onClose={requestCMEDialogClose}
+            onApprove={() => dispatch(submit('requestCMEForm'))}
+            approveText="Подтвердить"
+            cancelText="Отмена"
+            title="Заявка с портала НМО"
+            text={`Программа «${data.selectedRequest.courseName}»`}
+          >
+            <RequestCMEForm
+              onSubmit={handleSubmit}
+              initialValues={initialValues}
+            />
+          </DialogLayout>
+          <DialogLayout
+            options={documentsDialogParams}
+            onClose={documentsDialogClose}
+            title="Работа с документами"
+          ></DialogLayout>
+        </>
+      )}
     </>
   )
 }
+
+let RequestCMEForm = (props) => {
+  const specialityFieldRef = React.useRef(null)
+
+  React.useEffect(() => {
+    specialityFieldRef.current.focus()
+  }, [])
+
+  return (
+    <form onSubmit={props.handleSubmit}>
+      <Field
+        inputRef={specialityFieldRef}
+        name="speciality"
+        component={Input}
+        label="Специальность"
+        validate={required}
+        required
+      />
+      <Field
+        name="number"
+        component={MaskedInput}
+        mask={`NMO-999999-2099`}
+        label="Номер документа"
+        validate={[required, isStringContainsUnderscore]}
+        required
+      />
+    </form>
+  )
+}
+
+RequestCMEForm = reduxForm({ form: 'requestCMEForm' })(RequestCMEForm)
 
 export default compose(withAuth, MainLayout)(RequestsList)

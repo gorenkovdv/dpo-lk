@@ -1,5 +1,6 @@
 const initialState = {
   list: {},
+  selectedRequest: null,
 }
 
 export function requestsReducer(state = initialState, action) {
@@ -7,7 +8,9 @@ export function requestsReducer(state = initialState, action) {
     case 'REQUEST_CANCELED':
       return {
         ...state,
-        list: state.list.filter((request) => request.ID !== action.payload),
+        list: state.list.filter(
+          (request) => request.requestID !== action.payload
+        ),
       }
     case 'REQUESTS_LOADING_SUCCESS':
       return {
@@ -28,6 +31,11 @@ export function requestsReducer(state = initialState, action) {
             ]),
           }
         }),
+      }
+    case 'REQUESTS_SET_SELECTED_REQUEST':
+      return {
+        ...state,
+        selectedRequest: action.payload,
       }
     default:
       return state
