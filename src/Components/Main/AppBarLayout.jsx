@@ -64,7 +64,7 @@ const AppBarLayout = (props) => {
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
 
   const [open, setOpen] = useState(false)
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const fullScreen = useMediaQuery(theme.breakpoints.up('sm'))
 
   const menuId = 'primary-search-account-menu'
   const mobileMenuId = 'primary-search-account-menu-mobile'

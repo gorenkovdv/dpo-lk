@@ -18,10 +18,16 @@ const setSelectedRequest = (request) => {
   return { type: 'REQUESTS_SET_SELECTED_REQUEST', payload: request }
 }
 
+const documentsApprove = (data) => {
+  return { type: 'REQUESTS_DOCUMENTS_APPROVE', payload: data }
+}
+
 const getRequests = () => async (dispatch) => {
   dispatch(loaderActions.setLoading())
 
   const response = await requestsAPI.getRequests()
+
+  console.log(response.data)
 
   if (response.data.response) {
     dispatch(loadingSuccess(response.data.requests))
@@ -54,9 +60,22 @@ const updateCMERequest = (data) => async (dispatch) => {
   else dispatch(snackbarActions.showError(response.data.error))
 }
 
+const setDocumentsApprove = (requestID, status) => async (dispatch) => {
+  dispatch(loaderActions.setLoading())
+  const response = await requestsAPI.setDocumentsApprove(requestID, status)
+
+  console.log(response.data)
+
+  if (response.data.response) {
+    dispatch(documentsApprove({ requestID, status }))
+    dispatch(loaderActions.loadingSuccess())
+  } else dispatch(snackbarActions.showError(response.data.error))
+}
+
 export default {
   getRequests,
   cancelRequest,
   updateCMERequest,
   setSelectedRequest,
+  setDocumentsApprove,
 }

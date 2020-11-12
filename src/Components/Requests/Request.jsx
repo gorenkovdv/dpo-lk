@@ -39,6 +39,8 @@ const Request = ({
     ID: row.requestID,
     rowID: row.rowID,
     courseName: row.Name,
+    Price: row.Price,
+    documentsApproved: row.DocumentsApproved,
   }
   const IsCME = parseInt(row.IsCME)
 
@@ -155,7 +157,7 @@ const Request = ({
               </Grid>
             </Grid>
           ) : null}
-          {parseInt(row.Price) > 0 ? (
+          {parseInt(row.Price) > 0 && !parseInt(row.DocumentsApproved) ? (
             <Grid
               container
               direction="row"
@@ -170,7 +172,7 @@ const Request = ({
                   alt="moodleIcon"
                 />
               </Grid>
-              <Grid>
+              <Grid item>
                 <small>Необходимо Ваше участие в оформлении документов</small>
               </Grid>
             </Grid>

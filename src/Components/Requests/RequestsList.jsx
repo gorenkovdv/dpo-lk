@@ -17,11 +17,11 @@ import MainLayout from '../Main/MainLayout'
 import { MaskedInput, Input } from '../Commons/FormsControls/FormsControls'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import { required, isStringContainsUnderscore } from '../../utils/validate.js'
+import RequestDocumentsWindow from './RequestDocumentsWindow'
 import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
 import styles from '../../styles.js'
 import Request from './Request'
-import { userAPI } from '../../services/api'
 
 const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
 
@@ -51,6 +51,18 @@ const RequestsList = () => {
     disabled: true,
   })
 
+  const changeDocumentsApproveButtonState = (check) => {
+    setDocumentsDialogParams({
+      ...documentsDialogParams,
+      disabled: !check,
+    })
+  }
+
+  const cancelDocumentsApprove = () => {
+    dispatch(actions.setDocumentsApprove(data.selectedRequest.ID, 0))
+    documentsDialogClose()
+  }
+
   // onDialogOpen
   const cancelRequestDialogOpen = (request) => {
     dispatch(actions.setSelectedRequest(request))
@@ -64,7 +76,7 @@ const RequestsList = () => {
 
   const documentsDialogOpen = (request) => {
     dispatch(actions.setSelectedRequest(request))
-    setDocumentsDialogParams({ open: true, disabled: false })
+    setDocumentsDialogParams({ open: true, disabled: true })
   }
 
   // onDialogClose
@@ -87,6 +99,11 @@ const RequestsList = () => {
     dispatch(actions.cancelRequest(data.selectedRequest))
   }
 
+  const documentsDialogApprove = () => {
+    dispatch(actions.setDocumentsApprove(data.selectedRequest.ID, 1))
+    documentsDialogClose()
+  }
+
   const handleSubmit = (values) => {
     dispatch(
       allActions.requestsActions.updateCMERequest({
@@ -103,10 +120,12 @@ const RequestsList = () => {
       (request) => request.rowID === data.selectedRequest.rowID
     )
 
-    const parsedCME = JSON.parse(selectedRequest.RequestCME)
-    initialValues = {
-      speciality: parsedCME[0],
-      number: parsedCME[1],
+    if (selectedRequest.RequestCME) {
+      const parsedCME = JSON.parse(selectedRequest.RequestCME)
+      initialValues = {
+        speciality: parsedCME[0],
+        number: parsedCME[1],
+      }
     }
   }
 
@@ -119,7 +138,7 @@ const RequestsList = () => {
         профессиональной переподготовки
       </Typography>
       {data.list.length ? (
-        <TableContainer className={classes.tableContainer} component={Paper}>
+        <TableContainer component={Paper}>
           <Table size="small" className={classes.table}>
             <TableHead>
               <TableRow>
@@ -176,11 +195,13 @@ const RequestsList = () => {
               initialValues={initialValues}
             />
           </DialogLayout>
-          <DialogLayout
+          <RequestDocumentsWindow
             options={documentsDialogParams}
+            onApprove={documentsDialogApprove}
             onClose={documentsDialogClose}
-            title="Работа с документами"
-          ></DialogLayout>
+            onCheck={changeDocumentsApproveButtonState}
+            onCancel={cancelDocumentsApprove}
+          />
         </>
       )}
     </>

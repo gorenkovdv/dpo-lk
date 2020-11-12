@@ -37,6 +37,17 @@ export function requestsReducer(state = initialState, action) {
         ...state,
         selectedRequest: action.payload,
       }
+    case 'REQUESTS_DOCUMENTS_APPROVE':
+      return {
+        ...state,
+        list: state.list.map((request) => {
+          if (
+            parseInt(request.requestID) === parseInt(action.payload.requestID)
+          )
+            return { ...request, DocumentsApproved: action.payload.status }
+          return request
+        }),
+      }
     default:
       return state
   }
