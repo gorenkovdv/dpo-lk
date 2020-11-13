@@ -40,7 +40,7 @@ const Request = ({
     rowID: row.rowID,
     courseName: row.Name,
     Price: row.Price,
-    documentsApproved: row.DocumentsApproved,
+    DocumentsApproved: row.DocumentsApproved,
   }
   const IsCME = parseInt(row.IsCME)
 

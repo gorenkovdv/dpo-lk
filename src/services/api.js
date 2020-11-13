@@ -245,6 +245,15 @@ export const requestsAPI = {
     )
   },
 
+  async removeRequestUser(rowID) {
+    return await instance.post(
+      `cancel_request.php`,
+      qs.stringify({
+        rowID,
+      })
+    )
+  },
+
   async updateCMERequest(data) {
     return await instance.post(`update_CME_request.php`, qs.stringify(data))
   },

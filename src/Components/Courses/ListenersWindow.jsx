@@ -56,30 +56,24 @@ const ListenerWindowContent = ({ options, onClose }) => {
     setListenerInfoWindowOpen(false)
   }
 
-  // dialogParams
-  const [
-    removeRequestDialogParams,
-    setRemoveRequestDialogParams,
-  ] = React.useState({ open: false, disabled: false })
-
   //onDialogOpen
   const removeRequestDialogOpen = (user) => {
-    setSelectedListener(user)
-    setRemoveRequestDialogParams({ open: true, disabled: false })
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Удалить заявку`,
+        text: `Вы действительно хотите удалить заявку?`,
+        onApprove: () => removeUser(user),
+      })
+    )
   }
 
   // onDialogClose
   const removeRequestDialogClose = () => {
-    setRemoveRequestDialogParams({ open: false, disabled: true })
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
   }
 
-  const removeRequest = () => {
-    dispatch(
-      allActions.coursesActions.cancelCourseRequest(
-        course.ID,
-        selectedListener.rowID
-      )
-    )
+  const removeUser = (user) => {
+    dispatch(allActions.coursesActions.removeRequestUser(course.ID, user.rowID))
     removeRequestDialogClose()
   }
 
@@ -184,13 +178,6 @@ const ListenerWindowContent = ({ options, onClose }) => {
           onClose={closeListenerInfoWindow}
         />
       )}
-      <DialogLayout
-        options={removeRequestDialogParams}
-        onClose={removeRequestDialogClose}
-        onApprove={removeRequest}
-        title="Удалить заявку"
-        text={`Вы действительно хотите удалить заявку?`}
-      />
     </DialogLayout>
   )
 }

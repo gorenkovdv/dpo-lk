@@ -10,8 +10,7 @@ import {
   MenuItem,
   Tooltip,
 } from '@material-ui/core'
-import { makeStyles, useTheme } from '@material-ui/core/styles'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
+import { makeStyles } from '@material-ui/core/styles'
 import {
   Menu as MenuIcon,
   MoreVert as MoreIcon,
@@ -58,13 +57,11 @@ const useStyles = makeStyles((theme) => ({
 const AppBarLayout = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const theme = useTheme()
 
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
 
   const [open, setOpen] = useState(false)
-  const fullScreen = useMediaQuery(theme.breakpoints.up('sm'))
 
   const menuId = 'primary-search-account-menu'
   const mobileMenuId = 'primary-search-account-menu-mobile'
@@ -164,7 +161,6 @@ const AppBarLayout = (props) => {
       </Toolbar>
       {renderMobileMenu}
       <DialogLayout
-        fullScreen={fullScreen}
         options={{ open: open }}
         onClose={handleClose}
         onApprove={handleLogout}

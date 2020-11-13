@@ -17,8 +17,8 @@ const setListenerInfo = (data) => {
 const changeRequestStatus = (data) => {
   return { type: 'COURSES_CHANGE_REQUEST_STATUS', payload: data }
 }
-const courseRequestRemoved = (data) => {
-  return { type: 'COURSES_REQUEST_REMOVED', payload: data }
+const requestUserRemoved = (data) => {
+  return { type: 'COURSES_REQUEST_USER_REMOVED', payload: data }
 }
 const checkDataSaved = (data) => {
   return { type: 'COURSES_CHECK_DATA_SAVED', payload: data }
@@ -52,8 +52,6 @@ const requestCourses = (page, count, filters) => async (dispatch) => {
   dispatch(loaderActions.setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
 
-  console.log(response.data)
-
   if (response.data.response) {
     dispatch(
       loadingSuccess({
@@ -72,8 +70,6 @@ const changeListParams = (page, count, filters) => async (dispatch) => {
   dispatch(loaderActions.setLoading())
   const response = await coursesAPI.getCoursesList(page, count, filters)
 
-  console.log(response.data)
-
   if (response.data.response) {
     dispatch(
       loadingSuccess({
@@ -91,28 +87,30 @@ const changeListParams = (page, count, filters) => async (dispatch) => {
 }
 
 const createRequest = (course) => async (dispatch) => {
-  const message = `Подана заявка на обучение по программе «${course.Name}»`
-
   dispatch(loaderActions.setLoading())
   const response = await requestsAPI.createRequest(course.ID)
   const users = response.data.users
 
   if (response.data.response) {
     dispatch(changeRequestStatus({ courseID: course.ID, users }))
-    dispatch(snackbarActions.showSuccess(message))
+    dispatch(
+      snackbarActions.showSuccess(
+        `Подана заявка на обучение по программе «${course.Name}»`
+      )
+    )
     dispatch(loaderActions.loadingSuccess())
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
-const cancelRequest = (course, rowID) => async (dispatch) => {
+const cancelRequest = (course, requestID) => async (dispatch) => {
   const message = `Заявка на обучение по программе «${course.Name}» отменена`
 
   dispatch(loaderActions.setLoading())
-  const response = await requestsAPI.cancelRequest(course.ID, rowID)
+  const response = await requestsAPI.cancelRequest(requestID)
   const users = response.data.users
 
   if (response.data.response) {
-    dispatch(changeRequestStatus({ courseID: course.ID, users, rowID }))
+    dispatch(changeRequestStatus({ courseID: course.ID, users, requestID }))
     dispatch(snackbarActions.showSuccess(message))
     dispatch(loaderActions.loadingSuccess())
   } else dispatch(snackbarActions.showError(response.data.error))
@@ -134,18 +132,20 @@ const createListenersRequests = (courseID, users) => async (dispatch) => {
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
-const cancelCourseRequest = (courseID, rowID) => async (dispatch) => {
-  const response = await requestsAPI.cancelRequest(courseID, rowID)
+const removeRequestUser = (courseID, rowID) => async (dispatch) => {
+  const response = await requestsAPI.removeRequestUser(rowID)
+
+  console.log(response.data)
 
   if (response.data.response) {
     dispatch(
-      courseRequestRemoved({
+      requestUserRemoved({
         courseID,
         rowID,
         userID: userAPI.getUID(),
       })
     )
-    dispatch(snackbarActions.showSuccess('Заявка отменена'))
+    dispatch(snackbarActions.showSuccess('Слушатель удалён из заявки'))
   } else dispatch(snackbarActions.showError(response.data.error))
 }
 
@@ -224,7 +224,7 @@ export default {
   createRequest,
   cancelRequest,
   getListenerInfo,
-  cancelCourseRequest,
+  removeRequestUser,
   saveCheckData,
   getListenersOptions,
   setAdditionDialogOpen,

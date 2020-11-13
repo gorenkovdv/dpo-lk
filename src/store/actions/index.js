@@ -5,6 +5,7 @@ import entityDataActions from './entityDataActions'
 import listenerDataActions from './listenerDataActions'
 import coursesActions from './coursesActions'
 import requestsActions from './requestsActions'
+import confirmDialogActions from './confirmDialogActions'
 
 const allActions = {
   profileActions,
@@ -14,6 +15,7 @@ const allActions = {
   listenerDataActions,
   coursesActions,
   requestsActions,
+  confirmDialogActions,
 }
 
 export default allActions

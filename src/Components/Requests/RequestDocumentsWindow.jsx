@@ -2,7 +2,6 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import {
   Grid,
-  Button,
   Typography,
   FormControlLabel,
   Checkbox,
@@ -15,32 +14,36 @@ import {
 } from '@material-ui/core'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 
-const RequestDocumentsWindow = ({
-  options,
-  onApprove,
-  onClose,
-  onCheck,
-  onCancel,
-}) => {
-  const [checked, setChecked] = React.useState(false)
+const RequestDocumentsWindow = ({ open, onApprove, onClose, onCancel }) => {
   const selectedRequest = useSelector((state) => state.requests.selectedRequest)
+  const approved = parseInt(selectedRequest.DocumentsApproved)
+
+  const [checked, setChecked] = React.useState(false)
+  const [disabled, setDisabled] = React.useState(false)
+
+  const approveText = !approved ? `Подтвердить` : `Отменить условия сделки`
+  const approveFunction = !approved ? onApprove : onCancel
+
+  React.useEffect(() => {
+    setDisabled(Boolean(!approved))
+  }, [approved])
 
   const checkboxChange = (e) => {
     setChecked(!checked)
-    onCheck(!checked)
+    setDisabled(checked)
   }
 
   return (
     <DialogLayout
-      options={options}
-      onApprove={onApprove}
+      options={{ open, disabled }}
+      onApprove={approveFunction}
       onClose={onClose}
       title={`Работа с документами`}
-      approveText={`Сохранить`}
+      approveText={approveText}
       cancelText={`Отмена`}
     >
       <Typography>{`Программа: «${selectedRequest.courseName}»`}</Typography>
-      {!parseInt(selectedRequest.documentsApproved) ? (
+      {!approved ? (
         <>
           <TableContainer component={Paper}>
             <Table style={{ minWidth: 350 }} size="small">
@@ -80,15 +83,6 @@ const RequestDocumentsWindow = ({
       ) : (
         <>
           <Typography>Документы подтверждены</Typography>
-          <Button
-            type="button"
-            size="small"
-            variant={'contained'}
-            color="primary"
-            onClick={onCancel}
-          >
-            Отменить условия сделки
-          </Button>
         </>
       )}
     </DialogLayout>

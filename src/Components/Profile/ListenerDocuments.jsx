@@ -59,15 +59,6 @@ const ListenerDocuments = (props) => {
     )
   }
 
-  const tabProps = (index) => {
-    return {
-      id: `scrollable-auto-tab-${index}`,
-      key: `scrollable-auto-tab-${index}`,
-      'aria-controls': `scrollable-auto-tabpanel-${index}`,
-      className: classes.tab,
-    }
-  }
-
   const handleTabChange = (e, value) => {
     dispatch(allActions.listenerDataActions.setDocumentsTab(value))
   }
@@ -89,9 +80,9 @@ const ListenerDocuments = (props) => {
           variant="scrollable"
           scrollButtons="on"
         >
-          <Tab label="Документы об образовании" {...tabProps(0)} />
-          <Tab label="Сертификат специалиста" {...tabProps(1)} />
-          <Tab label="Иные документы" {...tabProps(2)} />
+          <Tab label="Документы об образовании" className={classes.tab} />
+          <Tab label="Сертификат специалиста" className={classes.tab} />
+          <Tab label="Иные документы" className={classes.tab} />
         </Tabs>
       </AppBar>
       <TabPanel value={selectedTab} index={0}>

@@ -30,7 +30,6 @@ import { makeStyles, useTheme } from '@material-ui/core/styles'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import MainLayout from '../Main/MainLayout'
-import DialogLayout from '../Commons/Dialog/DialogLayout'
 import { DateInput } from '../Commons/FormsControls/FormsControls'
 import ListenersWindow from './ListenersWindow'
 import AddListenersWindow from './AddListenersWindow'
@@ -92,7 +91,7 @@ const CheckboxInput = ({ checked, onFilterChange, edited, label }) => {
 const CoursesList = () => {
   const classes = useStyles()
   const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.up('md'))
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   const dispatch = useDispatch()
   const currentUserID = userAPI.getUID()
   const isLoading = useSelector((state) => state.loader.isLoading)
@@ -180,51 +179,51 @@ const CoursesList = () => {
     )
   }
 
-  const [
-    submitRequestDialogParams,
-    setSubmitRequestDialogParams,
-  ] = React.useState({ open: false, disabled: false })
-
-  const [
-    cancelRequestDialogParams,
-    setCancelRequestDialogParams,
-  ] = React.useState({ open: false, disabled: false })
-
   // onDialogOpen
+  const confirmDialogOpen = ({ title, text, onApprove }) => {
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title,
+        text,
+        onApprove,
+      })
+    )
+  }
+
   const submitRequestDialogOpen = (course) => {
-    dispatch(actions.setSelectedCourse(course))
-    setSubmitRequestDialogParams({ open: true, disabled: false })
+    confirmDialogOpen({
+      title: `Записаться на обучение по программе`,
+      text: `Вы хотите подать заявку на обучение по программе «${course.Name}»?`,
+      onApprove: () => submitRequest(course),
+    })
   }
 
   const cancelRequestDialogOpen = (course) => {
-    dispatch(actions.setSelectedCourse(course))
-    setCancelRequestDialogParams({ open: true, disabled: false })
+    confirmDialogOpen({
+      title: `Отозвать заявку`,
+      text: `Вы хотите отозвать заявку на обучение по программе «${course.Name}»?`,
+      onApprove: () => cancelRequest(course),
+    })
   }
 
   // onDialogClose
-  const submitRequestDialogClose = () => {
-    setSubmitRequestDialogParams({ open: false, disabled: true })
-    dispatch(actions.setSelectedCourse(null))
-  }
-
-  const cancelRequestDialogClose = () => {
-    setCancelRequestDialogParams({ open: false, disabled: true })
-    dispatch(actions.setSelectedCourse(null))
+  const confirmDialogClose = () => {
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
   }
 
   // onDialogApprove
-  const submitRequest = () => {
-    submitRequestDialogClose()
-    dispatch(actions.createRequest(data.selectedCourse))
+  const submitRequest = (course) => {
+    dispatch(actions.createRequest(course))
+    confirmDialogClose()
   }
 
-  const cancelRequest = () => {
-    const rowID = data.list
-      .find((course) => course.ID === data.selectedCourse.ID)
-      .users.find((user) => parseInt(user.id) === parseInt(currentUserID)).rowID
+  const cancelRequest = (course) => {
+    const userRow = data.list
+      .find((listCourse) => listCourse.ID === course.ID)
+      .users.find((user) => parseInt(user.id) === parseInt(currentUserID))
 
-    cancelRequestDialogClose()
-    dispatch(actions.cancelRequest(data.selectedCourse, rowID))
+    dispatch(actions.cancelRequest(course, userRow.requestID))
+    confirmDialogClose()
   }
 
   const openListenersWindow = (course) => {
@@ -645,7 +644,7 @@ const CoursesList = () => {
               onChange={handlePageChange}
             />
           </Grid>
-          {fullScreen ? (
+          {!fullScreen ? (
             <TableContainer component={Paper}>
               <Table size="small" className={classes.table}>
                 <TableHead>
@@ -710,24 +709,6 @@ const CoursesList = () => {
       ) : (
         <Typography>Список программ пуст</Typography>
       )}
-      <DialogLayout
-        options={submitRequestDialogParams}
-        onClose={submitRequestDialogClose}
-        onApprove={submitRequest}
-        title="Записаться на программу"
-        text={`Вы хотите подать заявку на обучение по программе${
-          data.selectedCourse ? ` «${data.selectedCourse.Name}»` : ''
-        }?`}
-      />
-      <DialogLayout
-        options={cancelRequestDialogParams}
-        onClose={cancelRequestDialogClose}
-        onApprove={cancelRequest}
-        title="Записаться на программу"
-        text={`Вы хотите отозвать заявку на обучение по программе${
-          data.selectedCourse ? ` «${data.selectedCourse.Name}»` : ''
-        }?`}
-      />
       {data.selectedCourse && (
         <>
           <ListenersWindow

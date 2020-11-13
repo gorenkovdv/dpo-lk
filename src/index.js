@@ -7,6 +7,7 @@ import thunk from 'redux-thunk'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import { rootReducer } from './store/reducers'
 import AlertSnackbar from './Components/Commons/AlertSnackbar/AlertSnackbar'
+import ConfirmDialog from './Components/Commons/Dialog/ConfirmDialog'
 import * as serviceWorker from './services/serviceWorker'
 import App from './App'
 import history from './history'
@@ -33,8 +34,9 @@ ReactDOM.render(
   <MuiThemeProvider theme={theme}>
     <Router history={history}>
       <Provider store={store}>
-        <AlertSnackbar />
         <App />
+        <AlertSnackbar />
+        <ConfirmDialog />
       </Provider>
     </Router>
   </MuiThemeProvider>,

@@ -139,11 +139,11 @@ const Course = ({
                     currentUserRequests.length > 0 ? 'outlined' : 'contained'
                   }
                   color="primary"
-                  onClick={() => {
-                    if (currentUserRequests.length > 0)
-                      onCancelRequest(currentCourse)
-                    else onSubmitRequest(currentCourse)
-                  }}
+                  onClick={() =>
+                    currentUserRequests.length > 0
+                      ? onCancelRequest(currentCourse)
+                      : onSubmitRequest(currentCourse)
+                  }
                 >
                   {currentUserRequests.length > 0
                     ? `Отозвать заявку`

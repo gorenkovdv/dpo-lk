@@ -300,15 +300,19 @@ let ListenerInfoForm = (props) => {
         </>
       )}
       <Typography className={classes.typography}>Документы</Typography>
-      {values.documents.map((document, index) => {
-        return (
-          <ListenerInfoDocument
-            key={document.id}
-            document={document}
-            index={index}
-          />
-        )
-      })}
+      {values.documents.length > 0 ? (
+        values.documents.map((document, index) => {
+          return (
+            <ListenerInfoDocument
+              key={document.id}
+              document={document}
+              index={index}
+            />
+          )
+        })
+      ) : (
+        <Typography>Нет документов</Typography>
+      )}
     </form>
   )
 }

@@ -70,15 +70,15 @@ const DialogLayout = ({
 }) => {
   const theme = useTheme()
   const classes = useStyles()
-  const fullScreen = useMediaQuery(theme.breakpoints.up('sm'))
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <Dialog
       scroll="paper"
-      fullScreen={!fullScreen}
+      fullScreen={fullScreen}
       open={options.open}
       onClose={onClose}
-      classes={largeSize && fullScreen ? { paper: classes.paper } : null}
+      classes={largeSize && !fullScreen ? { paper: classes.paper } : null}
     >
       <DialogTitle onClose={onClose}>{title}</DialogTitle>
       <DialogContent style={{ minWidth: 450 }}>

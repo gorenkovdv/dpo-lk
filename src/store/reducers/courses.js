@@ -64,13 +64,14 @@ export function coursesReducer(state = initialState, action) {
       return {
         ...state,
         list: state.list.map((course, index) => {
-          if (course.ID === action.payload.courseID) {
+          if (parseInt(course.ID) === parseInt(action.payload.courseID)) {
             return {
               ...course,
-              users: action.payload.rowID
+              users: action.payload.requestID
                 ? state.list[index].users.filter(
                     (user) =>
-                      parseInt(user.rowID) !== parseInt(action.payload.rowID)
+                      parseInt(user.requestID) !==
+                      parseInt(action.payload.requestID)
                   )
                 : state.list[index].users.concat(action.payload.users),
             }
@@ -78,15 +79,16 @@ export function coursesReducer(state = initialState, action) {
           return course
         }),
       }
-    case 'COURSES_REQUEST_REMOVED':
+    case 'COURSES_REQUEST_USER_REMOVED':
       return {
         ...state,
         list: state.list.map((course, index) => {
-          if (course.ID === action.payload.courseID) {
+          if (parseInt(course.ID) === parseInt(action.payload.courseID)) {
             return {
               ...course,
               users: state.list[index].users.filter(
-                (user) => user.rowID !== action.payload.rowID
+                (user) =>
+                  parseInt(user.rowID) !== parseInt(action.payload.rowID)
               ),
             }
           }
