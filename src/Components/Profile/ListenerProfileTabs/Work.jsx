@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Field, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -17,7 +17,6 @@ import {
   Save as SaveIcon,
   PictureAsPdf as PdfIcon,
 } from '@material-ui/icons'
-import DialogLayout from '../../Commons/Dialog/DialogLayout'
 import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
 import {
   localityTooltip,
@@ -119,21 +118,18 @@ let WorkDataForm = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
 
-  const [deleteFileDialogParams, setDeleteFileDialogParams] = useState({
-    open: false,
-    disabled: true,
-  })
-
-  const handleFileDelete = (e) => {
-    setDeleteFileDialogParams({ open: true, disabled: false })
-  }
-
-  const handleDeleteFileDialogClose = () => {
-    setDeleteFileDialogParams({ open: false, disabled: true })
+  const handleFileDelete = () => {
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Удалить файл`,
+        text: `Вы действительно хотите удалить файл?`,
+        onApprove: () => onFileDelete(),
+      })
+    )
   }
 
   const onFileDelete = () => {
-    handleDeleteFileDialogClose()
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
     dispatch(allActions.listenerDataActions.workFileDelete())
   }
 
@@ -164,7 +160,7 @@ let WorkDataForm = (props) => {
               </IconButton>
             </HtmlTooltip>
           </InputAdornment>
-         }
+        }
       />
       <Field name="country" label="Страна" component={Input} />
       <Field name="region" label="Регион (область, край)" component={Input} />
@@ -279,14 +275,6 @@ let WorkDataForm = (props) => {
       >
         Сохранить
       </Button>
-      <DialogLayout
-        options={deleteFileDialogParams}
-        onClose={handleDeleteFileDialogClose}
-        onApprove={onFileDelete}
-        id="delete-file-dialog-title"
-        title="Удалить файл"
-        text="Вы действительно хотите удалить файл?"
-      />
     </form>
   )
 }

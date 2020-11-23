@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Field, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -18,7 +18,6 @@ import {
   PostAdd as AddIcon,
   PictureAsPdf as PdfIcon,
 } from '@material-ui/icons'
-import DialogLayout from '../../Commons/Dialog/DialogLayout'
 import { SAVE_FILES_DIRECTORY } from '../../../store/const.js'
 import {
   Input,
@@ -48,12 +47,6 @@ const Others = ({ username }) => {
   const defaultFileURL = `sertificate${index}.pdf`
   const actions = allActions.listenerDataActions
 
-  const [documentsDialogParams, setDocumentsDialogParams] = useState({
-    open: false,
-    disabled: true,
-    redirect: 0,
-  })
-
   React.useEffect(() => {
     dispatch(actions.requestListenerData(6))
   }, [dispatch, actions])
@@ -76,28 +69,26 @@ const Others = ({ username }) => {
     dispatch(actions.selectDocument(index, 6))
   }
 
+  const confirmTransition = (value) => {
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Выбрать документ`,
+        text: `Новый документ не был сохранён. Вы действительно хотите перейти к другому документу?`,
+        onApprove: () => handleDocumentRedirect(value),
+      })
+    )
+  }
+
   const selectDocument = (e) => {
     if (e.target.value !== index) {
-      if (isDocumentNew) {
-        setDocumentsDialogParams({
-          open: true,
-          disabled: false,
-          redirect: e.target.value,
-        })
-      } else {
-        goToDocument(e.target.value)
-      }
+      if (isDocumentNew) confirmTransition(e.target.value)
+      else goToDocument(e.target.value)
     }
   }
 
-  const handleDocumentsDialogClose = () => {
-    setDocumentsDialogParams({ open: false, disabled: true, redirect: null })
-  }
-
-  const handleDocumentRedirect = () => {
-    handleDocumentsDialogClose()
-
-    dispatch(actions.dropNewOthersDocument(documentsDialogParams.redirect))
+  const handleDocumentRedirect = (value) => {
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(actions.dropNewOthersDocument(value))
   }
 
   const handleSubmit = (values) => {
@@ -196,13 +187,6 @@ const Others = ({ username }) => {
           username={username}
         />
       )}
-      <DialogLayout
-        options={documentsDialogParams}
-        onClose={handleDocumentsDialogClose}
-        onApprove={handleDocumentRedirect}
-        title="Выбрать документ"
-        text="Новый документ не был сохранён. Вы действительно хотите перейти к другому документу?"
-      />
     </>
   )
 }
@@ -213,46 +197,39 @@ let OthersDataForm = (props) => {
   const username = props.username
   const actions = allActions.listenerDataActions
 
-  const [deleteDocumentDialogParams, setDeleteDocumentDialogParams] = useState({
-    open: false,
-    disabled: true,
-  })
-  const [deleteFileDialogParams, setDeleteFileDialogParams] = useState({
-    open: false,
-    disabled: true,
-  })
-
   const cancelNewDocument = () => {
     dispatch(actions.dropNewOthersDocument(0))
   }
 
   // onDialogOpen
-  const deleteDocumentDialogShow = (e) => {
-    setDeleteDocumentDialogParams({ open: true, disabled: false })
+  const deleteDocumentDialogShow = () => {
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Удалить документ`,
+        text: `Вы действительно хотите удалить документ?`,
+        onApprove: () => deleteDocument(),
+      })
+    )
   }
 
-  const deleteFileDialogShow = (e) => {
-    setDeleteFileDialogParams({ open: true, disabled: false })
-  }
-
-  // onDialogClose
-  const deleteDocumentDialogClose = () => {
-    setDeleteDocumentDialogParams({ open: false, disabled: true })
-  }
-
-  const deleteFileDialogClose = () => {
-    setDeleteFileDialogParams({ open: false, disabled: true })
+  const deleteFileDialogShow = () => {
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Удалить файл`,
+        text: `Вы действительно хотите удалить файл?`,
+        onApprove: () => deleteFile(),
+      })
+    )
   }
 
   // onDialogApprove
-  const deleteDocument = (e) => {
-    deleteDocumentDialogClose()
-
+  const deleteDocument = () => {
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
     dispatch(actions.requestDocumentDelete(props.documentId, 6))
   }
 
-  const deleteFile = (e) => {
-    deleteFileDialogClose()
+  const deleteFile = () => {
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
     dispatch(actions.requestFileDelete(props.documentId, 6))
   }
 
@@ -326,20 +303,6 @@ let OthersDataForm = (props) => {
           Отмена
         </Button>
       )}
-      <DialogLayout
-        options={deleteFileDialogParams}
-        onClose={deleteFileDialogClose}
-        onApprove={deleteFile}
-        title="Удалить файл"
-        text="Вы действительно хотите удалить файл?"
-      />
-      <DialogLayout
-        options={deleteDocumentDialogParams}
-        onClose={deleteDocumentDialogClose}
-        onApprove={deleteDocument}
-        title="Удалить документ"
-        text="Вы действительно хотите удалить документ?"
-      />
     </form>
   )
 }

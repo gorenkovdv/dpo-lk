@@ -91,6 +91,8 @@ const createRequest = (course) => async (dispatch) => {
   const response = await requestsAPI.createRequest(course.ID)
   const users = response.data.users
 
+  console.log(response.data)
+
   if (response.data.response) {
     dispatch(changeRequestStatus({ courseID: course.ID, users }))
     dispatch(
@@ -108,6 +110,8 @@ const cancelRequest = (course, requestID) => async (dispatch) => {
   dispatch(loaderActions.setLoading())
   const response = await requestsAPI.cancelRequest(requestID)
   const users = response.data.users
+
+  console.log(response.data)
 
   if (response.data.response) {
     dispatch(changeRequestStatus({ courseID: course.ID, users, requestID }))

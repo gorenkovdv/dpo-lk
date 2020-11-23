@@ -46,31 +46,25 @@ const RequestsList = () => {
   })
 
   // onDialogOpen
-  const confirmDialogOpen = ({ title, text, onApprove }) => {
+  const cancelRequestDialogShow = (request) => {
+    dispatch(actions.setSelectedRequest(request))
     dispatch(
       allActions.confirmDialogActions.confirmDialogShow({
-        title,
-        text,
-        onApprove,
+        title: `Отменить заявку`,
+        text: `Отменить заявку на обучение по программе «${request.courseName}»?`,
+        onApprove: () => cancelRequest(),
       })
     )
   }
 
-  const cancelRequestDialogShow = (request) => {
-    dispatch(actions.setSelectedRequest(request))
-    confirmDialogOpen({
-      title: `Отменить заявку`,
-      text: `Отменить заявку на обучение по программе «${request.courseName}»?`,
-      onApprove: () => cancelRequest(),
-    })
-  }
-
   const cancelDocumentsApproveDialogShow = () => {
-    confirmDialogOpen({
-      title: `Отменить условия сделки`,
-      text: `Вы уверены, что хотите отменить условия сделки?`,
-      onApprove: () => cancelDocumentsApprove(),
-    })
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Отменить условия сделки`,
+        text: `Вы уверены, что хотите отменить условия сделки?`,
+        onApprove: () => cancelDocumentsApprove(),
+      })
+    )
   }
 
   const requestCMEDialogOpen = (request) => {

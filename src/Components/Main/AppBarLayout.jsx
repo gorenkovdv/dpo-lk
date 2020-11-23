@@ -16,7 +16,6 @@ import {
   MoreVert as MoreIcon,
   ExitToApp as ExitToAppIcon,
 } from '@material-ui/icons'
-import DialogLayout from '../Commons/Dialog/DialogLayout'
 import allActions from '../../store/actions'
 import { DRAWER_WIDTH } from '../../store/const.js'
 
@@ -61,8 +60,6 @@ const AppBarLayout = (props) => {
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null)
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
 
-  const [open, setOpen] = useState(false)
-
   const menuId = 'primary-search-account-menu'
   const mobileMenuId = 'primary-search-account-menu-mobile'
   const pagesType = props.pagesType
@@ -75,16 +72,18 @@ const AppBarLayout = (props) => {
     setMobileMoreAnchorEl(null)
   }
 
-  const handleClose = () => {
-    setOpen(false)
-    handleMobileMenuClose()
-  }
-
-  const handleMenuOpen = () => {
-    setOpen(true)
+  const handleDialogOpen = () => {
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Выход из личного кабинета`,
+        text: `Вы действительно хотите выйти из личного кабинета?`,
+        onApprove: () => handleLogout(),
+      })
+    )
   }
 
   const handleLogout = () => {
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
     dispatch(allActions.authActions.logout())
   }
 
@@ -98,7 +97,7 @@ const AppBarLayout = (props) => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem onClick={handleMenuOpen}>
+      <MenuItem onClick={handleDialogOpen}>
         <IconButton
           style={{ marginRight: 10 }}
           aria-label="account-of-current-user"
@@ -127,10 +126,11 @@ const AppBarLayout = (props) => {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap>
-          Личный кабинет&nbsp;
-          {pagesType === 'listener'
-            ? 'слушателя'
-            : 'представителя юридического лица'}
+          {`Личный кабинет ${
+            pagesType === 'listener'
+              ? 'слушателя'
+              : 'представителя юридического лица'
+          }`}
         </Typography>
         <div className={classes.grow} />
         <div className={classes.sectionDesktop}>
@@ -141,7 +141,7 @@ const AppBarLayout = (props) => {
               aria-controls={menuId}
               aria-haspopup="true"
               color="inherit"
-              onClick={handleMenuOpen}
+              onClick={handleDialogOpen}
             >
               <ExitToAppIcon />
             </IconButton>
@@ -160,14 +160,6 @@ const AppBarLayout = (props) => {
         </div>
       </Toolbar>
       {renderMobileMenu}
-      <DialogLayout
-        options={{ open: open }}
-        onClose={handleClose}
-        onApprove={handleLogout}
-        id="responsive-dialog-title"
-        title="Выход из личного кабинета"
-        text="Вы действительно хотите выйти из личного кабинета?"
-      />
     </AppBar>
   )
 }

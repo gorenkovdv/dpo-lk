@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Field, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -26,7 +26,6 @@ import {
 } from '../../Commons/FormsControls/FormsControls'
 import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
 import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
-import DialogLayout from '../../Commons/Dialog/DialogLayout'
 import { SAVE_FILES_DIRECTORY } from '../../../store/const.js'
 import { parseDate } from '../../../utils/parse.js'
 import allActions from '../../../store/actions'
@@ -107,29 +106,9 @@ const Education = ({ username }) => {
   const defaultFileURL = `education${level}${index}.pdf`
   const actions = allActions.listenerDataActions
 
-  const [documentsDialogParams, setDocumentsDialogParams] = useState({
-    open: false,
-    disabled: true,
-    redirect: { value: 0, type: 'document' },
-  })
-
   React.useEffect(() => {
     dispatch(actions.requestListenerData(4))
   }, [dispatch, actions])
-
-  const handleLevelChange = (e) => {
-    if (e.target.value !== level) {
-      if (isDocumentNew) {
-        setDocumentsDialogParams({
-          open: true,
-          disabled: false,
-          redirect: { value: e.target.value, type: 'level' },
-        })
-      } else {
-        goToLevel(e.target.value)
-      }
-    }
-  }
 
   const handleNewDocument = () => {
     let newDoc = {
@@ -148,6 +127,24 @@ const Education = ({ username }) => {
     dispatch(actions.createNewDocument(newDoc, 4))
   }
 
+  const confirmTransition = (value, type) => {
+    const typeText = type === `level` ? `уровню образования` : `документу`
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Выбрать документ`,
+        text: `Новый документ не был сохранён. Вы действительно хотите перейти к другому ${typeText}?`,
+        onApprove: () => handleDocumentRedirect(value, type),
+      })
+    )
+  }
+
+  const handleLevelChange = (e) => {
+    if (e.target.value !== level) {
+      if (isDocumentNew) confirmTransition(e.target.value, 'level')
+      else goToLevel(e.target.value)
+    }
+  }
+
   const goToLevel = (level) => {
     dispatch(actions.selectEducationLevel(level))
   }
@@ -158,30 +155,16 @@ const Education = ({ username }) => {
 
   const selectDocument = (e) => {
     if (e.target.value !== index) {
-      if (isDocumentNew) {
-        setDocumentsDialogParams({
-          open: true,
-          disabled: false,
-          redirect: { value: e.target.value, type: 'document' },
-        })
-      } else {
-        goToDocument(e.target.value)
-      }
+      if (isDocumentNew) confirmTransition(e.target.value, 'document')
+      else goToDocument(e.target.value)
     }
   }
 
-  const handleDocumentsDialogClose = () => {
-    setDocumentsDialogParams({ open: false, disabled: true, redirect: null })
-  }
+  const handleDocumentRedirect = (value, type) => {
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
 
-  const handleDocumentRedirect = () => {
-    handleDocumentsDialogClose()
-
-    if (documentsDialogParams.redirect.type === 'document')
-      goToDocument(documentsDialogParams.redirect.value)
-
-    if (documentsDialogParams.redirect.type === 'level')
-      goToLevel(documentsDialogParams.redirect.value)
+    if (type === 'document') goToDocument(value)
+    if (type === 'level') goToLevel(value)
 
     dispatch(actions.dropNewEducationDocument())
   }
@@ -300,14 +283,6 @@ const Education = ({ username }) => {
           username={username}
         />
       )}
-      <DialogLayout
-        options={documentsDialogParams}
-        onClose={handleDocumentsDialogClose}
-        onApprove={handleDocumentRedirect}
-        id="go-to-document-dialog-title"
-        title="Выбрать документ"
-        text="Новый документ не был сохранён. Вы действительно хотите перейти к другому документу?"
-      />
     </>
   )
 }
@@ -319,48 +294,41 @@ let EducationDataForm = (props) => {
   const level = props.level
   const username = props.username
 
-  const [deleteDocumentDialogParams, setDeleteDocumentDialogParams] = useState({
-    open: false,
-    disabled: true,
-  })
-  const [deleteFileDialogParams, setDeleteFileDialogParams] = useState({
-    open: false,
-    disabled: true,
-  })
-
   const cancelNewDocument = () => {
     dispatch(actions.selectDocument(0, 4))
     dispatch(actions.dropNewEducationDocument())
   }
 
   // onDialogOpen
-  const deleteDocumentDialogShow = (e) => {
-    setDeleteDocumentDialogParams({ open: true, disabled: false })
+  const deleteFileDialogShow = () => {
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Удалить файл`,
+        text: `Вы действительно хотите удалить файл?`,
+        onApprove: () => deleteFile(),
+      })
+    )
   }
 
-  const deleteFileDialogShow = (e) => {
-    setDeleteFileDialogParams({ open: true, disabled: false })
-  }
-
-  // onDialogClose
-  const deleteDocumentDialogClose = () => {
-    setDeleteDocumentDialogParams({ open: false, disabled: true })
-  }
-
-  const deleteFileDialogClose = () => {
-    setDeleteFileDialogParams({ open: false, disabled: true })
+  const deleteDocumentDialogShow = () => {
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Удалить документ`,
+        text: `Вы действительно хотите удалить документ?`,
+        onApprove: () => deleteDocument(),
+      })
+    )
   }
 
   // onDialogApprove
-  const deleteDocument = (e) => {
-    deleteDocumentDialogClose()
-
+  const deleteDocument = () => {
     dispatch(actions.requestDocumentDelete(props.documentId, 4))
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
   }
 
-  const deleteFile = (e) => {
-    deleteFileDialogClose()
+  const deleteFile = () => {
     dispatch(actions.requestFileDelete(props.documentId, 4))
+    dispatch(allActions.confirmDialogActions.confirmDialogClose())
   }
 
   return (
@@ -470,20 +438,6 @@ let EducationDataForm = (props) => {
           Отмена
         </Button>
       )}
-      <DialogLayout
-        options={deleteFileDialogParams}
-        onClose={deleteFileDialogClose}
-        onApprove={deleteFile}
-        title="Удалить файл"
-        text="Вы действительно хотите удалить файл?"
-      />
-      <DialogLayout
-        options={deleteDocumentDialogParams}
-        onClose={deleteDocumentDialogClose}
-        onApprove={deleteDocument}
-        title="Удалить документ"
-        text="Вы действительно хотите удалить документ?"
-      />
     </form>
   )
 }

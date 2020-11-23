@@ -180,30 +180,24 @@ const CoursesList = () => {
   }
 
   // onDialogOpen
-  const confirmDialogOpen = ({ title, text, onApprove }) => {
+  const submitRequestDialogOpen = (course) => {
     dispatch(
       allActions.confirmDialogActions.confirmDialogShow({
-        title,
-        text,
-        onApprove,
+        title: `Записаться на обучение по программе`,
+        text: `Вы хотите подать заявку на обучение по программе «${course.Name}»?`,
+        onApprove: () => submitRequest(course),
       })
     )
   }
 
-  const submitRequestDialogOpen = (course) => {
-    confirmDialogOpen({
-      title: `Записаться на обучение по программе`,
-      text: `Вы хотите подать заявку на обучение по программе «${course.Name}»?`,
-      onApprove: () => submitRequest(course),
-    })
-  }
-
   const cancelRequestDialogOpen = (course) => {
-    confirmDialogOpen({
-      title: `Отозвать заявку`,
-      text: `Вы хотите отозвать заявку на обучение по программе «${course.Name}»?`,
-      onApprove: () => cancelRequest(course),
-    })
+    dispatch(
+      allActions.confirmDialogActions.confirmDialogShow({
+        title: `Отозвать заявку`,
+        text: `Вы хотите отозвать заявку на обучение по программе «${course.Name}»?`,
+        onApprove: () => cancelRequest(course),
+      })
+    )
   }
 
   // onDialogClose
@@ -219,7 +213,7 @@ const CoursesList = () => {
 
   const cancelRequest = (course) => {
     const userRow = data.list
-      .find((listCourse) => listCourse.ID === course.ID)
+      .find((listCourse) => parseInt(listCourse.ID) === parseInt(course.ID))
       .users.find((user) => parseInt(user.id) === parseInt(currentUserID))
 
     dispatch(actions.cancelRequest(course, userRow.requestID))
