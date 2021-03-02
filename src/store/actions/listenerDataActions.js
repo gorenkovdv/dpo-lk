@@ -1,6 +1,6 @@
 import { profileAPI, documentAPI } from '../../services/api'
-import snackbarActions from './snackbarActions'
-import loaderActions from './loaderActions'
+import { actions as snackbarActions } from '../reducers/snackbar'
+import { actions as loaderActions } from '../reducers/loader'
 
 const loadingSuccess = (data) => {
   return { type: 'LISTENER_DATA_LOAD_SUCCESS', payload: data }

@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Router } from 'react-router-dom'
+import { HashRouter } from 'react-router-dom'
 import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
@@ -10,7 +10,6 @@ import AlertSnackbar from './Components/Commons/AlertSnackbar/AlertSnackbar'
 import ConfirmDialog from './Components/Commons/Dialog/ConfirmDialog'
 import * as serviceWorker from './services/serviceWorker'
 import App from './App'
-import history from './history'
 import './index.css'
 
 const theme = createMuiTheme({
@@ -32,13 +31,13 @@ window.store = store
 
 ReactDOM.render(
   <MuiThemeProvider theme={theme}>
-    <Router history={history}>
+    <HashRouter>
       <Provider store={store}>
         <App />
         <AlertSnackbar />
         <ConfirmDialog />
       </Provider>
-    </Router>
+    </HashRouter>
   </MuiThemeProvider>,
   document.getElementById('root')
 )

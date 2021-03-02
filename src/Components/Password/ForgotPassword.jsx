@@ -6,7 +6,7 @@ import { Grid, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Input } from '../Commons/FormsControls/FormsControls'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
-import allActions from '../../store/actions'
+import { findUser } from '../../store/reducers/auth'
 import styles from '../../styles.js'
 
 const useStyles = makeStyles(theme => ({
@@ -36,7 +36,7 @@ const ForgotPassword = () => {
   const dispatch = useDispatch()
 
   const handleSubmit = ({ value }) => {
-    dispatch(allActions.authActions.findUser(value))
+    dispatch(findUser(value))
   }
 
   return (
@@ -64,7 +64,7 @@ const ForgotPassword = () => {
 
 let ForgotPasswordForm = props => {
   const classes = useStyles()
-  return(
+  return (
     <form
       className={classes.form}
       onSubmit={props.handleSubmit}

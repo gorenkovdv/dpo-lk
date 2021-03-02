@@ -10,7 +10,7 @@ import { coursesReducer } from './courses'
 import { requestsReducer } from './requests'
 import { reducer as formReducer } from 'redux-form'
 
-export const rootReducer = combineReducers({
+const appReducer = combineReducers({
   profile: profileReducer,
   snackbar: snackbarReducer,
   confirmDialog: confirmDialogReducer,
@@ -22,3 +22,14 @@ export const rootReducer = combineReducers({
   requests: requestsReducer,
   form: formReducer,
 })
+
+export const rootReducer = (state: any, action: any) => {
+  appReducer(state, action)
+  return appReducer(state, action)
+}
+
+type RootReducerType = typeof rootReducer
+export type AppStateType = ReturnType<RootReducerType>
+
+type PropertiesType<T> = T extends { [key: string]: infer U } ? U : never
+export type InferActionsType<T extends { [key: string]: (...args: any[]) => any }> = ReturnType<PropertiesType<T>>

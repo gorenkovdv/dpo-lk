@@ -17,6 +17,7 @@ import {
   ExitToApp as ExitToAppIcon,
 } from '@material-ui/icons'
 import allActions from '../../store/actions'
+import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
 import { DRAWER_WIDTH } from '../../store/const.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -74,7 +75,7 @@ const AppBarLayout = (props) => {
 
   const handleDialogOpen = () => {
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Выход из личного кабинета`,
         text: `Вы действительно хотите выйти из личного кабинета?`,
         onApprove: () => handleLogout(),
@@ -83,7 +84,7 @@ const AppBarLayout = (props) => {
   }
 
   const handleLogout = () => {
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
     dispatch(allActions.authActions.logout())
   }
 
@@ -126,11 +127,10 @@ const AppBarLayout = (props) => {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap>
-          {`Личный кабинет ${
-            pagesType === 'listener'
-              ? 'слушателя'
-              : 'представителя юридического лица'
-          }`}
+          {`Личный кабинет ${pagesType === 'listener'
+            ? 'слушателя'
+            : 'представителя юридического лица'
+            }`}
         </Typography>
         <div className={classes.grow} />
         <div className={classes.sectionDesktop}>

@@ -28,6 +28,7 @@ import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
 import LoaderLayout from '../../Commons/Loader/LoaderLayout'
 import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
 import allActions from '../../../store/actions'
+import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
 import styles from '../../../styles.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -71,7 +72,7 @@ const Others = ({ username }) => {
 
   const confirmTransition = (value) => {
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Выбрать документ`,
         text: `Новый документ не был сохранён. Вы действительно хотите перейти к другому документу?`,
         onApprove: () => handleDocumentRedirect(value),
@@ -87,7 +88,7 @@ const Others = ({ username }) => {
   }
 
   const handleDocumentRedirect = (value) => {
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
     dispatch(actions.dropNewOthersDocument(value))
   }
 
@@ -166,16 +167,15 @@ const Others = ({ username }) => {
           >
             {currentData.map((option, index) => (
               <MenuItem key={index} value={index}>
-                {`Документ ${index + 1} ${
-                  currentData[index].isDocumentNew ? ' (новый)' : ''
-                }`}
+                {`Документ ${index + 1} ${currentData[index].isDocumentNew ? ' (новый)' : ''
+                  }`}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
       ) : (
-        <Typography>Нет документов</Typography>
-      )}
+          <Typography>Нет документов</Typography>
+        )}
       {currentDocument && (
         <OthersDataForm
           onSubmit={handleSubmit}
@@ -204,7 +204,7 @@ let OthersDataForm = (props) => {
   // onDialogOpen
   const deleteDocumentDialogShow = () => {
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Удалить документ`,
         text: `Вы действительно хотите удалить документ?`,
         onApprove: () => deleteDocument(),
@@ -214,7 +214,7 @@ let OthersDataForm = (props) => {
 
   const deleteFileDialogShow = () => {
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Удалить файл`,
         text: `Вы действительно хотите удалить файл?`,
         onApprove: () => deleteFile(),
@@ -224,12 +224,12 @@ let OthersDataForm = (props) => {
 
   // onDialogApprove
   const deleteDocument = () => {
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
     dispatch(actions.requestDocumentDelete(props.documentId, 6))
   }
 
   const deleteFile = () => {
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
     dispatch(actions.requestFileDelete(props.documentId, 6))
   }
 
@@ -293,16 +293,16 @@ let OthersDataForm = (props) => {
           Удалить документ
         </Button>
       ) : (
-        <Button
-          type="button"
-          className={classes.button}
-          variant="contained"
-          color="primary"
-          onClick={cancelNewDocument}
-        >
-          Отмена
-        </Button>
-      )}
+          <Button
+            type="button"
+            className={classes.button}
+            variant="contained"
+            color="primary"
+            onClick={cancelNewDocument}
+          >
+            Отмена
+          </Button>
+        )}
     </form>
   )
 }

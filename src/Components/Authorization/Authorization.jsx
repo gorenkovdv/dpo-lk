@@ -8,7 +8,7 @@ import { Input, PasswordInput } from '../Commons/FormsControls/FormsControls'
 import { VpnKey as KeyIcon, Person as PersonIcon } from '@material-ui/icons'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import { authAPI } from '../../services/api'
-import allActions from '../../store/actions'
+import { login } from '../../store/reducers/auth'
 import styles from '../../styles.js'
 
 const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
@@ -26,7 +26,7 @@ const Authorization = () => {
 
   const handleSubmit = (values) => {
     dispatch(
-      allActions.authActions.login(values.username, values.password || '')
+      login(values.username, values.password || '')
     )
   }
 
@@ -47,6 +47,13 @@ const Authorization = () => {
 
 let AuthForm = (props) => {
   const classes = useStyles()
+
+  const [showPassword, setShowPassword] = React.useState(false)
+
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword)
+  }
+
   return (
     <form className={classes.form} onSubmit={props.handleSubmit}>
       <Grid container direction="column" justify="center" alignItems="center">
@@ -59,6 +66,8 @@ let AuthForm = (props) => {
         />
         <Field
           name="password"
+          showpassword={showPassword}
+          showhandle={handleShowPassword}
           component={PasswordInput}
           margin="normal"
           label="Пароль"

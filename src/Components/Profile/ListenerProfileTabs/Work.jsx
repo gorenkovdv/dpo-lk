@@ -35,6 +35,7 @@ import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
 import { SAVE_FILES_DIRECTORY } from '../../../store/const.js'
 import { parseMonth } from '../../../utils/parse.js'
 import allActions from '../../../store/actions'
+import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
 import styles from '../../../styles.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -120,7 +121,7 @@ let WorkDataForm = (props) => {
 
   const handleFileDelete = () => {
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Удалить файл`,
         text: `Вы действительно хотите удалить файл?`,
         onApprove: () => onFileDelete(),
@@ -129,7 +130,7 @@ let WorkDataForm = (props) => {
   }
 
   const onFileDelete = () => {
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
     dispatch(allActions.listenerDataActions.workFileDelete())
   }
 

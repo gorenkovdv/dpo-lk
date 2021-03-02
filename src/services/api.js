@@ -3,7 +3,7 @@ import qs from 'qs'
 
 const instance = axios.create({
   baseURL: 'http://localhost/scripts/',
-  //baseURL: 'https://nagruzka.asmu.ru/scripts/',
+  //baseURL: 'https://dpo.asmu.ru/scripts/',
   timeout: 10000,
   headers: {
     'X-Requested-With': 'XMLHttpRequest',
@@ -89,9 +89,9 @@ export const authAPI = {
     if (sessionStorage.token == null) return false
 
     let parseToken = JSON.parse(sessionStorage.token)
-    let timeLeft = (parseToken.expires * 1000 - Date.now()) / 1000
+    //let timeLeft = (parseToken.expires * 1000 - Date.now()) / 1000
 
-    console.log(timeLeft)
+    //console.log(timeLeft)
 
     return (
       sessionStorage.access &&

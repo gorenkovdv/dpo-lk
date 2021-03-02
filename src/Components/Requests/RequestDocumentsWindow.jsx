@@ -42,7 +42,9 @@ const RequestDocumentsWindow = ({ open, onApprove, onClose, onCancel }) => {
       approveText={approveText}
       cancelText={`Отмена`}
     >
-      <Typography>{`Программа: «${selectedRequest.courseName}»`}</Typography>
+      <Typography
+        gutterBottom
+      >{`Программа: «${selectedRequest.courseName}»`}</Typography>
       {!approved ? (
         <>
           <TableContainer component={Paper}>
@@ -82,7 +84,34 @@ const RequestDocumentsWindow = ({ open, onApprove, onClose, onCancel }) => {
         </>
       ) : (
         <>
-          <Typography>Документы подтверждены</Typography>
+          <Typography gutterBottom>
+            <a
+              href={`http://localhost/templates/contract_fiz.php?request=${selectedRequest.ID}`}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Договор на подпись
+            </a>
+          </Typography>
+          <Typography gutterBottom>
+            <a
+              href={`http://localhost/templates/bill_fiz.php?request=${selectedRequest.ID}`}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Счёт на оплату
+            </a>
+          </Typography>
+          <Typography gutterBottom>
+            <a
+              href={`http://localhost/templates/act_fiz.php?request=${selectedRequest.ID}`}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Акт выполненных услуг
+            </a>
+          </Typography>
+          <Typography gutterBottom>Документы подписываются.</Typography>
         </>
       )}
     </DialogLayout>

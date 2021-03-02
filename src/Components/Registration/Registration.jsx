@@ -50,9 +50,9 @@ let RegistrationForm = (props) => {
   const classes = useStyles()
   return (
     <form className={classes.form} onSubmit={props.handleSubmit}>
-      <Field name="lastName" component={Input} label="Фамилия" required />
-      <Field name="firstName" component={Input} label="Имя" required />
-      <Field name="middleName" component={Input} label="Отчество" required />
+      <Field name="lastname" component={Input} label="Фамилия" required />
+      <Field name="firstname" component={Input} label="Имя" required />
+      <Field name="middlename" component={Input} label="Отчество" required />
       <Field
         name="email"
         component={Input}

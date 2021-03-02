@@ -1,6 +1,6 @@
 import { coursesAPI, requestsAPI, userAPI } from '../../services/api'
-import snackbarActions from './snackbarActions'
-import loaderActions from './loaderActions'
+import { actions as snackbarActions } from '../reducers/snackbar'
+import { actions as loaderActions } from '../reducers/loader'
 
 const setListenerInfoLoading = () => {
   return { type: 'COURSE_SET_LISTENER_INFO_LOADING' }

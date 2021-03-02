@@ -20,6 +20,7 @@ import RequestDocumentsWindow from './RequestDocumentsWindow'
 import RequestCMEForm from './RequestCMEForm'
 import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
+import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
 import styles from '../../styles.js'
 import Request from './Request'
 
@@ -49,7 +50,7 @@ const RequestsList = () => {
   const cancelRequestDialogShow = (request) => {
     dispatch(actions.setSelectedRequest(request))
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Отменить заявку`,
         text: `Отменить заявку на обучение по программе «${request.courseName}»?`,
         onApprove: () => cancelRequest(),
@@ -59,7 +60,7 @@ const RequestsList = () => {
 
   const cancelDocumentsApproveDialogShow = () => {
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Отменить условия сделки`,
         text: `Вы уверены, что хотите отменить условия сделки?`,
         onApprove: () => cancelDocumentsApprove(),
@@ -79,7 +80,7 @@ const RequestsList = () => {
 
   // onDialogClose
   const confirmDialogClose = () => {
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
   }
 
   const requestCMEDialogClose = () => {
@@ -173,8 +174,8 @@ const RequestsList = () => {
           </Table>
         </TableContainer>
       ) : (
-        <Typography>Нет активных заявок</Typography>
-      )}
+          <Typography>Нет активных заявок</Typography>
+        )}
       {data.selectedRequest && (
         <>
           <DialogLayout

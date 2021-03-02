@@ -1,9 +1,9 @@
 import React from 'react'
-import { Redirect, useHistory } from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 import { authAPI } from '../../services/api'
+import history from '../../history'
 
 const withAuth = (Component) => (props) => {
-  const history = useHistory()
   const [reload, setReload] = React.useState(true)
 
   //return <Component {...props} />

@@ -24,10 +24,10 @@ import {
 } from '../Commons/FormsControls/FormsControls'
 import {
   isEmailValid,
-  isStringContainsUnderscore,
+  isStringContainsUnderscore
 } from '../../utils/validate.js'
 import { parseDate } from '../../utils/parse.js'
-import allActions from '../../store/actions'
+import { requestProfile, updateProfile } from '../../store/reducers/profile'
 import styles from '../../styles.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -43,7 +43,6 @@ const Profile = (props) => {
   const dispatch = useDispatch()
   const isLoading = useSelector((state) => state.loader.isLoading)
   const data = useSelector((state) => state.profile)
-  const actions = allActions.profileActions
 
   const title =
     props.pagesType === 'listener'
@@ -51,11 +50,11 @@ const Profile = (props) => {
       : 'Регистрационные данные представителя юридического лица'
 
   useEffect(() => {
-    dispatch(actions.requestProfile())
-  }, [dispatch, actions])
+    dispatch(requestProfile())
+  }, [dispatch])
 
   const handleSubmit = (values) => {
-    dispatch(actions.updateProfile(values))
+    dispatch(updateProfile(values))
   }
 
   if (isLoading) return null

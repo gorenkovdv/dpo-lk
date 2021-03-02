@@ -25,7 +25,7 @@ import {
   CloudUpload as CloudUploadIcon,
   HighlightOff as DropIcon,
 } from '@material-ui/icons'
-import actions from '../../../store/actions/snackbarActions'
+import { actions } from '../../../store/reducers/snackbar'
 import { red } from '@material-ui/core/colors'
 import * as moment from 'moment'
 import 'moment/locale/ru'
@@ -133,27 +133,21 @@ export const MaskedInput = ({ input, meta: { touched, error }, ...props }) => {
 
 export const PasswordInput = ({ input, ...props }) => {
   const classes = useStyles()
-  const [showPassword, setShowPassword] = React.useState(false)
-
-  const handleShowPassword = () => {
-    setShowPassword(!showPassword)
-  }
 
   return (
     <TextField
       {...input}
-      {...props}
+      label={props.label}
       className={classes.textField}
-      type={showPassword ? 'text' : 'password'}
+      type={props.showpassword ? 'text' : 'password'}
       autoComplete="off"
       margin="normal"
       variant="outlined"
-      label={props.label}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
-            <IconButton size="small" onClick={handleShowPassword}>
-              {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+            <IconButton size="small" tabIndex="-1" onClick={props.showhandle}>
+              {props.showpassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
             </IconButton>
           </InputAdornment>
         ),
@@ -256,8 +250,8 @@ export const FileInput = ({ input, ...props }) => {
             </IconButton>
           </>
         ) : (
-          <span className={classes.fileLabel}>Файл не загружен</span>
-        )}
+            <span className={classes.fileLabel}>Файл не загружен</span>
+          )}
       </Grid>
     </Grid>
   )

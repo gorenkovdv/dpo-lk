@@ -29,6 +29,7 @@ import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
 import { SAVE_FILES_DIRECTORY } from '../../../store/const.js'
 import { parseDate } from '../../../utils/parse.js'
 import allActions from '../../../store/actions'
+import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
 import styles from '../../../styles.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -130,7 +131,7 @@ const Education = ({ username }) => {
   const confirmTransition = (value, type) => {
     const typeText = type === `level` ? `уровню образования` : `документу`
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Выбрать документ`,
         text: `Новый документ не был сохранён. Вы действительно хотите перейти к другому ${typeText}?`,
         onApprove: () => handleDocumentRedirect(value, type),
@@ -161,7 +162,7 @@ const Education = ({ username }) => {
   }
 
   const handleDocumentRedirect = (value, type) => {
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
 
     if (type === 'document') goToDocument(value)
     if (type === 'level') goToLevel(value)
@@ -226,21 +227,21 @@ const Education = ({ username }) => {
           currentData[level] &&
           currentData[level].length > 0
         ) ? (
-          <Grid container>
-            <Button
-              style={{ marginTop: 10, marginBottom: 10 }}
-              type="button"
-              disabled={isDocumentNew}
-              className={classes.button}
-              variant="contained"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={handleNewDocument}
-            >
-              Добавить документ
+            <Grid container>
+              <Button
+                style={{ marginTop: 10, marginBottom: 10 }}
+                type="button"
+                disabled={isDocumentNew}
+                className={classes.button}
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={handleNewDocument}
+              >
+                Добавить документ
             </Button>
-          </Grid>
-        ) : null}
+            </Grid>
+          ) : null}
       </Grid>
       {currentData && currentData[level] && currentData[level].length > 0 ? (
         <Grid container direction="column" alignItems="flex-start">
@@ -257,19 +258,18 @@ const Education = ({ username }) => {
           >
             {currentData[level].map((option, index) => (
               <MenuItem key={index} value={index}>
-                {`${data.educationTypes[level].name} ${index + 1} ${
-                  currentData[level][index].isDocumentNew ? ' (новый)' : ''
-                }`}
+                {`${data.educationTypes[level].name} ${index + 1} ${currentData[level][index].isDocumentNew ? ' (новый)' : ''
+                  }`}
               </MenuItem>
             ))}
           </TextField>
         </Grid>
       ) : (
-        <>
-          <Typography>Нет документов</Typography>
-          <br />
-        </>
-      )}
+          <>
+            <Typography>Нет документов</Typography>
+            <br />
+          </>
+        )}
       {currentDocument && (
         <EducationDataForm
           onSubmit={handleSubmit}
@@ -302,7 +302,7 @@ let EducationDataForm = (props) => {
   // onDialogOpen
   const deleteFileDialogShow = () => {
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Удалить файл`,
         text: `Вы действительно хотите удалить файл?`,
         onApprove: () => deleteFile(),
@@ -312,7 +312,7 @@ let EducationDataForm = (props) => {
 
   const deleteDocumentDialogShow = () => {
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Удалить документ`,
         text: `Вы действительно хотите удалить документ?`,
         onApprove: () => deleteDocument(),
@@ -323,12 +323,12 @@ let EducationDataForm = (props) => {
   // onDialogApprove
   const deleteDocument = () => {
     dispatch(actions.requestDocumentDelete(props.documentId, 4))
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
   }
 
   const deleteFile = () => {
     dispatch(actions.requestFileDelete(props.documentId, 4))
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
   }
 
   return (
@@ -428,16 +428,16 @@ let EducationDataForm = (props) => {
           Удалить документ
         </Button>
       ) : (
-        <Button
-          type="button"
-          className={classes.button}
-          variant="contained"
-          color="primary"
-          onClick={cancelNewDocument}
-        >
-          Отмена
-        </Button>
-      )}
+          <Button
+            type="button"
+            className={classes.button}
+            variant="contained"
+            color="primary"
+            onClick={cancelNewDocument}
+          >
+            Отмена
+          </Button>
+        )}
     </form>
   )
 }

@@ -125,7 +125,7 @@ const Request = ({
           <Tooltip title="Личная карточка">
             <IconButton>
               <a
-                href={`http://localhost/files/templates/personal_card.php?uid=${uid}&row=${row.ID}`}
+                href={`http://localhost/templates/personal_card.php?uid=${uid}&course=${row.ID}`}
                 rel="noopener noreferrer"
                 target="_blank"
               >

@@ -21,6 +21,7 @@ import {
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import ListenerInfoWindow from './ListenerInfoWindow'
 import allActions from '../../store/actions'
+import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
 import styles from '../../styles.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -59,7 +60,7 @@ const ListenerWindowContent = ({ options, onClose }) => {
   //onDialogOpen
   const removeRequestDialogOpen = (user) => {
     dispatch(
-      allActions.confirmDialogActions.confirmDialogShow({
+      confirmDialogActions.confirmDialogShow({
         title: `Удалить заявку`,
         text: `Вы действительно хотите удалить заявку?`,
         onApprove: () => removeUser(user),
@@ -69,7 +70,7 @@ const ListenerWindowContent = ({ options, onClose }) => {
 
   // onDialogClose
   const removeRequestDialogClose = () => {
-    dispatch(allActions.confirmDialogActions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
   }
 
   const removeUser = (user) => {
@@ -169,8 +170,8 @@ const ListenerWindowContent = ({ options, onClose }) => {
           </Table>
         </TableContainer>
       ) : (
-        <Typography>Список заявок пуст</Typography>
-      )}
+          <Typography>Список заявок пуст</Typography>
+        )}
       {selectedListener && (
         <ListenerInfoWindow
           user={selectedListener}

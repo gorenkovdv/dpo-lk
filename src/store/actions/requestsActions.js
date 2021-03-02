@@ -1,6 +1,6 @@
 import { requestsAPI } from '../../services/api'
-import snackbarActions from './snackbarActions'
-import loaderActions from './loaderActions'
+import { actions as snackbarActions } from '../reducers/snackbar'
+import { actions as loaderActions } from '../reducers/loader'
 
 const loadingSuccess = (data) => {
   return { type: 'REQUESTS_LOADING_SUCCESS', payload: data }

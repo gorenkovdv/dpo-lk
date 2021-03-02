@@ -1,5 +1,11 @@
 import * as moment from 'moment'
 
+const startDate = moment().add(-60, 'day').format('YYYY-MM-DD')
+const minStartDate = moment()
+  .startOf('year')
+  .add(-1, 'year')
+  .format('YYYY-MM-DD')
+
 const initialState = {
   list: {},
   filters: {
@@ -15,9 +21,9 @@ const initialState = {
     forDoctors: true,
     forNursingStaff: true,
     currentVolume: 0,
-    startDate: moment().add(-60, 'day').format('YYYY-MM-DD'),
+    startDate: startDate > minStartDate ? startDate : minStartDate,
     endDate: moment().add(2, 'years').format('YYYY-MM-DD'),
-    minStartDate: moment().startOf('year').format('YYYY-MM-DD'),
+    minStartDate,
     maxEndDate: moment().add(3, 'years').format('YYYY-MM-DD'),
   },
   volumeList: {},
@@ -69,10 +75,10 @@ export function coursesReducer(state = initialState, action) {
               ...course,
               users: action.payload.requestID
                 ? state.list[index].users.filter(
-                    (user) =>
-                      parseInt(user.requestID) !==
-                      parseInt(action.payload.requestID)
-                  )
+                  (user) =>
+                    parseInt(user.requestID) !==
+                    parseInt(action.payload.requestID)
+                )
                 : state.list[index].users.concat(action.payload.users),
             }
           }
@@ -167,20 +173,20 @@ export function coursesReducer(state = initialState, action) {
                   cathedra:
                     action.payload.cathedraAllow !== undefined
                       ? {
-                          date: action.payload.currentDatetime,
-                          comment: action.payload.cathedraComment,
-                          person: state.listenerInfo.fullname,
-                          label: `: ${action.payload.currentDatetime} ${state.listenerInfo.fullname}`,
-                        }
+                        date: action.payload.currentDatetime,
+                        comment: action.payload.cathedraComment,
+                        person: state.listenerInfo.fullname,
+                        label: `: ${action.payload.currentDatetime} ${state.listenerInfo.fullname}`,
+                      }
                       : user.checks.cathedra,
                   institute:
                     action.payload.instituteAllow !== undefined
                       ? {
-                          date: action.payload.currentDatetime,
-                          comment: action.payload.instituteComment,
-                          person: state.listenerInfo.fullname,
-                          label: `: ${action.payload.currentDatetime} ${state.listenerInfo.fullname}`,
-                        }
+                        date: action.payload.currentDatetime,
+                        comment: action.payload.instituteComment,
+                        person: state.listenerInfo.fullname,
+                        label: `: ${action.payload.currentDatetime} ${state.listenerInfo.fullname}`,
+                      }
                       : user.checks.institute,
                 },
               }

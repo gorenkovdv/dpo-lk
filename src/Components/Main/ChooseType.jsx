@@ -1,6 +1,5 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 import { Field, reduxForm, submit } from 'redux-form'
 import { Grid, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
@@ -10,6 +9,8 @@ import { MaskedInput } from '../Commons/FormsControls/FormsControls'
 import { required, isStringContainsUnderscore } from '../../utils/validate.js'
 import withAuth from '../Authorization/withAuth'
 import allActions from '../../store/actions'
+import { logout } from '../../store/reducers/auth'
+import history from '../../history'
 import styles from '../../styles.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -32,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const ChooseType = () => {
-  let history = useHistory()
   const classes = useStyles()
   const dispatch = useDispatch()
   const data = useSelector((state) => state.entityData.entities)
@@ -67,7 +67,7 @@ const ChooseType = () => {
   }
 
   const handleLogout = () => {
-    dispatch(allActions.authActions.logout())
+    dispatch(logout())
   }
 
   const handleClick = (type) => (e) => {

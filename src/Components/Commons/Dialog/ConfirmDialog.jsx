@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
 import { useTheme, withStyles } from '@material-ui/core/styles'
-import allActions from '../../../store/actions/'
+import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
 
 const styles = (theme) => ({
   closeButton: {
@@ -51,10 +51,9 @@ const DialogLayout = () => {
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
-  const actions = allActions.confirmDialogActions
 
   const handleClose = () => {
-    dispatch(actions.confirmDialogClose())
+    dispatch(confirmDialogActions.confirmDialogClose())
   }
 
   return (
