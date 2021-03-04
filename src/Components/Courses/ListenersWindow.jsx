@@ -21,6 +21,7 @@ import {
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import ListenerInfoWindow from './ListenerInfoWindow'
 import allActions from '../../store/actions'
+import { removeRequestUser } from '../../store/reducers/courses'
 import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
 import styles from '../../styles.js'
 
@@ -74,7 +75,7 @@ const ListenerWindowContent = ({ options, onClose }) => {
   }
 
   const removeUser = (user) => {
-    dispatch(allActions.coursesActions.removeRequestUser(course.ID, user.rowID))
+    dispatch(removeRequestUser(course.ID, user.rowID))
     removeRequestDialogClose()
   }
 

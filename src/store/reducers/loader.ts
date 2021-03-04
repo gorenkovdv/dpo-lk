@@ -10,7 +10,7 @@ const initialState: IState = {
 
 type loaderActionsTypes = InferActionsType<typeof actions>
 
-export function loaderReducer(state = initialState, action: loaderActionsTypes): IState {
+export const loaderReducer = (state = initialState, action: loaderActionsTypes): IState => {
   switch (action.type) {
     case 'LOADER_REQUEST_LOADING':
       return {

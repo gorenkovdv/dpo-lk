@@ -14,7 +14,7 @@ const initialState: IState = {
 
 type SnackbarActionsTypes = InferActionsType<typeof actions>
 
-export function snackbarReducer(state = initialState, action: SnackbarActionsTypes): IState {
+export const snackbarReducer = (state = initialState, action: SnackbarActionsTypes): IState => {
   switch (action.type) {
     case 'SNACKBAR_SHOW_SUCCESS_MESSAGE':
       return {

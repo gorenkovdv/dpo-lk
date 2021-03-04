@@ -18,7 +18,7 @@ import { Check as CheckIcon, Clear as ClearIcon } from '@material-ui/icons/'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import AddNewListenerWindow from './AddNewListenerWindow'
-import allActions from '../../store/actions'
+import { getListenersOptions, actions as coursesActions } from '../../store/reducers/courses'
 import styles from '../../styles.js'
 
 const useStyles = makeStyles((theme) => ({
@@ -43,29 +43,28 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
   const data = useSelector((state) => state.courses.listenersAddition)
   const course = useSelector((state) => state.courses.selectedCourse)
   const dialogOpen = data.isDialogOpen
-  const actions = allActions.coursesActions
   const loading = data.isLoading
 
   const onInputChange = (e, value) => {
     setInputValue(value)
-    dispatch(actions.getListenersOptions(value))
+    dispatch(getListenersOptions(value))
   }
 
   const onAddButtonClick = () => {
     setAutocompleteValue(null)
-    dispatch(actions.addListenerToList(autocompleteValue))
+    dispatch(coursesActions.addListenerToList(autocompleteValue))
   }
 
   const removeListener = (userID) => {
-    dispatch(actions.removeListenerFromList(userID))
+    dispatch(coursesActions.removeListenerFromList(userID))
   }
 
   const onDialogOpen = () => {
-    dispatch(actions.setAdditionDialogOpen(true))
+    dispatch(coursesActions.setAdditionDialogOpen(true))
   }
 
   const onDialogClose = () => {
-    dispatch(actions.setAdditionDialogOpen(false))
+    dispatch(coursesActions.setAdditionDialogOpen(false))
   }
 
   return (
@@ -103,9 +102,8 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
         }}
         renderOption={(option) => (
           <>
-            <span>{`${option.name}${
-              option.login ? ` (${option.login})` : ``
-            }`}</span>
+            <span>{`${option.name}${option.login ? ` (${option.login})` : ``
+              }`}</span>
             {option.isUserAdded && <CheckIcon className={classes.iconTitle} />}
           </>
         )}

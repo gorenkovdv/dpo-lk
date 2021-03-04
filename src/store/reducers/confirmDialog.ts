@@ -21,7 +21,7 @@ const initialState: IState = {
 
 type confirmDialogActionsTypes = InferActionsType<typeof actions>
 
-export function confirmDialogReducer(state = initialState, action: confirmDialogActionsTypes): IState {
+export const confirmDialogReducer = (state = initialState, action: confirmDialogActionsTypes): IState => {
   switch (action.type) {
     case 'CONFIRM_DIALOG_SHOW':
       return {

@@ -34,7 +34,7 @@ import { DateInput } from '../Commons/FormsControls/FormsControls'
 import ListenersWindow from './ListenersWindow'
 import AddListenersWindow from './AddListenersWindow'
 import withAuth from '../Authorization/withAuth'
-import allActions from '../../store/actions'
+import { requestCourses, changeListParams, createRequest, cancelRequest as cancelRequestAction, createListenersRequests, getListenersOptions, actions as coursesActions } from '../../store/reducers/courses'
 import styles from '../../styles.js'
 import { parseDate, parseCourseDate } from '../../utils/parse.js'
 import { userAPI } from '../../services/api'
@@ -107,25 +107,23 @@ const CoursesList = () => {
   )
   const minStartDate = data.filters.minStartDate
   const maxEndDate = data.filters.maxEndDate
-
-  const actions = allActions.coursesActions
   const pageCountVariants = [5, 10, 20, 50]
 
   React.useEffect(() => {
     const filters = data.filters
-    dispatch(actions.requestCourses(data.currentPage, data.pageSize, filters))
+    dispatch(requestCourses(data.currentPage, data.pageSize, filters))
     // eslint-disable-next-line
-  }, [dispatch, actions])
+  }, [dispatch])
 
   const handlePageChange = (e, value) => {
     if (value !== data.currentPage)
-      dispatch(actions.changeListParams(value, data.pageSize, data.filters))
+      dispatch(changeListParams(value, data.pageSize, data.filters))
   }
 
   const handlePageSizeChange = (e) => {
     if (e.target.value !== data.pageSize)
       dispatch(
-        actions.changeListParams(data.currentPage, e.target.value, data.filters)
+        changeListParams(data.currentPage, e.target.value, data.filters)
       )
   }
 
@@ -173,7 +171,7 @@ const CoursesList = () => {
     }
 
     dispatch(
-      actions.changeListParams(data.currentPage, data.pageSize, {
+      changeListParams(data.currentPage, data.pageSize, {
         ...data.filters,
         ...changes,
       })
@@ -208,7 +206,7 @@ const CoursesList = () => {
 
   // onDialogApprove
   const submitRequest = (course) => {
-    dispatch(actions.createRequest(course))
+    dispatch(createRequest(course))
     confirmDialogClose()
   }
 
@@ -217,17 +215,17 @@ const CoursesList = () => {
       .find((listCourse) => parseInt(listCourse.ID) === parseInt(course.ID))
       .users.find((user) => parseInt(user.id) === parseInt(currentUserID))
 
-    dispatch(actions.cancelRequest(course, userRow.requestID))
+    dispatch(cancelRequestAction(course, userRow.requestID))
     confirmDialogClose()
   }
 
   const openListenersWindow = (course) => {
-    dispatch(actions.setSelectedCourse(course))
+    dispatch(coursesActions.setSelectedCourse(course))
     setListenersWindowOpen(true)
   }
 
   const openAddListenersWindow = (course) => {
-    dispatch(actions.setSelectedCourse(course))
+    dispatch(coursesActions.setSelectedCourse(course))
     setAddListenersWindowOpen(true)
   }
 
@@ -237,20 +235,20 @@ const CoursesList = () => {
     })
 
     dispatch(
-      actions.createListenersRequests(data.selectedCourse.ID, listenersID)
+      createListenersRequests(data.selectedCourse.ID, listenersID)
     )
 
     setAddListenersWindowOpen(false)
   }
 
   const closeListenersWindow = () => {
-    dispatch(actions.setSelectedCourse(null))
+    dispatch(coursesActions.setSelectedCourse(null))
     setListenersWindowOpen(false)
   }
 
   const closeAddListenersWindow = () => {
-    dispatch(actions.setSelectedCourse(null))
-    dispatch(actions.clearAdditionListeners())
+    dispatch(coursesActions.setSelectedCourse(null))
+    dispatch(coursesActions.clearAdditionListeners())
     setAddListenersWindowOpen(false)
   }
 
@@ -279,7 +277,7 @@ const CoursesList = () => {
 
   const onInputChange = (e, value) => {
     setInputValue(value)
-    dispatch(actions.getListenersOptions(value))
+    dispatch(getListenersOptions(value))
   }
 
   const onSelectedFilterChange = (e) => {

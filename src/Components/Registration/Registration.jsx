@@ -20,7 +20,7 @@ import {
   isStringContainsUnderscore,
 } from '../../utils/validate.js'
 import { parseDate } from '../../utils/parse.js'
-import allActions from '../../store/actions'
+import { addUser } from '../../store/reducers/registration'
 import styles from '../../styles.js'
 
 const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
@@ -28,10 +28,9 @@ const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
 const Registration = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const actions = allActions.regActions
 
   const handleSubmit = (values) => {
-    dispatch(actions.addUser(values))
+    dispatch(addUser(values))
   }
 
   return (

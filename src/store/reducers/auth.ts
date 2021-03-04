@@ -23,7 +23,7 @@ const initialState: IState = {
 
 type authActionsTypes = InferActionsType<typeof actions>
 
-export function authReducer(state = initialState, action: authActionsTypes): IState {
+export const authReducer = (state = initialState, action: authActionsTypes): IState => {
   switch (action.type) {
     case 'SET_CONFIRM_PARAMS':
       return {
