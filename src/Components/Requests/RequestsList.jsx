@@ -15,12 +15,11 @@ import {
 import { makeStyles } from '@material-ui/core/styles'
 import MainLayout from '../Main/MainLayout'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
-
 import RequestDocumentsWindow from './RequestDocumentsWindow'
 import RequestCMEForm from './RequestCMEForm'
 import withAuth from '../Authorization/withAuth'
-import allActions from '../../store/actions'
 import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
+import { getRequests, setDocumentsApprove, cancelRequest as cancelRequestAction, updateCMERequest, actions as requestsActions } from '../../store/reducers/requests'
 import styles from '../../styles.js'
 import Request from './Request'
 
@@ -31,11 +30,10 @@ const RequestsList = () => {
   const dispatch = useDispatch()
   const isLoading = useSelector((state) => state.loader.isLoading)
   const data = useSelector((state) => state.requests)
-  const actions = allActions.requestsActions
 
   React.useEffect(() => {
-    dispatch(actions.getRequests())
-  }, [dispatch, actions])
+    dispatch(getRequests())
+  }, [dispatch])
 
   const [isDocumentsDialogOpen, setIsDocumentsDialogOpen] = React.useState(
     false
@@ -48,12 +46,11 @@ const RequestsList = () => {
 
   // onDialogOpen
   const cancelRequestDialogShow = (request) => {
-    dispatch(actions.setSelectedRequest(request))
     dispatch(
       confirmDialogActions.confirmDialogShow({
         title: `Отменить заявку`,
         text: `Отменить заявку на обучение по программе «${request.courseName}»?`,
-        onApprove: () => cancelRequest(),
+        onApprove: () => cancelRequest(request),
       })
     )
   }
@@ -69,12 +66,12 @@ const RequestsList = () => {
   }
 
   const requestCMEDialogOpen = (request) => {
-    dispatch(actions.setSelectedRequest(request))
+    dispatch(requestsActions.setSelectedRequest(request))
     setRequestCMEDialogParams({ open: true, disabled: false })
   }
 
   const documentsDialogOpen = (request) => {
-    dispatch(actions.setSelectedRequest(request))
+    dispatch(requestsActions.setSelectedRequest(request))
     setIsDocumentsDialogOpen(true)
   }
 
@@ -92,25 +89,25 @@ const RequestsList = () => {
   }
 
   // onDialogApprove
-  const cancelRequest = () => {
-    dispatch(actions.cancelRequest(data.selectedRequest))
+  const cancelRequest = (request) => {
+    dispatch(cancelRequestAction(request))
     confirmDialogClose()
   }
 
   const cancelDocumentsApprove = () => {
-    dispatch(actions.setDocumentsApprove(data.selectedRequest.ID, 0))
+    dispatch(setDocumentsApprove(data.selectedRequest.ID, 0))
     confirmDialogClose()
     documentsDialogClose()
   }
 
   const documentsDialogApprove = () => {
-    dispatch(actions.setDocumentsApprove(data.selectedRequest.ID, 1))
+    dispatch(setDocumentsApprove(data.selectedRequest.ID, 1))
     documentsDialogClose()
   }
 
   const handleSubmit = (values) => {
     dispatch(
-      allActions.requestsActions.updateCMERequest({
+      updateCMERequest({
         ...values,
         rowID: data.selectedRequest.rowID,
       })
@@ -174,8 +171,8 @@ const RequestsList = () => {
           </Table>
         </TableContainer>
       ) : (
-          <Typography>Нет активных заявок</Typography>
-        )}
+        <Typography>Нет активных заявок</Typography>
+      )}
       {data.selectedRequest && (
         <>
           <DialogLayout

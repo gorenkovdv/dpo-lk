@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Field, reduxForm, submit } from 'redux-form'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
-import allActions from '../../store/actions'
+import { getListenerInfo, saveCheckData } from '../../store/reducers/courses'
 import {
   Grid,
   TableContainer,
@@ -52,7 +52,7 @@ const ListenerInfo = ({ user, options, onClose }) => {
   const instituteRoots = [1, 2].includes(rootsGroup)
 
   React.useEffect(() => {
-    dispatch(allActions.coursesActions.getListenerInfo(user.id))
+    dispatch(getListenerInfo(user.id))
   }, [dispatch, user.id])
 
   const initialValues = {
@@ -77,7 +77,7 @@ const ListenerInfo = ({ user, options, onClose }) => {
 
   const handleSubmit = (values) => {
     dispatch(
-      allActions.coursesActions.saveCheckData(user.id, user.rowID, values)
+      saveCheckData(user.id, user.rowID, values)
     )
   }
 

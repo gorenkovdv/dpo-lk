@@ -1,15 +1,10 @@
-
 import { ThunkAction } from 'redux-thunk'
 import { coursesAPI, requestsAPI, userAPI } from '../../services/api'
 import { actions as snackbarActions } from '../reducers/snackbar'
 import { actions as loaderActions } from '../reducers/loader'
 import { AppStateType, InferActionsType } from './index'
+import { ICourseBasic, IDocument } from '../../types'
 import moment from 'moment'
-
-interface IStateRoots {
-  group: number | null
-  cathedra: string | null | undefined
-}
 
 interface IUserOption {
   id: number
@@ -27,7 +22,7 @@ interface ICourseUser {
   instituteAllow?: number
   comment: string
   lastUpdate: string | null
-  requestCME: any
+  requestCME: string | null
   checks: {
     cathedra: ICourseUserCheck,
     institute: ICourseUserCheck
@@ -41,37 +36,9 @@ interface ICourseUserCheck {
   person: string | undefined
 }
 
-interface ICourse {
-  ID: number
-  GUID: string
-  AdditionalSpecialities: string
-  AllowedByCathListeners: number
-  BeginDate: string
-  BeginDateMonth: string
-  Department: string
-  DepartmentGUID: string
-  EGS: string
-  EducationForm: string
-  EndDate: string
-  FullTimeBeginDate: string
-  FullTimeEndDate: string
-  FullyApprovedListeners: number
-  IsCME: number
-  IsEducationDistance: number
-  Listeners: number
-  ListenersGroup: string
-  MoodleID: string
-  Name: string
-  NotApprovedByCathListeners: string
-  NotApprovedListeners: string
-  Price: number
-  ProfEducationType: string
-  RequestDate: string
-  SertificationExamDate: string | null
-  Speciality: string
+interface ICourse extends ICourseBasic {
   StartDateTooltip: string
-  Territory: string
-  Volume: number
+  BeginDateMonth: string
   users: Array<ICourseUser>
 }
 
@@ -98,26 +65,6 @@ interface ISelectedCourse {
   ID: number
   Name: string
 }
-
-interface IDocument {
-  id: number
-  level: number
-  type: number
-  name: string
-  organozation: string
-  hours: string
-  comment: string
-  documentCheck: number
-  fileURL: string | null
-  fullName: string | null
-  firstDate: string
-  firstDateName: string
-  secondDate: string | null
-  secondDateName: string | null
-  serial: string
-  speciality: string
-}
-
 interface IListenerInfo {
   documents?: Array<IDocument>
   fullname?: string
@@ -145,7 +92,6 @@ interface IState {
   totalCount: number
   pageSize: number
   currentPage: number
-  roots: IStateRoots
   selectedCourse: ISelectedCourse | null
   listenerInfo: IListenerInfo
   listenersAddition: {
@@ -153,6 +99,10 @@ interface IState {
     isLoading: boolean
     options: Array<IUserOption>
     list: Array<IUserOption>
+  }
+  roots: {
+    group: number | null
+    cathedra: string | null | undefined
   }
 }
 
@@ -580,8 +530,9 @@ export const getListenersOptions = (value: string): ThunkAction<Promise<void>, A
 }
 
 export const saveCheckData = (userID: number, rowID: number, data: any): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+  console.log(data)
   return async (dispatch) => {
-    const simpleDocumentsCheck = data.documents.map((document: any) => {
+    const simpleDocumentsCheck = data.documents.map((document: IDocument) => {
       return {
         id: document.id,
         check: document.documentCheck,

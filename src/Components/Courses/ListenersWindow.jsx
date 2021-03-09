@@ -20,7 +20,6 @@ import {
 } from '@material-ui/icons'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import ListenerInfoWindow from './ListenerInfoWindow'
-import allActions from '../../store/actions'
 import { removeRequestUser } from '../../store/reducers/courses'
 import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
 import styles from '../../styles.js'
@@ -171,8 +170,8 @@ const ListenerWindowContent = ({ options, onClose }) => {
           </Table>
         </TableContainer>
       ) : (
-          <Typography>Список заявок пуст</Typography>
-        )}
+        <Typography>Список заявок пуст</Typography>
+      )}
       {selectedListener && (
         <ListenerInfoWindow
           user={selectedListener}
