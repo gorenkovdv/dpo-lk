@@ -9,7 +9,7 @@ import { VpnKey as KeyIcon, Person as PersonIcon } from '@material-ui/icons'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import { authAPI } from '../../services/api'
 import { login } from '../../store/reducers/auth'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
 

@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import AssignmentIcon from '@material-ui/icons/AssignmentTwoTone'
 import MainLayout from '../Main/MainLayout'
 import withAuth from '../Authorization/withAuth'
-import styles from '../../styles.js'
+import styles from '../../styles'
 import document from '../../files/Poryadok-predostavleniya-dokumentov.pdf'
 
 const useStyles = makeStyles(theme => ({

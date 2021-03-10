@@ -18,10 +18,10 @@ import {
 import {
   isEmailValid,
   isStringContainsUnderscore,
-} from '../../utils/validate.js'
-import { parseDate } from '../../utils/parse.js'
+} from '../../utils/validate'
+import { parseDate } from '../../utils/parse'
 import { addUser } from '../../store/reducers/registration'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
 

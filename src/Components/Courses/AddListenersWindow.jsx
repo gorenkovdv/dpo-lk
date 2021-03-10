@@ -19,7 +19,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import AddNewListenerWindow from './AddNewListenerWindow'
 import { getListenersOptions, actions as coursesActions } from '../../store/reducers/courses'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),

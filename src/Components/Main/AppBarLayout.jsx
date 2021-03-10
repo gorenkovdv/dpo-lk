@@ -16,9 +16,9 @@ import {
   MoreVert as MoreIcon,
   ExitToApp as ExitToAppIcon,
 } from '@material-ui/icons'
-import allActions from '../../store/actions'
+import { logout } from '../../store/reducers/auth'
 import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
-import { DRAWER_WIDTH } from '../../store/const.js'
+import { DRAWER_WIDTH } from '../../store/const'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -85,7 +85,7 @@ const AppBarLayout = (props) => {
 
   const handleLogout = () => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(allActions.authActions.logout())
+    dispatch(logout())
   }
 
   const renderMobileMenu = (

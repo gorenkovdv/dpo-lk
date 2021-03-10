@@ -17,9 +17,9 @@ import { makeStyles } from '@material-ui/core/styles'
 import { RadioGroupContainer } from '../Commons/FormsControls/FormsControls'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import { SAVE_FILES_DIRECTORY } from '../../store/const.js'
+import { SAVE_FILES_DIRECTORY } from '../../store/const'
 import { userAPI } from '../../services/api'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),

@@ -21,7 +21,7 @@ import {
   Web as WebIcon,
 } from '@material-ui/icons'
 import LogoLayout from './LogoLayout'
-import { DRAWER_WIDTH } from '../../store/const.js'
+import { DRAWER_WIDTH } from '../../store/const'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -151,9 +151,8 @@ const DrawerLayout = (props) => {
                 <ListItem
                   button
                   key={item.key}
-                  className={`${classes.listItem} ${
-                    item.isSelected ? classes.selected : null
-                  }`}
+                  className={`${classes.listItem} ${item.isSelected ? classes.selected : null
+                    }`}
                   onClick={() =>
                     !item.isSelected ? props.history.push(item.path) : null
                   }

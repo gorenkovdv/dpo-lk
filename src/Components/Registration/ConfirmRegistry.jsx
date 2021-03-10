@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import { actions as authActions, checkParams } from '../../store/reducers/auth'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles(theme => ({
   ...styles(theme),
@@ -43,23 +43,23 @@ const ConfirmRegistry = props => {
             {params.error}
           </Typography>
         ) : (
-            <Grid
-              container
-              direction="column"
-              justify="center"
-              alignItems="center"
-            >
-              <Typography className={classes.typography}>
-                {params.reset
-                  ? `Учётная запись успешно подтверждена.
+          <Grid
+            container
+            direction="column"
+            justify="center"
+            alignItems="center"
+          >
+            <Typography className={classes.typography}>
+              {params.reset
+                ? `Учётная запись успешно подтверждена.
               Для активации учётной записи первый вход в систему выполняется без пароля`
-                  : `Данная учётная запись уже активирована`}
-              </Typography>
-              <Typography>
-                Ваш логин: <b>{params.login}</b>
-              </Typography>
-            </Grid>
-          )
+                : `Данная учётная запись уже активирована`}
+            </Typography>
+            <Typography>
+              Ваш логин: <b>{params.login}</b>
+            </Typography>
+          </Grid>
+        )
       )}
       <NavLink to="/auth" className={classes.link}>
         Перейти на страницу авторизации

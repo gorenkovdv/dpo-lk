@@ -9,7 +9,7 @@ import {
   TableRow,
 } from '@material-ui/core'
 import { Clear as ClearIcon } from '@material-ui/icons'
-import styles from '../../styles.js'
+import styles from '../../styles'
 import moodleIcon from '../../img/moodle.png'
 import cmeIcon from '../../img/CME.png'
 import cardIcon from '../../img/personal_card.png'

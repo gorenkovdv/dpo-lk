@@ -3,7 +3,7 @@ import { AppStateType, InferActionsType } from './index'
 import { actions as snackbarActions } from './snackbar'
 import { actions as loaderActions } from './loader'
 import { authAPI } from '../../services/api'
-import { PASSWORD_LENGTH } from '../../store/const.js'
+import { PASSWORD_LENGTH } from '../../store/const'
 import history from '../../history'
 
 interface IConfirm {

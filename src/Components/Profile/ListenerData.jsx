@@ -10,9 +10,9 @@ import FactAddress from './ListenerProfileTabs/FactAddress'
 import Passport from './ListenerProfileTabs/Passport'
 import Work from './ListenerProfileTabs/Work'
 import withAuth from '../Authorization/withAuth'
-import allActions from '../../store/actions'
+import { setSelectedTabAction } from '../../store/reducers/listenerData'
 import { userAPI } from '../../services/api'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),
@@ -71,7 +71,7 @@ const ListenerData = (props) => {
   }
 
   const handleTabChange = (e, value) => {
-    dispatch(allActions.listenerDataActions.setSelectedTab(value))
+    dispatch(setSelectedTabAction(value))
   }
 
   if (pagesType === 'entity') return <Redirect to="/entity/data" />

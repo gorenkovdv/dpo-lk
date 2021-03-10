@@ -25,8 +25,8 @@ import {
   localityTooltip,
   streetTooltip,
 } from '../../Commons/Tooltips/AddressTooltips'
-import allActions from '../../../store/actions'
-import styles from '../../../styles.js'
+import { requestListenerData, updateData } from '../../../store/reducers/listenerData'
+import styles from '../../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),
@@ -38,20 +38,17 @@ const FactAddress = () => {
   const dispatch = useDispatch()
   const data = useSelector((state) => state.listenerData)
   const [isAddressesEqual, setAddressesEqual] = React.useState(false)
-  const actions = allActions.listenerDataActions
 
   React.useEffect(() => {
-    dispatch(actions.requestListenerData(data.selectedTab))
-  }, [dispatch, actions, data.selectedTab])
+    dispatch(requestListenerData(data.selectedTab))
+  }, [dispatch, data.selectedTab])
 
   const handleSwitch = (checked) => {
     setAddressesEqual(checked)
   }
 
   const handleSubmit = (values) => {
-    dispatch(
-      allActions.listenerDataActions.updateData(values, data.selectedTab)
-    )
+    dispatch(updateData(values, data.selectedTab))
   }
 
   if (data.isLoading)

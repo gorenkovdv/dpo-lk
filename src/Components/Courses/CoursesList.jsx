@@ -35,8 +35,8 @@ import ListenersWindow from './ListenersWindow'
 import AddListenersWindow from './AddListenersWindow'
 import withAuth from '../Authorization/withAuth'
 import { requestCourses, changeListParams, createRequest, cancelRequest as cancelRequestAction, createListenersRequests, getListenersOptions, actions as coursesActions } from '../../store/reducers/courses'
-import styles from '../../styles.js'
-import { parseDate, parseCourseDate } from '../../utils/parse.js'
+import styles from '../../styles'
+import { parseDate, parseCourseDate } from '../../utils/parse'
 import { userAPI } from '../../services/api'
 import Course from './Course'
 import CourseMobile from './CourseMobile'
@@ -310,8 +310,8 @@ const CoursesList = () => {
               {filtersOpen ? (
                 <KeyboardArrowUpIcon />
               ) : (
-                  <KeyboardArrowDownIcon />
-                )}
+                <KeyboardArrowDownIcon />
+              )}
             </IconButton>
           </Grid>
           <Grid>
@@ -503,65 +503,65 @@ const CoursesList = () => {
               />
             </Grid>
           ) : (
-              <Grid className={classes.fullWidth}>
-                <Autocomplete
-                  open={autocompleteOpen}
-                  onOpen={() => setAutocompleteOpen(true)}
-                  onClose={() => setAutocompleteOpen(false)}
-                  noOptionsText="Список пуст"
-                  getOptionSelected={(option, value) =>
-                    option.name === value.name
+            <Grid className={classes.fullWidth}>
+              <Autocomplete
+                open={autocompleteOpen}
+                onOpen={() => setAutocompleteOpen(true)}
+                onClose={() => setAutocompleteOpen(false)}
+                noOptionsText="Список пуст"
+                getOptionSelected={(option, value) =>
+                  option.name === value.name
+                }
+                getOptionDisabled={(option) => option.isUserAdded}
+                getOptionLabel={(option) =>
+                  `${option.name}${option.login ? ` (${option.login})` : ``}`
+                }
+                options={data.listenersAddition.options}
+                loading={loading}
+                inputValue={inputValue}
+                value={autocompleteValue}
+                onInputChange={onInputChange}
+                onChange={(e, value) => {
+                  setAutocompleteValue(value)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && autocompleteValue) {
+                    handleFilterChange('searchUser', autocompleteValue.id)
                   }
-                  getOptionDisabled={(option) => option.isUserAdded}
-                  getOptionLabel={(option) =>
-                    `${option.name}${option.login ? ` (${option.login})` : ``}`
-                  }
-                  options={data.listenersAddition.options}
-                  loading={loading}
-                  inputValue={inputValue}
-                  value={autocompleteValue}
-                  onInputChange={onInputChange}
-                  onChange={(e, value) => {
-                    setAutocompleteValue(value)
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && autocompleteValue) {
-                      handleFilterChange('searchUser', autocompleteValue.id)
-                    }
-                  }}
-                  classes={{
-                    option: classes.option,
-                    noOptions: classes.option,
-                  }}
-                  renderOption={(option) => (
-                    <>
-                      <span>{`${option.name}${option.login ? ` (${option.login})` : ``
-                        }`}</span>
-                      {option.isUserAdded && (
-                        <CheckIcon className={classes.iconTitle} />
-                      )}
-                    </>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Введите полностью или частично ФИО слушателя"
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {loading ? (
-                              <CircularProgress color="inherit" size={20} />
-                            ) : null}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
-                      }}
-                    />
-                  )}
-                />
-              </Grid>
-            )}
+                }}
+                classes={{
+                  option: classes.option,
+                  noOptions: classes.option,
+                }}
+                renderOption={(option) => (
+                  <>
+                    <span>{`${option.name}${option.login ? ` (${option.login})` : ``
+                      }`}</span>
+                    {option.isUserAdded && (
+                      <CheckIcon className={classes.iconTitle} />
+                    )}
+                  </>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Введите полностью или частично ФИО слушателя"
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {loading ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          )}
           <Grid container direction="row" alignItems="center">
             <Grid item>
               <Button
@@ -678,29 +678,29 @@ const CoursesList = () => {
               </Table>
             </TableContainer>
           ) : (
-              <TableContainer component={Paper}>
-                <Table size="small" className={classes.mobileTable}>
-                  <TableBody>
-                    {data.list.map((course) => (
-                      <CourseMobile
-                        key={course.ID}
-                        roots={data.roots}
-                        course={course}
-                        onWindowOpen={openListenersWindow}
-                        onAddWindowOpen={openAddListenersWindow}
-                        onSubmitRequest={submitRequestDialogOpen}
-                        onCancelRequest={cancelRequestDialogOpen}
-                        currentUserID={currentUserID}
-                      />
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
+            <TableContainer component={Paper}>
+              <Table size="small" className={classes.mobileTable}>
+                <TableBody>
+                  {data.list.map((course) => (
+                    <CourseMobile
+                      key={course.ID}
+                      roots={data.roots}
+                      course={course}
+                      onWindowOpen={openListenersWindow}
+                      onAddWindowOpen={openAddListenersWindow}
+                      onSubmitRequest={submitRequestDialogOpen}
+                      onCancelRequest={cancelRequestDialogOpen}
+                      currentUserID={currentUserID}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
         </>
       ) : (
-          <Typography>Список программ пуст</Typography>
-        )}
+        <Typography>Список программ пуст</Typography>
+      )}
       {data.selectedCourse && (
         <>
           <ListenersWindow

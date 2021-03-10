@@ -18,7 +18,7 @@ import {
   PostAdd as AddIcon,
   PictureAsPdf as PdfIcon,
 } from '@material-ui/icons'
-import { SAVE_FILES_DIRECTORY } from '../../../store/const.js'
+import { SAVE_FILES_DIRECTORY } from '../../../store/const'
 import {
   Input,
   Textarea,
@@ -27,9 +27,17 @@ import {
 import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
 import LoaderLayout from '../../Commons/Loader/LoaderLayout'
 import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
-import allActions from '../../../store/actions'
+import {
+  updateData,
+  requestListenerData,
+  createNewDocumentAction,
+  selectDocumentAction,
+  dropNewOtherDocumentAction,
+  documentDeleteAction,
+  fileDeleteAction
+} from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
-import styles from '../../../styles.js'
+import styles from '../../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),
@@ -46,11 +54,10 @@ const Others = ({ username }) => {
   const currentDocument = currentData ? currentData[index] : null
   const isDocumentNew = currentDocument ? currentDocument.isDocumentNew : false
   const defaultFileURL = `sertificate${index}.pdf`
-  const actions = allActions.listenerDataActions
 
   React.useEffect(() => {
-    dispatch(actions.requestListenerData(6))
-  }, [dispatch, actions])
+    dispatch(requestListenerData(6))
+  }, [dispatch])
 
   const handleNewDocument = (e) => {
     let newDoc = {
@@ -63,11 +70,11 @@ const Others = ({ username }) => {
       isDocumentNew: true,
     }
 
-    dispatch(actions.createNewDocument(newDoc, 6))
+    dispatch(createNewDocumentAction(newDoc, 6))
   }
 
   const goToDocument = (index) => {
-    dispatch(actions.selectDocument(index, 6))
+    dispatch(selectDocumentAction(index, 6))
   }
 
   const confirmTransition = (value) => {
@@ -89,21 +96,20 @@ const Others = ({ username }) => {
 
   const handleDocumentRedirect = (value) => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(actions.dropNewOthersDocument(value))
+    dispatch(dropNewOtherDocumentAction(value))
   }
 
   const handleSubmit = (values) => {
-    dispatch(
-      actions.updateData(
-        {
-          ...values,
-          document: index,
-          newDocument: isDocumentNew,
-          newFile: values.newFile ? values.newFile.base64 : null,
-          fileURL: values.newFile ? defaultFileURL : currentDocument.fileURL,
-        },
-        6
-      )
+    dispatch(updateData(
+      {
+        ...values,
+        document: index,
+        newDocument: isDocumentNew,
+        newFile: values.newFile ? values.newFile.base64 : null,
+        fileURL: values.newFile ? defaultFileURL : currentDocument.fileURL,
+      },
+      6
+    )
     )
   }
 
@@ -174,8 +180,8 @@ const Others = ({ username }) => {
           </TextField>
         </Grid>
       ) : (
-          <Typography>Нет документов</Typography>
-        )}
+        <Typography>Нет документов</Typography>
+      )}
       {currentDocument && (
         <OthersDataForm
           onSubmit={handleSubmit}
@@ -195,10 +201,9 @@ let OthersDataForm = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const username = props.username
-  const actions = allActions.listenerDataActions
 
   const cancelNewDocument = () => {
-    dispatch(actions.dropNewOthersDocument(0))
+    dispatch(dropNewOtherDocumentAction(0))
   }
 
   // onDialogOpen
@@ -225,12 +230,12 @@ let OthersDataForm = (props) => {
   // onDialogApprove
   const deleteDocument = () => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(actions.requestDocumentDelete(props.documentId, 6))
+    dispatch(documentDeleteAction(props.documentId, 6))
   }
 
   const deleteFile = () => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(actions.requestFileDelete(props.documentId, 6))
+    dispatch(fileDeleteAction(props.documentId, 6))
   }
 
   return (
@@ -293,16 +298,16 @@ let OthersDataForm = (props) => {
           Удалить документ
         </Button>
       ) : (
-          <Button
-            type="button"
-            className={classes.button}
-            variant="contained"
-            color="primary"
-            onClick={cancelNewDocument}
-          >
-            Отмена
-          </Button>
-        )}
+        <Button
+          type="button"
+          className={classes.button}
+          variant="contained"
+          color="primary"
+          onClick={cancelNewDocument}
+        >
+          Отмена
+        </Button>
+      )}
     </form>
   )
 }

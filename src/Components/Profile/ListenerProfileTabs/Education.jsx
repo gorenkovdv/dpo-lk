@@ -26,11 +26,20 @@ import {
 } from '../../Commons/FormsControls/FormsControls'
 import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
 import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
-import { SAVE_FILES_DIRECTORY } from '../../../store/const.js'
-import { parseDate } from '../../../utils/parse.js'
-import allActions from '../../../store/actions'
+import { SAVE_FILES_DIRECTORY } from '../../../store/const'
+import { parseDate } from '../../../utils/parse'
+import {
+  updateData,
+  requestListenerData,
+  createNewDocumentAction,
+  selectEducationLevelAction,
+  selectDocumentAction,
+  dropNewEducationDocumentAction,
+  documentDeleteAction,
+  fileDeleteAction
+} from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
-import styles from '../../../styles.js'
+import styles from '../../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),
@@ -105,11 +114,10 @@ const Education = ({ username }) => {
     currentData && currentData[level] ? currentData[level][index] : null
   const isDocumentNew = currentDocument ? currentDocument.isDocumentNew : false
   const defaultFileURL = `education${level}${index}.pdf`
-  const actions = allActions.listenerDataActions
 
   React.useEffect(() => {
-    dispatch(actions.requestListenerData(4))
-  }, [dispatch, actions])
+    dispatch(requestListenerData(4))
+  }, [dispatch])
 
   const handleNewDocument = () => {
     let newDoc = {
@@ -125,7 +133,7 @@ const Education = ({ username }) => {
       isDocumentNew: true,
     }
 
-    dispatch(actions.createNewDocument(newDoc, 4))
+    dispatch(createNewDocumentAction(newDoc, 4))
   }
 
   const confirmTransition = (value, type) => {
@@ -147,11 +155,11 @@ const Education = ({ username }) => {
   }
 
   const goToLevel = (level) => {
-    dispatch(actions.selectEducationLevel(level))
+    dispatch(selectEducationLevelAction(level))
   }
 
   const goToDocument = (index) => {
-    dispatch(actions.selectDocument(index, 4))
+    dispatch(selectDocumentAction(index, 4))
   }
 
   const selectDocument = (e) => {
@@ -167,22 +175,21 @@ const Education = ({ username }) => {
     if (type === 'document') goToDocument(value)
     if (type === 'level') goToLevel(value)
 
-    dispatch(actions.dropNewEducationDocument())
+    dispatch(dropNewEducationDocumentAction())
   }
 
   const handleSubmit = (values) => {
-    dispatch(
-      actions.updateData(
-        {
-          ...values,
-          level: level,
-          document: index,
-          newDocument: isDocumentNew,
-          newFile: values.newFile ? values.newFile.base64 : null,
-          fileURL: values.newFile ? defaultFileURL : currentDocument.fileURL,
-        },
-        4
-      )
+    dispatch(updateData(
+      {
+        ...values,
+        level: level,
+        document: index,
+        newDocument: isDocumentNew,
+        newFile: values.newFile ? values.newFile.base64 : null,
+        fileURL: values.newFile ? defaultFileURL : currentDocument.fileURL,
+      },
+      4
+    )
     )
   }
 
@@ -227,21 +234,21 @@ const Education = ({ username }) => {
           currentData[level] &&
           currentData[level].length > 0
         ) ? (
-            <Grid container>
-              <Button
-                style={{ marginTop: 10, marginBottom: 10 }}
-                type="button"
-                disabled={isDocumentNew}
-                className={classes.button}
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                onClick={handleNewDocument}
-              >
-                Добавить документ
+          <Grid container>
+            <Button
+              style={{ marginTop: 10, marginBottom: 10 }}
+              type="button"
+              disabled={isDocumentNew}
+              className={classes.button}
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={handleNewDocument}
+            >
+              Добавить документ
             </Button>
-            </Grid>
-          ) : null}
+          </Grid>
+        ) : null}
       </Grid>
       {currentData && currentData[level] && currentData[level].length > 0 ? (
         <Grid container direction="column" alignItems="flex-start">
@@ -265,11 +272,11 @@ const Education = ({ username }) => {
           </TextField>
         </Grid>
       ) : (
-          <>
-            <Typography>Нет документов</Typography>
-            <br />
-          </>
-        )}
+        <>
+          <Typography>Нет документов</Typography>
+          <br />
+        </>
+      )}
       {currentDocument && (
         <EducationDataForm
           onSubmit={handleSubmit}
@@ -290,13 +297,12 @@ const Education = ({ username }) => {
 let EducationDataForm = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const actions = allActions.listenerDataActions
   const level = props.level
   const username = props.username
 
   const cancelNewDocument = () => {
-    dispatch(actions.selectDocument(0, 4))
-    dispatch(actions.dropNewEducationDocument())
+    dispatch(selectDocumentAction(0, 4))
+    dispatch(dropNewEducationDocumentAction())
   }
 
   // onDialogOpen
@@ -322,12 +328,12 @@ let EducationDataForm = (props) => {
 
   // onDialogApprove
   const deleteDocument = () => {
-    dispatch(actions.requestDocumentDelete(props.documentId, 4))
+    dispatch(documentDeleteAction(props.documentId, 4))
     dispatch(confirmDialogActions.confirmDialogClose())
   }
 
   const deleteFile = () => {
-    dispatch(actions.requestFileDelete(props.documentId, 4))
+    dispatch(fileDeleteAction(props.documentId, 4))
     dispatch(confirmDialogActions.confirmDialogClose())
   }
 
@@ -428,16 +434,16 @@ let EducationDataForm = (props) => {
           Удалить документ
         </Button>
       ) : (
-          <Button
-            type="button"
-            className={classes.button}
-            variant="contained"
-            color="primary"
-            onClick={cancelNewDocument}
-          >
-            Отмена
-          </Button>
-        )}
+        <Button
+          type="button"
+          className={classes.button}
+          variant="contained"
+          color="primary"
+          onClick={cancelNewDocument}
+        >
+          Отмена
+        </Button>
+      )}
     </form>
   )
 }

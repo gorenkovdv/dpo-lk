@@ -18,8 +18,8 @@ import {
 } from '../Commons/Tooltips/AddressTooltips'
 import MainLayout from '../Main/MainLayout'
 import withAuth from '../Authorization/withAuth'
-import allActions from '../../store/actions'
-import styles from '../../styles.js'
+import { requestEntityData, updateEntityData } from '../../store/reducers/entityData'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),
@@ -30,14 +30,13 @@ const EntityData = (props) => {
   const dispatch = useDispatch()
   const isLoading = useSelector((state) => state.loader.isLoading)
   const data = useSelector((state) => state.entityData)
-  const actions = allActions.entityDataActions
 
   useEffect(() => {
-    dispatch(actions.requestEntityData())
-  }, [dispatch, actions])
+    dispatch(requestEntityData())
+  }, [dispatch])
 
   const handleSubmit = (values) => {
-    dispatch(actions.updateEntityData(values))
+    dispatch(updateEntityData(values))
   }
 
   if (props.pagesType === 'listener') return <Redirect to="/listener/data" />

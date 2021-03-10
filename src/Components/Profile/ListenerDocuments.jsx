@@ -9,9 +9,9 @@ import Education from './ListenerProfileTabs/Education'
 import Sertificates from './ListenerProfileTabs/Sertificates'
 import Others from './ListenerProfileTabs/Others'
 import withAuth from '../Authorization/withAuth'
-import allActions from '../../store/actions'
+import { setDocumentsTabAction } from '../../store/reducers/listenerData'
 import { userAPI } from '../../services/api'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),
@@ -60,7 +60,7 @@ const ListenerDocuments = (props) => {
   }
 
   const handleTabChange = (e, value) => {
-    dispatch(allActions.listenerDataActions.setDocumentsTab(value))
+    dispatch(setDocumentsTabAction(value))
   }
 
   if (pagesType === 'entity') return <Redirect to="/entity/data" />

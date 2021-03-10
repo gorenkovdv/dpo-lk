@@ -20,7 +20,7 @@ import RequestCMEForm from './RequestCMEForm'
 import withAuth from '../Authorization/withAuth'
 import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
 import { getRequests, setDocumentsApprove, cancelRequest as cancelRequestAction, updateCMERequest, actions as requestsActions } from '../../store/reducers/requests'
-import styles from '../../styles.js'
+import styles from '../../styles'
 import Request from './Request'
 
 const useStyles = makeStyles((theme) => ({ ...styles(theme) }))

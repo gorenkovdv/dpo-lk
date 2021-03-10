@@ -22,7 +22,7 @@ import DialogLayout from '../Commons/Dialog/DialogLayout'
 import ListenerInfoWindow from './ListenerInfoWindow'
 import { removeRequestUser } from '../../store/reducers/courses'
 import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),

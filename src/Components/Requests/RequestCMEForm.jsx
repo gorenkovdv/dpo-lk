@@ -1,7 +1,7 @@
 import React from 'react'
 import { Field, reduxForm } from 'redux-form'
 import { MaskedInput, Input } from '../Commons/FormsControls/FormsControls'
-import { required, isStringContainsUnderscore } from '../../utils/validate.js'
+import { required, isStringContainsUnderscore } from '../../utils/validate'
 
 let RequestCMEForm = (props) => {
   const specialityFieldRef = React.useRef(null)

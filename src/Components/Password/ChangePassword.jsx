@@ -11,7 +11,7 @@ import { PasswordInput } from '../Commons/FormsControls/FormsControls'
 import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import { actions as authActions, checkParams, changePassword } from '../../store/reducers/auth'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles(theme => ({ ...styles(theme) }))
 

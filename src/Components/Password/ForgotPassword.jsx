@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Input } from '../Commons/FormsControls/FormsControls'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import { findUser } from '../../store/reducers/auth'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles(theme => ({
   ...styles(theme),

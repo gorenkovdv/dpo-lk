@@ -10,7 +10,7 @@ import {
 import AppBarLayout from './AppBarLayout'
 import DrawerLayout from './DrawerLayout'
 import { userAPI } from '../../services/api'
-import { DRAWER_WIDTH } from '../../store/const.js'
+import { DRAWER_WIDTH } from '../../store/const'
 
 const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,

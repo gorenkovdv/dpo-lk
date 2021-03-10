@@ -8,7 +8,7 @@ import {
 import { loadFileTooltip } from '../Tooltips/LoadFileTooltip'
 import { red } from '@material-ui/core/colors'
 import ReactFileReader from 'react-file-reader'
-import styles from '../../../styles.js'
+import styles from '../../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),

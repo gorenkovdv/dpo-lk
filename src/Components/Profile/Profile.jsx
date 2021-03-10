@@ -25,10 +25,10 @@ import {
 import {
   isEmailValid,
   isStringContainsUnderscore
-} from '../../utils/validate.js'
-import { parseDate } from '../../utils/parse.js'
+} from '../../utils/validate'
+import { parseDate } from '../../utils/parse'
 import { requestProfile, updateProfile } from '../../store/reducers/profile'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),

@@ -32,11 +32,11 @@ import {
 } from '../../Commons/FormsControls/FormsControls'
 import LoaderLayout from '../../Commons/Loader/LoaderLayout'
 import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
-import { SAVE_FILES_DIRECTORY } from '../../../store/const.js'
-import { parseMonth } from '../../../utils/parse.js'
-import allActions from '../../../store/actions'
+import { SAVE_FILES_DIRECTORY } from '../../../store/const'
+import { parseMonth } from '../../../utils/parse'
+import { requestListenerData, updateData, workFileDelete } from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
-import styles from '../../../styles.js'
+import styles from '../../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),
@@ -47,23 +47,21 @@ const Work = ({ username }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const data = useSelector((state) => state.listenerData)
-  const actions = allActions.listenerDataActions
   const defaultFileURL = 'work.pdf'
 
   React.useEffect(() => {
-    dispatch(actions.requestListenerData(data.selectedTab))
-  }, [dispatch, actions, data.selectedTab])
+    dispatch(requestListenerData(data.selectedTab))
+  }, [dispatch, data.selectedTab])
 
   const handleSubmit = (values) => {
-    dispatch(
-      allActions.listenerDataActions.updateData(
-        {
-          ...values,
-          newFile: values.newFile ? values.newFile.base64 : null,
-          fileURL: values.newFile ? defaultFileURL : data.list.work.fileURL,
-        },
-        data.selectedTab
-      )
+    dispatch(updateData(
+      {
+        ...values,
+        newFile: values.newFile ? values.newFile.base64 : null,
+        fileURL: values.newFile ? defaultFileURL : data.list.work.fileURL,
+      },
+      data.selectedTab
+    )
     )
   }
 
@@ -131,7 +129,7 @@ let WorkDataForm = (props) => {
 
   const onFileDelete = () => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(allActions.listenerDataActions.workFileDelete())
+    dispatch(workFileDelete())
   }
 
   return (

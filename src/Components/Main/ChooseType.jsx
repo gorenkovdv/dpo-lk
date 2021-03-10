@@ -6,12 +6,12 @@ import { makeStyles } from '@material-ui/core/styles'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import { MaskedInput } from '../Commons/FormsControls/FormsControls'
-import { required, isStringContainsUnderscore } from '../../utils/validate.js'
+import { required, isStringContainsUnderscore } from '../../utils/validate'
 import withAuth from '../Authorization/withAuth'
-import allActions from '../../store/actions'
+import { checkEntityRoots, addEntityRepresentative } from '../../store/reducers/entityData'
 import { logout } from '../../store/reducers/auth'
 import history from '../../history'
-import styles from '../../styles.js'
+import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({
   ...styles(theme),
@@ -52,7 +52,7 @@ const ChooseType = () => {
   }, [])
 
   React.useEffect(() => {
-    dispatch(allActions.entityDataActions.checkEntityRoots())
+    dispatch(checkEntityRoots())
   }, [dispatch])
 
   const selectEntityDialogShow = (e) => {
@@ -81,7 +81,7 @@ const ChooseType = () => {
 
   const handleSubmit = (values) => {
     selectEntityDialogClose()
-    dispatch(allActions.entityDataActions.addEntityRepresentative(values.ITN))
+    dispatch(addEntityRepresentative(values.ITN))
   }
 
   return (

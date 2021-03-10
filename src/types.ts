@@ -31,13 +31,14 @@ export interface ICourseBasic {
 
 export interface IDocument {
     id: number
-    level: number
-    type: number
+    level?: number
+    type?: number
     name: string
-    organozation: string
+    organization: string
     hours: string
     comment: string
     documentCheck: number
+    documentName?: string
     fileURL: string | null
     fullName: string | null
     firstDate: string
@@ -46,4 +47,5 @@ export interface IDocument {
     secondDateName: string | null
     serial: string
     speciality: string
+    isDocumentNew?: boolean
 }

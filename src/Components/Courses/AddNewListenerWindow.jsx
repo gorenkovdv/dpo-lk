@@ -7,16 +7,15 @@ import {
   MaskedInput,
   DateInput,
 } from '../Commons/FormsControls/FormsControls'
-import { isStringContainsUnderscore, required } from '../../utils/validate.js'
-import { parseDate } from '../../utils/parse.js'
-import allActions from '../../store/actions'
+import { isStringContainsUnderscore, required } from '../../utils/validate'
+import { parseDate } from '../../utils/parse'
+import { addNewListener } from '../../store/reducers/courses'
 
 const AddNewListenerWindow = ({ options, onClose }) => {
   const dispatch = useDispatch()
 
   const handleSubmit = (values) => {
-    console.log(values)
-    dispatch(allActions.coursesActions.addNewListener(values))
+    dispatch(addNewListener(values))
   }
 
   const initialValues = {
