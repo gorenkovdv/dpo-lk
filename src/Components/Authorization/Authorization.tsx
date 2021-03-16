@@ -1,19 +1,59 @@
 import React, { useEffect } from 'react'
 import { NavLink, Redirect } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { Field, reduxForm } from 'redux-form'
+import { Field, reduxForm, InjectedFormProps } from 'redux-form'
 import { Grid, Button, InputAdornment } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, Theme } from '@material-ui/core/styles'
 import { Input, PasswordInput } from '../Commons/FormsControls/FormsControls'
 import { VpnKey as KeyIcon, Person as PersonIcon } from '@material-ui/icons'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import { authAPI } from '../../services/api'
 import { login } from '../../store/reducers/auth'
-import styles from '../../styles'
 
-const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
+const useStyles = makeStyles((theme: Theme) => ({
+  h3: {
+    textAlign: 'center',
+    fontWeight: 500,
+    marginTop: 15,
+    marginBottom: 15,
+    fontSize: 26,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: 20,
+    },
+  },
+  form: {
+    boxSizing: 'border-box',
+    padding: theme.spacing(1),
+    width: 400,
+    maxWidth: '100%',
+  },
+  inputEndIcon: {
+    marginLeft: theme.spacing(1),
+    padding: 3,
+    color: 'gray',
+  },
+  button: {
+    marginTop: 20,
+    width: '100%',
+  },
+  link: {
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    },
+  },
+}))
 
-const Authorization = () => {
+interface IAuthData {
+  username: string,
+  password: string
+}
+
+const Authorization: React.FC = (): JSX.Element => {
   const classes = useStyles()
   const dispatch = useDispatch()
 
@@ -24,7 +64,7 @@ const Authorization = () => {
     }
   })
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: IAuthData) => {
     dispatch(
       login(values.username, values.password || '')
     )
@@ -39,13 +79,13 @@ const Authorization = () => {
         <h3 className={classes.h3}>
           Личный кабинет слушателя курсов ДПО / НМО
         </h3>
-        <AuthForm onSubmit={handleSubmit} />
+        <AuthReduxForm onSubmit={handleSubmit} />
       </Grid>
     </div>
   )
 }
 
-let AuthForm = (props) => {
+const AuthForm: React.FC<InjectedFormProps<IAuthData>> = ({ handleSubmit }) => {
   const classes = useStyles()
 
   const [showPassword, setShowPassword] = React.useState(false)
@@ -55,14 +95,17 @@ let AuthForm = (props) => {
   }
 
   return (
-    <form className={classes.form} onSubmit={props.handleSubmit}>
+    <form className={classes.form} onSubmit={handleSubmit}>
       <Grid container direction="column" justify="center" alignItems="center">
         <Field
           name="username"
           component={Input}
           margin="normal"
           label="Логин"
-          endadornment={<InputAdornment><PersonIcon className={classes.inputEndIcon} /></InputAdornment>}
+          endadornment={
+            <InputAdornment position="start">
+              <PersonIcon className={classes.inputEndIcon} />
+            </InputAdornment>}
         />
         <Field
           name="password"
@@ -93,6 +136,6 @@ let AuthForm = (props) => {
   )
 }
 
-AuthForm = reduxForm({ form: 'authForm' })(AuthForm)
+const AuthReduxForm = reduxForm<IAuthData>({ form: 'authForm' })(AuthForm)
 
 export default Authorization

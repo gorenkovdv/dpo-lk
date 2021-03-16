@@ -49,3 +49,12 @@ export interface IDocument {
     speciality: string
     isDocumentNew?: boolean
 }
+
+export interface IProfile {
+    lastname: string
+    firstname: string
+    middlename: string
+    email: string
+    snils: string
+    birthdate: string
+}

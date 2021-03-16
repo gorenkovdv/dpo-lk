@@ -3,10 +3,10 @@ import { Redirect } from 'react-router-dom'
 import { authAPI } from '../../services/api'
 import history from '../../history'
 
-const withAuth = (Component) => (props) => {
+const withAuth = <P extends object>(
+  Component: React.ComponentType<P>
+): React.FC<P> => (props) => {
   const [reload, setReload] = React.useState(true)
-
-  //return <Component {...props} />
 
   if (!sessionStorage.token) return <Redirect to="/auth" />
 
@@ -23,7 +23,6 @@ const withAuth = (Component) => (props) => {
   authAPI
     .checkAuth()
     .then((response) => {
-      console.log(response)
       if (response.data.response) {
         authAPI.setToken(response.data.token)
         setReload(!reload)
