@@ -95,7 +95,7 @@ export const getRequests = (): ThunkAction<Promise<void>, AppStateType, unknown,
     if (response.data.response) {
       dispatch(actions.requestsLoadingSuccess(response.data.requests))
       dispatch(actions.loadingSuccess())
-    } else dispatch(snackbarActions.showError(response.data.error))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -108,12 +108,13 @@ export const cancelRequest = (request: ISelectedRequest): ThunkAction<Promise<vo
     if (response.data.response) {
       dispatch(actions.requestCanceled(request.ID))
       dispatch(
-        snackbarActions.showSuccess(
-          `Заявка на обучение по программе «${request.courseName}» отменена`
+        snackbarActions.showMessageAction(
+          `Заявка на обучение по программе «${request.courseName}» отменена`,
+          `success`
         )
       )
       dispatch(loaderActions.loadingSuccess())
-    } else dispatch(snackbarActions.showError(response.data.error))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -122,7 +123,7 @@ export const updateCMERequest = (data: { speciality: string, number: string, row
     const response = await requestsAPI.updateCMERequest(data)
 
     if (response.data.response) dispatch(actions.CMERequestUpdated(data))
-    else dispatch(actions.showError(response.data.error))
+    else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -134,7 +135,7 @@ export const setDocumentsApprove = (requestID: number, status: number): ThunkAct
     if (response.data.response) {
       dispatch(actions.documentsApprove({ requestID, status }))
       dispatch(actions.loadingSuccess())
-    } else dispatch(actions.showError(response.data.error))
+    } else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 

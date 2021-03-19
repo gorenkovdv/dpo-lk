@@ -1,39 +1,32 @@
 import { InferActionsType } from './index'
-
+import { SeverityType } from '../../types'
 interface IState {
-  open: Boolean
+  isOpen: boolean
   message: string
-  severity: string
+  severity: SeverityType
 }
 
 const initialState: IState = {
-  open: false,
+  isOpen: false,
   message: '',
-  severity: 'error'
+  severity: 'success'
 }
 
 type SnackbarActionsTypes = InferActionsType<typeof actions>
 
 export const snackbarReducer = (state = initialState, action: SnackbarActionsTypes): IState => {
   switch (action.type) {
-    case 'SNACKBAR_SHOW_SUCCESS_MESSAGE':
+    case 'SNACKBAR_SHOW_MESSAGE':
       return {
         ...state,
-        open: true,
-        message: action.payload,
-        severity: 'success'
+        isOpen: true,
+        message: action.payload.message,
+        severity: action.payload.severity
       }
-    case 'SNACKBAR_CLEAR':
+    case 'SNACKBAR_CLOSE_MESSAGE':
       return {
         ...state,
-        open: false,
-      }
-    case 'SNACKBAR_SHOW_ERROR_MESSAGE':
-      return {
-        ...state,
-        open: true,
-        message: action.payload,
-        severity: 'error'
+        isOpen: false,
       }
     default:
       return state
@@ -41,15 +34,11 @@ export const snackbarReducer = (state = initialState, action: SnackbarActionsTyp
 }
 
 export const actions = {
-  showSuccess: (message: string) => ({
-    type: 'SNACKBAR_SHOW_SUCCESS_MESSAGE',
-    payload: message
+  showMessageAction: (message: string, severity: SeverityType) => ({
+    type: 'SNACKBAR_SHOW_MESSAGE',
+    payload: { message, severity }
   } as const),
-  showError: (error: string) => ({
-    type: 'SNACKBAR_SHOW_ERROR_MESSAGE',
-    payload: error
-  } as const),
-  clearSnackbar: () => ({
-    type: 'SNACKBAR_CLEAR'
+  closeMessageAction: () => ({
+    type: 'SNACKBAR_CLOSE_MESSAGE'
   } as const)
 }

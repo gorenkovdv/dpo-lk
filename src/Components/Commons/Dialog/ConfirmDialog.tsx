@@ -12,10 +12,12 @@ import {
   useMediaQuery,
 } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
-import { useTheme, withStyles } from '@material-ui/core/styles'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
+import { getConfirmDialogParams } from '../../../store/selectors/common'
 
-const styles = (theme) => ({
+
+const useStyles = makeStyles((theme) => ({
   closeButton: {
     position: 'absolute',
     right: 0,
@@ -25,12 +27,13 @@ const styles = (theme) => ({
   title: {
     paddingRight: theme.spacing(3),
   },
-})
+}))
 
-const DialogTitle = withStyles(styles)((props) => {
-  const { children, classes, onClose, ...other } = props
+
+const DialogTitle: React.FC<{ onClose: () => void }> = ({ children, onClose, ...other }): JSX.Element => {
+  const classes = useStyles()
   return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
+    <MuiDialogTitle disableTypography {...other}>
       <Typography className={classes.title} variant="h6">
         {children}
       </Typography>
@@ -43,11 +46,11 @@ const DialogTitle = withStyles(styles)((props) => {
       </IconButton>
     </MuiDialogTitle>
   )
-})
+}
 
-const DialogLayout = () => {
+const DialogLayout: React.FC = (): JSX.Element => {
   const dispatch = useDispatch()
-  const params = useSelector((state) => state.confirmDialog)
+  const { open, disabled, title, text, onApprove } = useSelector(getConfirmDialogParams)
 
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -60,20 +63,21 @@ const DialogLayout = () => {
     <Dialog
       scroll="paper"
       fullScreen={fullScreen}
-      open={params.open}
+      open={open}
       onClose={handleClose}
     >
-      <DialogTitle onClose={handleClose}>{params.title}</DialogTitle>
+      <DialogTitle onClose={handleClose}>{title}</DialogTitle>
       <DialogContent style={{ minWidth: 450 }}>
-        <DialogContentText>{params.text}</DialogContentText>
+        <DialogContentText>{text}</DialogContentText>
       </DialogContent>
 
       <DialogActions>
         <Button
           color="primary"
+          component="button"
           variant="contained"
-          disabled={params.disabled}
-          onClick={params.onApprove}
+          disabled={disabled}
+          onClick={onApprove}
           autoFocus
         >
           Да

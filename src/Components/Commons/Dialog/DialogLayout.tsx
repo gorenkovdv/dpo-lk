@@ -11,9 +11,9 @@ import {
   useMediaQuery,
 } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
-import { useTheme, withStyles, makeStyles } from '@material-ui/core/styles'
+import { useTheme, Theme, makeStyles } from '@material-ui/core/styles'
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   closeButton: {
     position: 'absolute',
     right: 0,
@@ -23,9 +23,6 @@ const styles = (theme) => ({
   title: {
     paddingRight: theme.spacing(3),
   },
-})
-
-const useStyles = makeStyles((theme) => ({
   paper: {
     minWidth: 1200,
     maxHeight: 750,
@@ -37,10 +34,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const DialogTitle = withStyles(styles)((props) => {
-  const { children, classes, onClose, ...other } = props
+const DialogTitle: React.FC<{ onClose: () => void }> = ({ children, onClose, ...other }): JSX.Element => {
+  const classes = useStyles()
   return (
-    <MuiDialogTitle disableTypography className={classes.root} {...other}>
+    <MuiDialogTitle disableTypography {...other}>
       <Typography className={classes.title} variant="h6">
         {children}
       </Typography>
@@ -55,9 +52,9 @@ const DialogTitle = withStyles(styles)((props) => {
       ) : null}
     </MuiDialogTitle>
   )
-})
+}
 
-const DialogLayout = ({
+const DialogLayout: React.FC<any> = ({
   options,
   largeSize,
   title,
@@ -67,7 +64,7 @@ const DialogLayout = ({
   approveText,
   cancelText,
   children,
-}) => {
+}): JSX.Element => {
   const theme = useTheme()
   const classes = useStyles()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -78,7 +75,7 @@ const DialogLayout = ({
       fullScreen={fullScreen}
       open={options.open}
       onClose={onClose}
-      classes={largeSize && !fullScreen ? { paper: classes.paper } : null}
+      classes={largeSize && !fullScreen ? { paper: classes.paper } : undefined as any}
     >
       <DialogTitle onClose={onClose}>{title}</DialogTitle>
       <DialogContent style={{ minWidth: 450 }}>

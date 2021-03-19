@@ -83,7 +83,7 @@ export const addEntityRepresentative = (ITN: string): ThunkAction<Promise<void>,
     const response = await entityAPI.addEntityRepresentative(ITN)
 
     if (response.data.response) history.push('/profile')
-    else dispatch(actions.showError(response.data.error))
+    else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -105,7 +105,7 @@ export const requestEntityData = (): ThunkAction<Promise<void>, AppStateType, un
         actions.entityDataLoadingSuccess({ ...response.data.entity, roots: response.data.roots })
       )
       dispatch(actions.loadingSuccess())
-    } else dispatch(actions.showError(response.data.error))
+    } else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -115,8 +115,8 @@ export const updateEntityData = (data: any): ThunkAction<Promise<void>, AppState
 
     if (response.data.response) {
       dispatch(actions.updatingSuccess(data))
-      dispatch(actions.showSuccess('Данные успешно обновлены'))
-    } else dispatch(actions.showError(response.data.error))
+      dispatch(actions.showMessageAction('Данные успешно обновлены', 'success'))
+    } else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 

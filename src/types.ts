@@ -1,3 +1,5 @@
+export type SeverityType = 'error' | 'info' | 'success' | 'warning'
+
 export interface ICourseBasic {
     ID: number
     GUID: string

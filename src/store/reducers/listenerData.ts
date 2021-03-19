@@ -485,7 +485,7 @@ export const requestListenerData = (selectedTab: number): ThunkAction<Promise<vo
     if (response.data.response) {
       dispatch(actions.listenerDataLoadingSuccess(response.data.output))
       dispatch(actions.loadingSuccess())
-    } else dispatch(actions.showError(response.data.error))
+    } else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -494,7 +494,7 @@ export const workFileDelete = (): ThunkAction<Promise<void>, AppStateType, unkno
     const response = await documentAPI.deleteWorkFile()
 
     if (response.data.response) dispatch(actions.workFileDeleted())
-    else dispatch(actions.showError(response.data.error))
+    else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -514,8 +514,8 @@ export const updateData = (data: any, type: number): ThunkAction<Promise<void>, 
         default: break;
       }
 
-      dispatch(actions.showSuccess('Данные успешно обновлены'))
-    } else dispatch(actions.showError(response.data.error))
+      dispatch(actions.showMessageAction('Данные успешно обновлены', 'success'))
+    } else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -572,8 +572,8 @@ export const documentDeleteAction = (documentId: number, type: number): ThunkAct
         case 6: dispatch(actions.otherDocumentDeleted(documentId)); break;
         default: break;
       }
-      dispatch(snackbarActions.showSuccess('Документ успешно удалён'))
-    } else dispatch(snackbarActions.showError(response.data.error))
+      dispatch(snackbarActions.showMessageAction('Документ успешно удалён', 'success'))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -589,8 +589,8 @@ export const fileDeleteAction = (documentId: number, type: number): ThunkAction<
         default: break;
       }
 
-      dispatch(actions.showSuccess('Файл успешно удалён'))
-    } else dispatch(actions.showError(response.data.error))
+      dispatch(actions.showMessageAction('Файл успешно удалён', 'success'))
+    } else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 

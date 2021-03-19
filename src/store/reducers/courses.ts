@@ -399,8 +399,8 @@ export const requestCourses = (page: number, count: number, filters: IFilters): 
           rootCathedra: response.data.rootCathedra,
         })
       )
-      dispatch(loaderActions.loadingSuccess())
-    } else dispatch(snackbarActions.showError(response.data.error))
+      dispatch(actions.loadingSuccess())
+    } else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -421,8 +421,8 @@ export const changeListParams = (page: number, count: number, filters: IFilters)
           rootCathedra: response.data.rootCathedra,
         })
       )
-      dispatch(loaderActions.loadingSuccess())
-    } else dispatch(snackbarActions.showError(response.data.error))
+      dispatch(actions.loadingSuccess())
+    } else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -435,12 +435,13 @@ export const createRequest = (course: ISelectedCourse): ThunkAction<Promise<void
     if (response.data.response) {
       dispatch(actions.changeRequestStatus({ courseID: course.ID, users }))
       dispatch(
-        snackbarActions.showSuccess(
-          `Подана заявка на обучение по программе «${course.Name}»`
+        snackbarActions.showMessageAction(
+          `Подана заявка на обучение по программе «${course.Name}»`,
+          `success`
         )
       )
       dispatch(loaderActions.loadingSuccess())
-    } else dispatch(snackbarActions.showError(response.data.error))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -454,9 +455,9 @@ export const cancelRequest = (course: ISelectedCourse, requestID: number): Thunk
 
     if (response.data.response) {
       dispatch(actions.changeRequestStatus({ courseID: course.ID, users, requestID }))
-      dispatch(snackbarActions.showSuccess(message))
+      dispatch(snackbarActions.showMessageAction(message, 'success'))
       dispatch(loaderActions.loadingSuccess())
-    } else dispatch(snackbarActions.showError(response.data.error))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -472,9 +473,9 @@ export const createListenersRequests = (courseID: number, users: Array<ICourseUs
           users: response.data.users,
         })
       )
-      dispatch(snackbarActions.showSuccess('Слушатели добавлены на курс'))
+      dispatch(snackbarActions.showMessageAction('Слушатели добавлены на курс', 'success'))
       dispatch(loaderActions.loadingSuccess())
-    } else dispatch(snackbarActions.showError(response.data.error))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -492,8 +493,8 @@ export const removeRequestUser = (courseID: number, rowID: number): ThunkAction<
           userID: userAPI.getUID(),
         })
       )
-      dispatch(snackbarActions.showSuccess('Слушатель удалён из заявки'))
-    } else dispatch(snackbarActions.showError(response.data.error))
+      dispatch(snackbarActions.showMessageAction('Слушатель удалён из заявки', 'success'))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -509,7 +510,7 @@ export const getListenerInfo = (userID: number): ThunkAction<Promise<void>, AppS
           documents: response.data.documents,
         })
       )
-    } else dispatch(snackbarActions.showError(response.data.error))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -522,7 +523,7 @@ export const getListenersOptions = (value: string): ThunkAction<Promise<void>, A
 
       if (response.data.response)
         dispatch(actions.setListenersOptions(response.data.listeners))
-      else dispatch(snackbarActions.showError(response.data.error))
+      else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
     } else {
       dispatch(actions.setListenersOptions([]))
     }
@@ -554,8 +555,8 @@ export const saveCheckData = (userID: number, rowID: number, data: any): ThunkAc
           rowID,
         })
       )
-      dispatch(snackbarActions.showSuccess('Изменения сохранены'))
-    } else dispatch(snackbarActions.showError(response.data.error))
+      dispatch(snackbarActions.showMessageAction('Изменения сохранены', 'success'))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -566,7 +567,7 @@ export const addNewListener = (values: INewListener): ThunkAction<Promise<void>,
     if (response.data.response) {
       dispatch(actions.addListenerToList(response.data.user))
       dispatch(actions.setAdditionDialogOpen(false))
-    } else dispatch(snackbarActions.showError(response.data.error))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 

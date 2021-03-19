@@ -122,14 +122,15 @@ export const changePassword = (id: number, key: string, password: string, repeat
           dispatch(actions.setPasswordParams({ reset: false, showForm: true }))
 
           if (response.data.response)
-            dispatch(snackbarActions.showSuccess('Пароль успешно изменен'))
-          else dispatch(snackbarActions.showError(response.data.error))
+            dispatch(snackbarActions.showMessageAction('Пароль успешно изменен', 'success'))
+          else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
         }
-      } else dispatch(snackbarActions.showError('Пароли должны совпадать'))
+      } else dispatch(snackbarActions.showMessageAction('Пароли должны совпадать', 'error'))
     } else
       dispatch(
-        snackbarActions.showError(
-          `Пароль должен содержать как минимум ${PASSWORD_LENGTH} символов`
+        snackbarActions.showMessageAction(
+          `Пароль должен содержать как минимум ${PASSWORD_LENGTH} символов`,
+          `error`
         )
       )
   }
@@ -141,11 +142,12 @@ export const findUser = (value: string): ThunkAction<Promise<void>, AppStateType
 
     if (response.data.response)
       dispatch(
-        snackbarActions.showSuccess(
-          `Информация выслана на электронную почту ${response.data.email}`
+        snackbarActions.showMessageAction(
+          `Информация выслана на электронную почту ${response.data.email}`,
+          `success`
         )
       )
-    else dispatch(snackbarActions.showError(response.data.error))
+    else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -160,7 +162,7 @@ export const login = (username: string, password: string): ThunkAction<Promise<v
         history.replace(
           `/changepassword/${response.data.uid}/${response.data.token.key}`
         )
-    } else dispatch(snackbarActions.showError(response.data.error))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 

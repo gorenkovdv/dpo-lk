@@ -14,11 +14,12 @@ export const addUser = (data: IProfile): ThunkAction<Promise<void>, AppStateType
         if (response.data.response) {
             dispatch(reset('registrationForm'))
             dispatch(
-                snackbarActions.showSuccess(
-                    `Ссылка для активации учётной записи выслана на электронную почту ${data.email}`
+                snackbarActions.showMessageAction(
+                    `Ссылка для активации учётной записи выслана на электронную почту ${data.email}`,
+                    `success`
                 )
             )
-        } else dispatch(snackbarActions.showError(response.data.error))
+        } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
     }
 }
 

@@ -54,7 +54,7 @@ export const requestProfile = (): ThunkAction<Promise<void>, AppStateType, unkno
     if (response.data.response) {
       dispatch(actions.updatingSuccess(response.data.profile))
       dispatch(loaderActions.loadingSuccess())
-    } else dispatch(snackbarActions.showError(response.data.error))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 
@@ -66,8 +66,8 @@ export const updateProfile = (data: IProfileStateList): ThunkAction<Promise<void
 
     if (response.data.response) {
       dispatch(actions.updatingSuccess(data))
-      dispatch(snackbarActions.showSuccess('Данные успешно обновлены'))
-    } else dispatch(snackbarActions.showError(response.data.error))
+      dispatch(snackbarActions.showMessageAction('Данные успешно обновлены', 'success'))
+    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
   }
 }
 

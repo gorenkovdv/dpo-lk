@@ -3,7 +3,7 @@ import { InferActionsType } from './index'
 interface IStateParams {
   title: string,
   text: string,
-  onApprove: (() => (params: any) => void) | null
+  onApprove?: () => (params: any) => void
 }
 
 interface IState extends IStateParams {
@@ -15,8 +15,7 @@ const initialState: IState = {
   open: false,
   disabled: true,
   title: '',
-  text: '',
-  onApprove: null,
+  text: ''
 }
 
 type confirmDialogActionsTypes = InferActionsType<typeof actions>
