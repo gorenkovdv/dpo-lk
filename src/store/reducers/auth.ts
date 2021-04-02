@@ -1,5 +1,4 @@
-import { ThunkAction } from 'redux-thunk'
-import { AppStateType, InferActionsType } from './index'
+import { BaseThunkType, InferActionsType } from './index'
 import { actions as snackbarActions } from './snackbar'
 import { actions as loaderActions } from './loader'
 import { authAPI } from '../../services/api'
@@ -22,6 +21,7 @@ const initialState: IState = {
 }
 
 type authActionsTypes = InferActionsType<typeof actions>
+type ThunkType = BaseThunkType<authActionsTypes>
 
 export const authReducer = (state = initialState, action: authActionsTypes): IState => {
   switch (action.type) {
@@ -69,7 +69,7 @@ export const actions = {
   ...loaderActions
 }
 
-export const checkParams = (id: number, key: string, type: string): ThunkAction<Promise<void>, AppStateType, unknown, authActionsTypes> => {
+export const checkParams = (id: number, key: string, type: string): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     let params = {}
@@ -104,7 +104,7 @@ export const checkParams = (id: number, key: string, type: string): ThunkAction<
   }
 }
 
-export const changePassword = (id: number, key: string, password: string, repeat: string): ThunkAction<Promise<void>, AppStateType, unknown, authActionsTypes> => {
+export const changePassword = (id: number, key: string, password: string, repeat: string): ThunkType => {
   return async (dispatch) => {
     if (password.length >= PASSWORD_LENGTH && repeat.length >= PASSWORD_LENGTH) {
       if (password === repeat) {
@@ -136,7 +136,7 @@ export const changePassword = (id: number, key: string, password: string, repeat
   }
 }
 
-export const findUser = (value: string): ThunkAction<Promise<void>, AppStateType, unknown, authActionsTypes> => {
+export const findUser = (value: string): ThunkType => {
   return async (dispatch) => {
     const response = await authAPI.findUser(value)
 
@@ -151,7 +151,7 @@ export const findUser = (value: string): ThunkAction<Promise<void>, AppStateType
   }
 }
 
-export const login = (username: string, password: string): ThunkAction<Promise<void>, AppStateType, unknown, authActionsTypes> => {
+export const login = (username: string, password: string): ThunkType => {
   return async (dispatch) => {
     const response = await authAPI.login(username, password)
 
@@ -166,7 +166,7 @@ export const login = (username: string, password: string): ThunkAction<Promise<v
   }
 }
 
-export const logout = (): ThunkAction<Promise<void>, AppStateType, unknown, authActionsTypes> => {
+export const logout = (): ThunkType => {
   return async () => {
     await authAPI.logout()
 

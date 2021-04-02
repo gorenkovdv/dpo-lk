@@ -1,6 +1,6 @@
 import { ThunkAction } from 'redux-thunk'
 import { ICourseBasic } from '../../types'
-import { AppStateType, InferActionsType } from './index'
+import { AppStateType, BaseThunkType, InferActionsType } from './index'
 import { requestsAPI } from '../../services/api'
 import { actions as snackbarActions } from './snackbar'
 import { actions as loaderActions } from './loader'
@@ -27,6 +27,7 @@ interface ISelectedRequest {
 }
 
 type requestsActionsTypes = InferActionsType<typeof actions>
+type ThunkType = BaseThunkType<requestsActionsTypes>
 
 const initialState: IState = {
   list: [],
@@ -86,7 +87,7 @@ export const requestsReducer = (state = initialState, action: requestsActionsTyp
   }
 }
 
-export const getRequests = (): ThunkAction<Promise<void>, AppStateType, unknown, requestsActionsTypes> => {
+export const getRequests = (): ThunkType => {
   return async (dispatch) => {
     dispatch(actions.setLoading())
 
@@ -99,7 +100,7 @@ export const getRequests = (): ThunkAction<Promise<void>, AppStateType, unknown,
   }
 }
 
-export const cancelRequest = (request: ISelectedRequest): ThunkAction<Promise<void>, AppStateType, unknown, requestsActionsTypes> => {
+export const cancelRequest = (request: ISelectedRequest): ThunkType => {
   return async (dispatch) => {
     dispatch(actions.setLoading())
 
@@ -118,7 +119,7 @@ export const cancelRequest = (request: ISelectedRequest): ThunkAction<Promise<vo
   }
 }
 
-export const updateCMERequest = (data: { speciality: string, number: string, rowID: number }): ThunkAction<Promise<void>, AppStateType, unknown, requestsActionsTypes> => {
+export const updateCMERequest = (data: { speciality: string, number: string, rowID: number }): ThunkType => {
   return async (dispatch) => {
     const response = await requestsAPI.updateCMERequest(data)
 
@@ -127,7 +128,7 @@ export const updateCMERequest = (data: { speciality: string, number: string, row
   }
 }
 
-export const setDocumentsApprove = (requestID: number, status: number): ThunkAction<Promise<void>, AppStateType, unknown, requestsActionsTypes> => {
+export const setDocumentsApprove = (requestID: number, status: number): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     const response = await requestsAPI.setDocumentsApprove(requestID, status)

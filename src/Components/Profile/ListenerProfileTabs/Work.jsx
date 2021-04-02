@@ -106,7 +106,7 @@ const Work = ({ username }) => {
         onSubmit={handleSubmit}
         initialValues={data.list.work}
         username={username}
-        positionTypes={data.list.positionTypes}
+        positionTypes={data.list.work.positionTypes}
         fileURL={data.list.work && data.list.work.fileURL}
       />
     </>

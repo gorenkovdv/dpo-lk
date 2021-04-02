@@ -60,3 +60,10 @@ export interface IProfile {
     snils: string
     birthdate: string
 }
+
+export interface IUserOption {
+    id: number
+    login: string
+    name: string
+    isUserAdded: boolean
+}

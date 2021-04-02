@@ -1,5 +1,4 @@
-import { ThunkAction } from 'redux-thunk'
-import { AppStateType, InferActionsType } from './index'
+import { BaseThunkType, InferActionsType } from './index'
 import { actions as snackbarActions } from './snackbar'
 import { authAPI } from '../../services/api'
 import { IProfile } from '../../types'
@@ -7,7 +6,7 @@ import { reset } from 'redux-form'
 
 type profileActionsTypes = InferActionsType<typeof actions>
 
-export const addUser = (data: IProfile): ThunkAction<Promise<void>, AppStateType, unknown, profileActionsTypes> => {
+export const addUser = (data: IProfile): BaseThunkType<profileActionsTypes> => {
     return async (dispatch) => {
         const response = await authAPI.addUser(data)
 

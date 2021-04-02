@@ -1,8 +1,7 @@
-import { ThunkAction } from 'redux-thunk'
 import { entityAPI } from '../../services/api'
 import { actions as snackbarActions } from './snackbar'
 import { actions as loaderActions } from './loader'
-import { AppStateType, InferActionsType } from './index'
+import { BaseThunkType, InferActionsType } from './index'
 import history from '../../history'
 
 interface IStateList {
@@ -55,6 +54,7 @@ const initialState: IState = {
 }
 
 type entityDataActionsTypes = InferActionsType<typeof actions>
+type ThunkType = BaseThunkType<entityDataActionsTypes>
 
 export const entityDataReducer = (state = initialState, action: entityDataActionsTypes): IState => {
   switch (action.type) {
@@ -78,7 +78,7 @@ export const entityDataReducer = (state = initialState, action: entityDataAction
   }
 }
 
-export const addEntityRepresentative = (ITN: string): ThunkAction<Promise<void>, AppStateType, unknown, entityDataActionsTypes> => {
+export const addEntityRepresentative = (ITN: string): ThunkType => {
   return async (dispatch) => {
     const response = await entityAPI.addEntityRepresentative(ITN)
 
@@ -87,7 +87,7 @@ export const addEntityRepresentative = (ITN: string): ThunkAction<Promise<void>,
   }
 }
 
-export const checkEntityRoots = (): ThunkAction<Promise<void>, AppStateType, unknown, entityDataActionsTypes> => {
+export const checkEntityRoots = (): ThunkType => {
   return async (dispatch) => {
     const response = await entityAPI.checkEntityRoots()
 
@@ -95,7 +95,7 @@ export const checkEntityRoots = (): ThunkAction<Promise<void>, AppStateType, unk
   }
 }
 
-export const requestEntityData = (): ThunkAction<Promise<void>, AppStateType, unknown, entityDataActionsTypes> => {
+export const requestEntityData = (): ThunkType => {
   return async (dispatch) => {
     dispatch(actions.setLoading())
     const response = await entityAPI.getEntityData()
@@ -109,7 +109,7 @@ export const requestEntityData = (): ThunkAction<Promise<void>, AppStateType, un
   }
 }
 
-export const updateEntityData = (data: any): ThunkAction<Promise<void>, AppStateType, unknown, entityDataActionsTypes> => {
+export const updateEntityData = (data: any): ThunkType => {
   return async (dispatch) => {
     const response = await entityAPI.setEntityData(data)
 

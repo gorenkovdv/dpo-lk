@@ -1,10 +1,9 @@
-import { ThunkAction } from 'redux-thunk'
-import { AppStateType, InferActionsType } from './index'
+import { BaseThunkType, InferActionsType } from './index'
 import { actions as loaderActions } from './loader'
 import { actions as snackbarActions } from './snackbar'
 import { profileAPI } from '../../services/api'
 
-interface IState {
+export interface IState {
   list: IProfileStateList
 }
 
@@ -31,6 +30,7 @@ const initialState: IState = {
 }
 
 type profileActionsTypes = InferActionsType<typeof actions>
+type ThunkType = BaseThunkType<profileActionsTypes>
 
 export const profileReducer = (state = initialState, action: profileActionsTypes): IState => {
   switch (action.type) {
@@ -44,30 +44,24 @@ export const profileReducer = (state = initialState, action: profileActionsTypes
   }
 }
 
-export const requestProfile = (): ThunkAction<Promise<void>, AppStateType, unknown, profileActionsTypes> => {
-  return async (dispatch) => {
-    dispatch(loaderActions.setLoading())
-    const response = await profileAPI.getProfile()
+export const requestProfile = (): ThunkType => async (dispatch) => {
+  dispatch(actions.setLoading())
+  const response = await profileAPI.getProfile()
 
-    //console.log(response.data)
-
-    if (response.data.response) {
-      dispatch(actions.updatingSuccess(response.data.profile))
-      dispatch(loaderActions.loadingSuccess())
-    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
-  }
+  if (response.data.response) {
+    dispatch(actions.updatingSuccess(response.data.profile))
+    dispatch(actions.loadingSuccess())
+  } else dispatch(actions.showMessageAction(response.data.error, 'error'))
 }
 
-export const updateProfile = (data: IProfileStateList): ThunkAction<Promise<void>, AppStateType, unknown, profileActionsTypes> => {
+export const updateProfile = (data: IProfileStateList): ThunkType => {
   return async (dispatch) => {
     const response = await profileAPI.setProfile(data)
 
-    //console.log(response.data)
-
     if (response.data.response) {
       dispatch(actions.updatingSuccess(data))
-      dispatch(snackbarActions.showMessageAction('Данные успешно обновлены', 'success'))
-    } else dispatch(snackbarActions.showMessageAction(response.data.error, 'error'))
+      dispatch(actions.showMessageAction('Данные успешно обновлены', 'success'))
+    } else dispatch(actions.showMessageAction(response.data.error, 'error'))
   }
 }
 

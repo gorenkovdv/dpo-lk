@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import { Action, combineReducers } from 'redux'
 import { profileReducer } from './profile'
 import { snackbarReducer } from './snackbar'
 import { confirmDialogReducer } from './confirmDialog'
@@ -9,6 +9,7 @@ import { listenerDataReducer } from './listenerData'
 import { coursesReducer } from './courses'
 import { requestsReducer } from './requests'
 import { reducer as formReducer } from 'redux-form'
+import { ThunkAction } from 'redux-thunk'
 
 const appReducer = combineReducers({
   profile: profileReducer,
@@ -28,8 +29,6 @@ export const rootReducer = (state: any, action: any) => {
   return appReducer(state, action)
 }
 
-type RootReducerType = typeof rootReducer
-export type AppStateType = ReturnType<RootReducerType>
-
-type PropertiesType<T> = T extends { [key: string]: infer U } ? U : never
-export type InferActionsType<T extends { [key: string]: (...args: any[]) => any }> = ReturnType<PropertiesType<T>>
+export type AppStateType = ReturnType<typeof rootReducer>
+export type InferActionsType<T> = T extends { [key: string]: (...args: any[]) => infer U } ? U : never
+export type BaseThunkType<A extends Action, R = Promise<void>> = ThunkAction<R, AppStateType, unknown, A>

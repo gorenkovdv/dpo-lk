@@ -75,7 +75,7 @@ const DialogLayout: React.FC<any> = ({
       fullScreen={fullScreen}
       open={options.open}
       onClose={onClose}
-      classes={largeSize && !fullScreen ? { paper: classes.paper } : undefined as any}
+      classes={largeSize && !fullScreen ? { paper: classes.paper } : null as any}
     >
       <DialogTitle onClose={onClose}>{title}</DialogTitle>
       <DialogContent style={{ minWidth: 450 }}>

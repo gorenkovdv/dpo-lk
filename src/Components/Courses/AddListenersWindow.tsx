@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { ChangeEvent } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, Theme } from '@material-ui/core/styles'
 import {
   Button,
   IconButton,
@@ -19,10 +19,10 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import AddNewListenerWindow from './AddNewListenerWindow'
 import { getListenersOptions, actions as coursesActions } from '../../store/reducers/courses'
-import styles from '../../styles'
+import { getListenersAddition, getSelectedCourse } from '../../store/selectors/courses'
+import { IUserOption } from '../../types'
 
-const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
+const useStyles = makeStyles((theme: Theme) => ({
   modalTableContainer: {
     maxHeight: 380,
   },
@@ -32,30 +32,51 @@ const useStyles = makeStyles((theme) => ({
   option: {
     transform: 'translateZ(0)',
   },
+  iconTitle: {
+    marginLeft: theme.spacing(1.25),
+  },
+  table: {
+    minWidth: 650,
+    borderCollapse: 'collapse',
+  },
 }))
 
-const AddListenersWindow = ({ options, onClose, onApprove }) => {
+interface IProps {
+  options: Array<IUserOption>,
+  onClose: any,
+  onApprove: any
+}
+
+const defaultValue = {
+  id: 0,
+  login: '',
+  name: '',
+  isUserAdded: false
+}
+
+const AddListenersWindow: React.FC<IProps> = ({ options, onClose, onApprove }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const [open, setOpen] = React.useState(false)
   const [inputValue, setInputValue] = React.useState('')
-  const [autocompleteValue, setAutocompleteValue] = React.useState(null)
-  const data = useSelector((state) => state.courses.listenersAddition)
-  const course = useSelector((state) => state.courses.selectedCourse)
+  const [autocompleteValue, setAutocompleteValue] = React.useState(defaultValue)
+  const data = useSelector(getListenersAddition)
+  const course = useSelector(getSelectedCourse)
   const dialogOpen = data.isDialogOpen
   const loading = data.isLoading
 
-  const onInputChange = (e, value) => {
+  const onInputChange = (event: ChangeEvent<{}>, value: string) => {
     setInputValue(value)
     dispatch(getListenersOptions(value))
   }
 
   const onAddButtonClick = () => {
-    setAutocompleteValue(null)
-    dispatch(coursesActions.addListenerToList(autocompleteValue))
+    setAutocompleteValue(defaultValue)
+
+    if (autocompleteValue.id > 0) dispatch(coursesActions.addListenerToList(autocompleteValue))
   }
 
-  const removeListener = (userID) => {
+  const removeListener = (userID: number) => {
     dispatch(coursesActions.removeListenerFromList(userID))
   }
 
@@ -75,7 +96,7 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
       cancelText="Отмена"
       onApprove={() => onApprove(data.list)}
       onClose={onClose}
-      title={`Запись слушателей на курс «${course.Name}»`}
+      title={course ? `Запись слушателей на курс «${course.Name}»` : ''}
     >
       <Autocomplete
         style={{ width: '100%' }}
@@ -86,15 +107,15 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
         getOptionSelected={(option, value) => option.name === value.name}
         getOptionDisabled={(option) => option.isUserAdded}
         getOptionLabel={(option) =>
-          `${option.name}${option.login ? ` (${option.login})` : ``}`
+          `${option.name} (${option.login})`
         }
         options={data.options}
         loading={loading}
         inputValue={inputValue}
         value={autocompleteValue}
         onInputChange={onInputChange}
-        onChange={(e, value) => {
-          setAutocompleteValue(value)
+        onChange={(e: ChangeEvent<{}>, value: IUserOption | null) => {
+          if (value) setAutocompleteValue(value)
         }}
         classes={{
           option: classes.option,
@@ -102,8 +123,7 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
         }}
         renderOption={(option) => (
           <>
-            <span>{`${option.name}${option.login ? ` (${option.login})` : ``
-              }`}</span>
+            <span>{`${option.name} (${option.login})`}</span>
             {option.isUserAdded && <CheckIcon className={classes.iconTitle} />}
           </>
         )}
@@ -127,8 +147,8 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
       />
       <Button
         className={classes.button}
-        margin="dense"
         type="button"
+        component="button"
         variant="contained"
         color="primary"
         onClick={onAddButtonClick}
@@ -138,8 +158,8 @@ const AddListenersWindow = ({ options, onClose, onApprove }) => {
       </Button>
       <Button
         className={classes.button}
-        margin="dense"
         type="button"
+        component="button"
         variant="contained"
         color="primary"
         onClick={onDialogOpen}

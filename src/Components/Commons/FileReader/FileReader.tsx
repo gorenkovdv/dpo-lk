@@ -8,17 +8,28 @@ import {
 import { loadFileTooltip } from '../Tooltips/LoadFileTooltip'
 import { red } from '@material-ui/core/colors'
 import ReactFileReader from 'react-file-reader'
-import styles from '../../../styles'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
+  fileLabel: {
+    margin: theme.spacing(0, 0.75, 0, 1.25),
+    display: 'inline-block',
+    fontSize: '0.75em',
+    color: 'rgba(0, 0, 0, 0.87)',
+  },
   button: {
-    ...styles(theme).button,
+    width: '100%',
     marginTop: 0,
   },
 }))
 
-const FileReader = ({ newFile, fileTypes, onFileSelect, onFileDrop }) => {
+interface IProps {
+  newFile: any,
+  fileTypes: Array<string>,
+  onFileSelect: (file: any) => void,
+  onFileDrop: () => void
+}
+
+const FileReader: React.FC<IProps> = ({ newFile, fileTypes, onFileSelect, onFileDrop }): JSX.Element => {
   const classes = useStyles()
 
   return (

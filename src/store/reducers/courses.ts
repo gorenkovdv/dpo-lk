@@ -1,17 +1,9 @@
-import { ThunkAction } from 'redux-thunk'
 import { coursesAPI, requestsAPI, userAPI } from '../../services/api'
 import { actions as snackbarActions } from '../reducers/snackbar'
 import { actions as loaderActions } from '../reducers/loader'
-import { AppStateType, InferActionsType } from './index'
-import { ICourseBasic, IDocument } from '../../types'
+import { BaseThunkType, InferActionsType } from './index'
+import { ICourseBasic, IDocument, IUserOption } from '../../types'
 import moment from 'moment'
-
-interface IUserOption {
-  id: number
-  login: string | null
-  name: string
-  isUserAdded?: boolean
-}
 
 interface ICourseUser {
   id: number
@@ -107,6 +99,7 @@ interface IState {
 }
 
 type coursesActionsTypes = InferActionsType<typeof actions>
+type ThunkType = BaseThunkType<coursesActionsTypes>
 
 const startDate = moment().add(-60, 'day').format('YYYY-MM-DD')
 const minStartDate = moment()
@@ -339,7 +332,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
 
             return {
               id: user.id,
-              login: user.username ? user.username.toLowerCase() : null,
+              login: user.username.toLowerCase(),
               name: user.fullname,
               isUserAdded,
             }
@@ -384,7 +377,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
   }
 }
 
-export const requestCourses = (page: number, count: number, filters: IFilters): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const requestCourses = (page: number, count: number, filters: IFilters): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     const response = await coursesAPI.getCoursesList(page, count, filters)
@@ -404,7 +397,7 @@ export const requestCourses = (page: number, count: number, filters: IFilters): 
   }
 }
 
-export const changeListParams = (page: number, count: number, filters: IFilters): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const changeListParams = (page: number, count: number, filters: IFilters): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     const response = await coursesAPI.getCoursesList(page, count, filters)
@@ -426,7 +419,7 @@ export const changeListParams = (page: number, count: number, filters: IFilters)
   }
 }
 
-export const createRequest = (course: ISelectedCourse): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const createRequest = (course: ISelectedCourse): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     const response = await requestsAPI.createRequest(course.ID)
@@ -445,7 +438,7 @@ export const createRequest = (course: ISelectedCourse): ThunkAction<Promise<void
   }
 }
 
-export const cancelRequest = (course: ISelectedCourse, requestID: number): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const cancelRequest = (course: ISelectedCourse, requestID: number): ThunkType => {
   return async (dispatch) => {
     const message = `Заявка на обучение по программе «${course.Name}» отменена`
 
@@ -461,7 +454,7 @@ export const cancelRequest = (course: ISelectedCourse, requestID: number): Thunk
   }
 }
 
-export const createListenersRequests = (courseID: number, users: Array<ICourseUser>): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const createListenersRequests = (courseID: number, users: Array<ICourseUser>): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     const response = await coursesAPI.createListenersRequests(courseID, users)
@@ -479,7 +472,7 @@ export const createListenersRequests = (courseID: number, users: Array<ICourseUs
   }
 }
 
-export const removeRequestUser = (courseID: number, rowID: number): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const removeRequestUser = (courseID: number, rowID: number): ThunkType => {
   return async (dispatch) => {
     const response = await requestsAPI.removeRequestUser(rowID)
 
@@ -498,7 +491,7 @@ export const removeRequestUser = (courseID: number, rowID: number): ThunkAction<
   }
 }
 
-export const getListenerInfo = (userID: number): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const getListenerInfo = (userID: number): ThunkType => {
   return async (dispatch) => {
     dispatch(actions.setListenerInfoLoading())
     const response = await coursesAPI.getListenerInfo(userID)
@@ -514,7 +507,7 @@ export const getListenerInfo = (userID: number): ThunkAction<Promise<void>, AppS
   }
 }
 
-export const getListenersOptions = (value: string): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const getListenersOptions = (value: string): ThunkType => {
   return async (dispatch) => {
     dispatch(actions.setListenersOptionsLoading())
 
@@ -530,7 +523,7 @@ export const getListenersOptions = (value: string): ThunkAction<Promise<void>, A
   }
 }
 
-export const saveCheckData = (userID: number, rowID: number, data: any): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const saveCheckData = (userID: number, rowID: number, data: any): ThunkType => {
   console.log(data)
   return async (dispatch) => {
     const simpleDocumentsCheck = data.documents.map((document: IDocument) => {
@@ -560,7 +553,7 @@ export const saveCheckData = (userID: number, rowID: number, data: any): ThunkAc
   }
 }
 
-export const addNewListener = (values: INewListener): ThunkAction<Promise<void>, AppStateType, unknown, coursesActionsTypes> => {
+export const addNewListener = (values: INewListener): ThunkType => {
   return async (dispatch) => {
     const response = await coursesAPI.addNewListener(values)
 
@@ -602,7 +595,7 @@ export const actions = {
   setListenersOptionsLoading: () => ({
     type: 'COURSES_LISTENERS_OPTIONS_LOADING'
   } as const),
-  setListenersOptions: (data: Array<{ id: number, username: string | null, fullname: string }>) => ({
+  setListenersOptions: (data: Array<{ id: number, username: string, fullname: string }>) => ({
     type: 'COURSES_SET_LISTENERS_OPTIONS',
     payload: data
   } as const),

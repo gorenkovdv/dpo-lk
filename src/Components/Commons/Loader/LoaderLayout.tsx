@@ -1,9 +1,10 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import classes from './LoaderLayout.module.css'
+import { AppStateType } from '../../../store/reducers/'
 
-const LoaderLayout = () => {
-  const isLoading = useSelector((state) => state.loader.isLoading)
+const LoaderLayout: React.FC = (): JSX.Element | null => {
+  const isLoading = useSelector((state: AppStateType) => state.loader.isLoading)
   const colorClass = sessionStorage.pagesType === 'entity' ? classes.entity : ''
   return isLoading ? (
     <div className={classes.loader}>

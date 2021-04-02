@@ -3,7 +3,7 @@ import HtmlTooltip from './HtmlTooltip'
 import { IconButton } from '@material-ui/core'
 import { Help as HelpIcon } from '@material-ui/icons'
 
-export const localityTooltip = (
+export const localityTooltip: JSX.Element = (
   <HtmlTooltip
     title={
       <>
@@ -20,7 +20,7 @@ export const localityTooltip = (
   </HtmlTooltip>
 )
 
-export const streetTooltip = (
+export const streetTooltip: JSX.Element = (
   <HtmlTooltip
     title={
       <>

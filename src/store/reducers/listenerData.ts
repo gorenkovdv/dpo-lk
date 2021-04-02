@@ -1,8 +1,7 @@
-import { ThunkAction } from 'redux-thunk'
 import { profileAPI, documentAPI } from '../../services/api'
 import { actions as snackbarActions } from './snackbar'
 import { actions as loaderActions } from './loader'
-import { AppStateType, InferActionsType } from './index'
+import { BaseThunkType, InferActionsType } from './index'
 import { IDocument } from '../../types'
 
 interface IPage {
@@ -35,6 +34,7 @@ interface IWork extends IAddress {
   workPhone: string
   fileURL: string | null
   newFile?: string | null
+  positionTypes: Array<string>
 }
 
 interface IStateList {
@@ -63,6 +63,8 @@ interface IState {
 }
 
 type listenerDataActionsTypes = InferActionsType<typeof actions>
+type ThunkType = BaseThunkType<listenerDataActionsTypes>
+type SyncThunkType = BaseThunkType<listenerDataActionsTypes, void>
 
 const initialState: IState = {
   list: {
@@ -108,6 +110,7 @@ const initialState: IState = {
       hrPhone: '',
       workPhone: '',
       fileURL: null,
+      positionTypes: [],
     },
     education: {
       currentDocument: 0,
@@ -476,7 +479,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
   }
 }
 
-export const requestListenerData = (selectedTab: number): ThunkAction<Promise<void>, AppStateType, unknown, listenerDataActionsTypes> => {
+export const requestListenerData = (selectedTab: number): ThunkType => {
   return async (dispatch) => {
     dispatch(actions.setLoading())
 
@@ -489,7 +492,7 @@ export const requestListenerData = (selectedTab: number): ThunkAction<Promise<vo
   }
 }
 
-export const workFileDelete = (): ThunkAction<Promise<void>, AppStateType, unknown, listenerDataActionsTypes> => {
+export const workFileDelete = (): ThunkType => {
   return async (dispatch) => {
     const response = await documentAPI.deleteWorkFile()
 
@@ -498,7 +501,7 @@ export const workFileDelete = (): ThunkAction<Promise<void>, AppStateType, unkno
   }
 }
 
-export const updateData = (data: any, type: number): ThunkAction<Promise<void>, AppStateType, unknown, listenerDataActionsTypes> => {
+export const updateData = (data: any, type: number): ThunkType => {
   return async (dispatch) => {
     const response = await profileAPI.setListenerData(data, type)
 
@@ -519,49 +522,49 @@ export const updateData = (data: any, type: number): ThunkAction<Promise<void>, 
   }
 }
 
-export const setSelectedTabAction = (tab: number): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => (dispatch) => {
+export const setSelectedTabAction = (tab: number): SyncThunkType => (dispatch) => {
   dispatch(actions.setSelectedTab(tab))
 }
 
-export const setDocumentsTabAction = (tab: number): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => (dispatch) => {
+export const setDocumentsTabAction = (tab: number): SyncThunkType => async (dispatch) => {
   dispatch(actions.setDocumentsTab(tab))
 }
 
-export const createNewDocumentAction = (document: IDocument, type: number): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => (dispatch) => {
+export const createNewDocumentAction = (document: IDocument, type: number): SyncThunkType => (dispatch) => {
   switch (type) {
-    case 4: dispatch(actions.createNewEducationDocument(document))
-    case 5: dispatch(actions.createNewSertificate(document))
-    case 6: dispatch(actions.createNewOtherDocument(document))
+    case 4: dispatch(actions.createNewEducationDocument(document)); break;
+    case 5: dispatch(actions.createNewSertificate(document)); break;
+    case 6: dispatch(actions.createNewOtherDocument(document)); break;
     default: break;
   }
 }
 
-export const selectEducationLevelAction = (level: number): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => (dispatch) => {
+export const selectEducationLevelAction = (level: number): SyncThunkType => (dispatch) => {
   dispatch(actions.selectEducationLevel(level))
 }
 
-export const selectDocumentAction = (index: number, type: number): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => (dispatch) => {
+export const selectDocumentAction = (index: number, type: number): SyncThunkType => (dispatch) => {
   switch (type) {
-    case 4: dispatch(actions.selectEducationDocument(index))
-    case 5: dispatch(actions.selectSertificate(index))
-    case 6: dispatch(actions.selectOtherDocument(index))
+    case 4: dispatch(actions.selectEducationDocument(index)); break;
+    case 5: dispatch(actions.selectSertificate(index)); break;
+    case 6: dispatch(actions.selectOtherDocument(index)); break;
     default: break;
   }
 }
 
-export const dropNewEducationDocumentAction = (): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => (dispatch) => {
+export const dropNewEducationDocumentAction = (): SyncThunkType => (dispatch) => {
   dispatch(actions.dropNewEducationDocument())
 }
 
-export const dropNewSertificateAction = (redirectIndex: number): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => (dispatch) => {
+export const dropNewSertificateAction = (redirectIndex: number): SyncThunkType => (dispatch) => {
   dispatch(actions.dropNewSertificate(redirectIndex))
 }
 
-export const dropNewOtherDocumentAction = (redirectIndex: number): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => (dispatch) => {
+export const dropNewOtherDocumentAction = (redirectIndex: number): SyncThunkType => (dispatch) => {
   dispatch(actions.dropNewOtherDocument(redirectIndex))
 }
 
-export const documentDeleteAction = (documentId: number, type: number): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => {
+export const documentDeleteAction = (documentId: number, type: number): SyncThunkType => {
   return async (dispatch) => {
     const response = await documentAPI.deleteDocument(documentId)
 
@@ -577,7 +580,7 @@ export const documentDeleteAction = (documentId: number, type: number): ThunkAct
   }
 }
 
-export const fileDeleteAction = (documentId: number, type: number): ThunkAction<void, AppStateType, unknown, listenerDataActionsTypes> => {
+export const fileDeleteAction = (documentId: number, type: number): SyncThunkType => {
   return async (dispatch) => {
     const response = await documentAPI.deleteDocumentsFile(documentId)
 

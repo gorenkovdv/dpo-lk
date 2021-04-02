@@ -12,6 +12,7 @@ import {
   Switch,
   Radio,
   RadioGroup,
+  GridDirection,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import {
@@ -27,8 +28,9 @@ import {
 } from '@material-ui/icons'
 import { actions } from '../../../store/reducers/snackbar'
 import { red } from '@material-ui/core/colors'
-import * as moment from 'moment'
+import moment from 'moment'
 import 'moment/locale/ru'
+import { WrappedFieldProps } from 'redux-form'
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -38,11 +40,27 @@ const useStyles = makeStyles((theme) => ({
   button: {
     marginRight: theme.spacing(1),
   },
+  fileLabel: {
+    margin: theme.spacing(0, 0.75, 0, 1.25),
+    display: 'inline-block',
+    fontSize: '0.75em',
+    color: 'rgba(0, 0, 0, 0.87)',
+  },
 }))
 
 moment.locale('ru')
 
-export const Input = ({ input, meta: { touched, error }, ...props }) => {
+type MarginType = 'dense' | 'none' | 'normal'
+
+interface IInputProps {
+  margin?: MarginType,
+  adornment?: JSX.Element,
+  endadornment?: JSX.Element,
+  readOnly?: boolean,
+  type?: string
+}
+
+export const Input: React.FC<WrappedFieldProps & IInputProps> = ({ input, meta: { touched, error }, ...props }): JSX.Element => {
   const hasError = touched && error !== undefined
   const classes = useStyles()
   return (
@@ -65,7 +83,11 @@ export const Input = ({ input, meta: { touched, error }, ...props }) => {
   )
 }
 
-export const Textarea = ({ input, ...props }) => {
+interface ITextareaProps {
+  adornment?: JSX.Element
+}
+
+export const Textarea: React.FC<WrappedFieldProps & ITextareaProps> = ({ input, ...props }): JSX.Element => {
   const classes = useStyles()
   return (
     <TextField
@@ -85,7 +107,7 @@ export const Textarea = ({ input, ...props }) => {
   )
 }
 
-export const Select = ({ input, children, ...props }) => {
+export const Select: React.FC<WrappedFieldProps> = ({ input, children, ...props }): JSX.Element => {
   const classes = useStyles()
   return (
     <TextField
@@ -102,7 +124,16 @@ export const Select = ({ input, children, ...props }) => {
   )
 }
 
-export const MaskedInput = ({ input, meta: { touched, error }, ...props }) => {
+interface IMaskedInputProps {
+  fullWidth?: boolean
+  variant?: any
+  label: string
+  adornment?: JSX.Element
+  inputRef?: any
+  mask: string
+}
+
+export const MaskedInput: React.FC<WrappedFieldProps & IMaskedInputProps> = ({ input, meta: { touched, error }, mask, ...props }): JSX.Element => {
   const classes = useStyles()
   const hasError = touched && error !== undefined
 
@@ -110,7 +141,7 @@ export const MaskedInput = ({ input, meta: { touched, error }, ...props }) => {
   if (maskProps.inputRef) delete maskProps.inputRef
 
   return (
-    <InputMask {...maskProps} {...input}>
+    <InputMask mask={mask} {...maskProps} {...input}>
       {() => (
         <TextField
           {...props}
@@ -131,7 +162,13 @@ export const MaskedInput = ({ input, meta: { touched, error }, ...props }) => {
   )
 }
 
-export const PasswordInput = ({ input, ...props }) => {
+interface IPasswordInput {
+  label: string
+  showpassword?: boolean
+  showhandle?: () => void
+}
+
+export const PasswordInput: React.FC<WrappedFieldProps & IPasswordInput> = ({ input, ...props }): JSX.Element => {
   const classes = useStyles()
 
   return (
@@ -146,7 +183,7 @@ export const PasswordInput = ({ input, ...props }) => {
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
-            <IconButton size="small" tabIndex="-1" onClick={props.showhandle}>
+            <IconButton size="small" onClick={props.showhandle}>
               {props.showpassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
             </IconButton>
           </InputAdornment>
@@ -156,7 +193,16 @@ export const PasswordInput = ({ input, ...props }) => {
   )
 }
 
-export const DateInput = ({ input, ...props }) => {
+interface IDateInputProps {
+  maxDate?: string,
+  minDate?: string
+  autoOk?: boolean,
+  classes?: any,
+  dateformat: string,
+  margin?: MarginType
+}
+
+export const DateInput: React.FC<WrappedFieldProps & IDateInputProps> = ({ input, ...props }): JSX.Element => {
   const maxDate = props.maxDate
     ? `${moment(props.maxDate).format('YYYY-MM-DD')}`
     : '2100-01-01'
@@ -190,18 +236,23 @@ export const DateInput = ({ input, ...props }) => {
   )
 }
 
-export const FileInput = ({ input, ...props }) => {
+interface IFileInputProps {
+  filetypes?: Array<string>
+}
+
+export const FileInput: React.FC<WrappedFieldProps & IFileInputProps> = ({ input, ...props }): JSX.Element => {
   const classes = useStyles()
   const dispatch = useDispatch()
 
-  const handleFileSelect = (file) => {
+  const handleFileSelect = (file: any) => {
     if (
       file.fileList[0].type !== 'application/pdf' ||
       file.fileList[0].size > 5000000
     )
       dispatch(
-        actions.showError(
-          'Ошибка. Загружаемый файл должен иметь PDF формат и размер не более 5 Мб'
+        actions.showMessageAction(
+          'Ошибка. Загружаемый файл должен иметь PDF формат и размер не более 5 Мб',
+          'error'
         )
       )
     else
@@ -250,14 +301,18 @@ export const FileInput = ({ input, ...props }) => {
             </IconButton>
           </>
         ) : (
-            <span className={classes.fileLabel}>Файл не загружен</span>
-          )}
+          <span className={classes.fileLabel}>Файл не загружен</span>
+        )}
       </Grid>
     </Grid>
   )
 }
 
-export const Switcher = ({ input, ...props }) => {
+interface ISwitcherProps {
+  label: string
+}
+
+export const Switcher: React.FC<WrappedFieldProps & ISwitcherProps> = ({ input, ...props }): JSX.Element => {
   return (
     <FormControlLabel
       control={<Switch {...input} checked={input.value} color="primary" />}
@@ -266,7 +321,12 @@ export const Switcher = ({ input, ...props }) => {
   )
 }
 
-export const RadioGroupContainer = ({ input, children, ...props }) => {
+interface IRadioGroupProps {
+  direction?: GridDirection
+  radios: Array<any>
+}
+
+export const RadioGroupContainer: React.FC<WrappedFieldProps & IRadioGroupProps> = ({ input, children, ...props }) => {
   return (
     <RadioGroup {...input}>
       <Grid container direction={props.direction ? props.direction : 'column'}>
