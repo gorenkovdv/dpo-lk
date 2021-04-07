@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { Field, reduxForm, submit } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm, submit } from 'redux-form'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import {
   Input,
@@ -11,14 +11,29 @@ import { isStringContainsUnderscore, required } from '../../utils/validate'
 import { parseDate } from '../../utils/parse'
 import { addNewListener } from '../../store/reducers/courses'
 
-const AddNewListenerWindow = ({ options, onClose }) => {
+interface IProps {
+  options: {
+    open: boolean
+  },
+  onClose: () => void
+}
+
+interface IFormProps {
+  lastname: string
+  firstname: string
+  middlename: string
+  birthdate: string
+  snils: string,
+}
+
+const AddNewListenerWindow: React.FC<IProps> = ({ options, onClose }): JSX.Element => {
   const dispatch = useDispatch()
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: IFormProps) => {
     dispatch(addNewListener(values))
   }
 
-  const initialValues = {
+  const initialValues: IFormProps = {
     lastname: 'Горенков',
     firstname: 'Дмитрий',
     middlename: 'Вячеславович',
@@ -36,7 +51,7 @@ const AddNewListenerWindow = ({ options, onClose }) => {
       onClose={onClose}
       title={`Поиск/регистрация слушателя`}
     >
-      <AddNewListenerWindowForm
+      <AddNewListenerWindowReduxForm
         onSubmit={handleSubmit}
         initialValues={initialValues}
       />
@@ -44,9 +59,9 @@ const AddNewListenerWindow = ({ options, onClose }) => {
   )
 }
 
-let AddNewListenerWindowForm = (props) => {
+const AddNewListenerWindowForm: React.FC<InjectedFormProps<IFormProps>> = ({ handleSubmit }) => {
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Field
         name="lastname"
         validate={[required]}
@@ -89,8 +104,6 @@ let AddNewListenerWindowForm = (props) => {
   )
 }
 
-AddNewListenerWindowForm = reduxForm({ form: 'addNewListenerWindowForm' })(
-  AddNewListenerWindowForm
-)
+const AddNewListenerWindowReduxForm = reduxForm<IFormProps>({ form: 'addNewListenerWindowForm' })(AddNewListenerWindowForm)
 
 export default AddNewListenerWindow

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   IconButton,
@@ -9,6 +9,7 @@ import {
   Typography,
   MenuItem,
   Tooltip,
+  InputBaseProps,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import {
@@ -37,20 +38,53 @@ import {
   fileDeleteAction
 } from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
-import styles from '../../../styles'
+import { getOtherData } from '../../../store/selectors/listener'
+import { getIsLoading } from '../../../store/selectors/loader'
+import { IDocument } from '../../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
-  button: { ...styles(theme).documentButton },
+  button: {
+    marginTop: 20,
+    width: '100%',
+    maxWidth: 250,
+    [theme.breakpoints.down('xs')]: {
+      maxWidth: '100%',
+    },
+  },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
+  iconTitle: {
+    marginLeft: theme.spacing(1.25),
+  },
+  textField: {
+    boxSizing: 'border-box',
+    width: '100%',
+  },
+  typography: {
+    boxSizing: 'border-box',
+    padding: theme.spacing(1, 0),
+  },
+  link: {
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    },
+  },
+
 }))
 
-const Others = ({ username }) => {
+const Others: React.FC<{ username: string }> = ({ username }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const allData = useSelector((state) => state.listenerData)
-  const data = allData.list
-  const index = data.others.currentDocument || 0
-  const currentData = data.others.documents
+  const data = useSelector(getOtherData)
+  const isLoading = useSelector(getIsLoading)
+  const index = data.currentDocument || 0
+  const currentData = data.documents
   const currentDocument = currentData ? currentData[index] : null
   const isDocumentNew = currentDocument ? currentDocument.isDocumentNew : false
   const defaultFileURL = `sertificate${index}.pdf`
@@ -59,11 +93,17 @@ const Others = ({ username }) => {
     dispatch(requestListenerData(6))
   }, [dispatch])
 
-  const handleNewDocument = (e) => {
-    let newDoc = {
+  const handleNewDocument = () => {
+    let newDoc: IDocument = {
+      id: 0,
+      name: '',
+      comment: '',
       organization: '',
       speciality: '',
       firstDate: null,
+      firstDateName: '',
+      secondDate: null,
+      secondDateName: '',
       serial: '',
       newFile: null,
       fileURL: null,
@@ -73,11 +113,11 @@ const Others = ({ username }) => {
     dispatch(createNewDocumentAction(newDoc, 6))
   }
 
-  const goToDocument = (index) => {
+  const goToDocument = (index: number) => {
     dispatch(selectDocumentAction(index, 6))
   }
 
-  const confirmTransition = (value) => {
+  const confirmTransition = (value: number) => {
     dispatch(
       confirmDialogActions.confirmDialogShow({
         title: `Выбрать документ`,
@@ -87,33 +127,33 @@ const Others = ({ username }) => {
     )
   }
 
-  const selectDocument = (e) => {
+  const selectDocument = (e: any) => {
     if (e.target.value !== index) {
       if (isDocumentNew) confirmTransition(e.target.value)
       else goToDocument(e.target.value)
     }
   }
 
-  const handleDocumentRedirect = (value) => {
+  const handleDocumentRedirect = (value: number) => {
     dispatch(confirmDialogActions.confirmDialogClose())
     dispatch(dropNewOtherDocumentAction(value))
   }
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: any) => {
     dispatch(updateData(
       {
         ...values,
         document: index,
         newDocument: isDocumentNew,
         newFile: values.newFile ? values.newFile.base64 : null,
-        fileURL: values.newFile ? defaultFileURL : currentDocument.fileURL,
+        fileURL: values.newFile ? defaultFileURL : currentDocument && currentDocument.fileURL,
       },
       6
     )
     )
   }
 
-  if (allData.isLoading)
+  if (isLoading)
     return (
       <Grid container direction="row" justify="center">
         <LoaderLayout />
@@ -183,11 +223,11 @@ const Others = ({ username }) => {
         <Typography>Нет документов</Typography>
       )}
       {currentDocument && (
-        <OthersDataForm
+        <OthersDataReduxForm
           onSubmit={handleSubmit}
           initialValues={currentDocument}
           index={index}
-          documentId={currentDocument.id ? currentDocument.id : null}
+          documentId={currentDocument.id ? currentDocument.id : 0}
           fileURL={currentDocument.fileURL}
           isDocumentNew={isDocumentNew}
           username={username}
@@ -197,7 +237,21 @@ const Others = ({ username }) => {
   )
 }
 
-let OthersDataForm = (props) => {
+interface IProps {
+  index: number
+  documentId: number
+  fileURL: string | null
+  isDocumentNew?: boolean
+  username: string
+}
+
+interface IValues {
+  documentName: string
+  comment: string
+  newFile: string | null
+}
+
+let OthersDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = ({ handleSubmit, ...props }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const username = props.username
@@ -239,7 +293,7 @@ let OthersDataForm = (props) => {
   }
 
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Field
         name="documentName"
         label="Наименование документа"
@@ -262,7 +316,7 @@ let OthersDataForm = (props) => {
             target="_blank"
           >
             <Grid container direction="row" alignItems="center">
-              <PdfIcon className={classes.iconColor} />
+              <PdfIcon />
               <Typography style={{ marginLeft: 5, marginRight: 5 }}>
                 Скан-копия
               </Typography>
@@ -312,7 +366,7 @@ let OthersDataForm = (props) => {
   )
 }
 
-OthersDataForm = reduxForm({
+const OthersDataReduxForm = reduxForm<IValues, IProps>({
   form: 'othersDataForm',
   enableReinitialize: true,
 })(OthersDataForm)

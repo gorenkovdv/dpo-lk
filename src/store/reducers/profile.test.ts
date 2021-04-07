@@ -27,7 +27,6 @@ const result = {
 
 jest.mock('../../services/api')
 const profileAPIMock = profileAPI as jest.Mocked<typeof profileAPI>
-profileAPIMock.getProfile.mockReturnValue(Promise.resolve(result))
 
 const dispatchMock = jest.fn()
 const getStateMock = jest.fn()
@@ -41,19 +40,25 @@ beforeEach(() => {
     getStateMock.mockClear()
 })
 
-test("profile updatingSuccess action", () => {
-    const newState = profileReducer(state, actions.updatingSuccess(state.list))
+describe("profile reducer", () => {
+    test("UPDATE_SUCCESS", () => {
+        const newState = profileReducer(state, actions.updatingSuccess(state.list))
 
-    expect(newState.list).toMatchObject(state.list)
+        expect(newState.list).toMatchObject(state.list)
+    })
 })
 
-test("success requestProfile thunk", async () => {
-    const thunk = requestProfile()
 
-    await thunk(dispatchMock, getStateMock, {})
+describe("profile thunk", () => {
+    test("success requestProfile", async () => {
+        profileAPIMock.getProfile.mockReturnValue(Promise.resolve(result))
 
-    expect(dispatchMock).toBeCalledTimes(3)
-    expect(dispatchMock).toHaveBeenNthCalledWith(1, actions.setLoading())
-    expect(dispatchMock).toHaveBeenNthCalledWith(2, actions.updatingSuccess(state.list))
-    expect(dispatchMock).toHaveBeenNthCalledWith(3, actions.loadingSuccess())
+        const thunk = requestProfile()
+        await thunk(dispatchMock, getStateMock, {})
+
+        expect(dispatchMock).toBeCalledTimes(3)
+        expect(dispatchMock).toHaveBeenNthCalledWith(1, actions.setLoading())
+        expect(dispatchMock).toHaveBeenNthCalledWith(2, actions.updatingSuccess(state.list))
+        expect(dispatchMock).toHaveBeenNthCalledWith(3, actions.loadingSuccess())
+    })
 })

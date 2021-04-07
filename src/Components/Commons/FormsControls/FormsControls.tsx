@@ -46,6 +46,11 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '0.75em',
     color: 'rgba(0, 0, 0, 0.87)',
   },
+  inputEndIcon: {
+    marginLeft: theme.spacing(1),
+    padding: 3,
+    color: 'gray',
+  },
 }))
 
 moment.locale('ru')

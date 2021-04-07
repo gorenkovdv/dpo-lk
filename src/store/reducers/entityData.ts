@@ -27,7 +27,7 @@ interface IStateList {
 
 interface IState {
   list: IStateList,
-  entities?: Array<number>
+  entities: Array<number>
 }
 
 const initialState: IState = {
@@ -51,6 +51,7 @@ const initialState: IState = {
     street: '',
     workPhone: '',
   },
+  entities: []
 }
 
 type entityDataActionsTypes = InferActionsType<typeof actions>
@@ -58,17 +59,17 @@ type ThunkType = BaseThunkType<entityDataActionsTypes>
 
 export const entityDataReducer = (state = initialState, action: entityDataActionsTypes): IState => {
   switch (action.type) {
-    case 'ENTITY_DATA_LOAD_SUCCESS':
+    case 'dpo-lk/entity/LOAD_SUCCESS':
       return {
         ...state,
         list: action.payload,
       }
-    case 'ENTITY_DATA_UPDATE_SUCCESS':
+    case 'dpo-lk/entity/UPDATE_SUCCESS':
       return {
         ...state,
         list: action.payload,
       }
-    case 'ENTITY_ROOTS_CONFIRMED':
+    case 'dpo-lk/entity/ROOTS_CONFIRMED':
       return {
         ...state,
         entities: action.payload,
@@ -122,15 +123,15 @@ export const updateEntityData = (data: any): ThunkType => {
 
 const actions = {
   entityDataLoadingSuccess: (data: any) => ({
-    type: 'ENTITY_DATA_LOAD_SUCCESS',
+    type: 'dpo-lk/entity/LOAD_SUCCESS',
     payload: data
   } as const),
   updatingSuccess: (data: any) => ({
-    type: 'ENTITY_DATA_UPDATE_SUCCESS',
+    type: 'dpo-lk/entity/UPDATE_SUCCESS',
     payload: data
   } as const),
   entityRootsConfirmed: (data: any) => ({
-    type: 'ENTITY_ROOTS_CONFIRMED',
+    type: 'dpo-lk/entity/ROOTS_CONFIRMED',
     payload: data
   } as const),
   ...snackbarActions,

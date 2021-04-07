@@ -1,18 +1,37 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { Grid, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Input } from '../Commons/FormsControls/FormsControls'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import { findUser } from '../../store/reducers/auth'
-import styles from '../../styles'
 
 const useStyles = makeStyles(theme => ({
-  ...styles(theme),
+  h3: {
+    textAlign: 'center',
+    fontWeight: 500,
+    marginTop: 15,
+    marginBottom: 15,
+    fontSize: 26,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: 20,
+    },
+  },
+  link: {
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    },
+  },
   typography: {
-    ...styles(theme).typography,
+    boxSizing: 'border-box',
+    padding: theme.spacing(1, 0),
     width: '50%',
     [theme.breakpoints.down('sm')]: {
       width: '100%',
@@ -26,17 +45,27 @@ const useStyles = makeStyles(theme => ({
     fontStyle: 'italic',
     marginTop: 25,
   },
+  form: {
+    boxSizing: 'border-box',
+    padding: theme.spacing(1),
+    width: 400,
+    maxWidth: '100%',
+  },
+  button: {
+    marginTop: 20,
+    width: '100%',
+  },
   error: {
     color: theme.palette.error.main,
   },
 }))
 
-const ForgotPassword = () => {
+const ForgotPassword: React.FC = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
 
-  const handleSubmit = ({ value }) => {
-    dispatch(findUser(value))
+  const handleSubmit = (values: IValues) => {
+    dispatch(findUser(values.value))
   }
 
   return (
@@ -49,7 +78,7 @@ const ForgotPassword = () => {
           указанную в данных вашей учетной записи, введите имя пользователя
           (логин) или адрес электронной почты из вашей учетной записи:
         </Typography>
-        <ForgotPasswordForm onSubmit={handleSubmit} />
+        <ForgotPasswordReduxForm onSubmit={handleSubmit} />
         <NavLink to="/auth" className={classes.link}>
           Перейти на страницу авторизации
         </NavLink>
@@ -62,7 +91,11 @@ const ForgotPassword = () => {
   )
 }
 
-let ForgotPasswordForm = props => {
+interface IValues {
+  value: string
+}
+
+const ForgotPasswordForm: React.FC<InjectedFormProps<IValues>> = (props) => {
   const classes = useStyles()
   return (
     <form
@@ -94,6 +127,6 @@ let ForgotPasswordForm = props => {
   )
 }
 
-ForgotPasswordForm = reduxForm({ form: 'forgotPasswordForm' })(ForgotPasswordForm)
+const ForgotPasswordReduxForm = reduxForm<IValues>({ form: 'forgotPasswordForm' })(ForgotPasswordForm)
 
 export default ForgotPassword

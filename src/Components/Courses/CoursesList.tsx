@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { ChangeEvent, useState, FC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { compose } from 'redux'
 import {
@@ -34,16 +34,35 @@ import { DateInput } from '../Commons/FormsControls/FormsControls'
 import ListenersWindow from './ListenersWindow'
 import AddListenersWindow from './AddListenersWindow'
 import withAuth from '../Authorization/withAuth'
-import { requestCourses, changeListParams, createRequest, cancelRequest as cancelRequestAction, createListenersRequests, getListenersOptions, actions as coursesActions } from '../../store/reducers/courses'
-import styles from '../../styles'
-import { parseDate, parseCourseDate } from '../../utils/parse'
-import { userAPI } from '../../services/api'
+import {
+  requestCourses,
+  changeListParams,
+  createRequest,
+  cancelRequest as cancelRequestAction,
+  createListenersRequests,
+  getListenersOptions,
+  actions as coursesActions
+} from '../../store/reducers/courses'
 import Course from './Course'
 import CourseMobile from './CourseMobile'
+import { parseDate, parseCourseDate } from '../../utils/parse'
+import { userAPI } from '../../services/api'
 import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
+import { getIsLoading } from '../../store/selectors/loader'
+import {
+  getCoursesFilters,
+  getCurrentPage,
+  getPageSize,
+  getCoursesList,
+  getSelectedCourse,
+  getListenersAddition,
+  getVolumeList,
+  getTotalCount,
+  getCoursesRoots
+} from '../../store/selectors/courses'
+import { ICourseFilters, ISelectedCourse, IUserOption } from '../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
   inlineDateField: {
     width: 175,
     '&:first-child': {
@@ -69,9 +88,47 @@ const useStyles = makeStyles((theme) => ({
       padding: theme.spacing(0.5),
     },
   },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
+  pointer: {
+    cursor: 'pointer',
+  },
+  startIcon: {
+    marginRight: theme.spacing(1),
+  },
+  fullWidth: {
+    width: '100%',
+  },
+  verticalMargin: {
+    margin: theme.spacing(2, 0),
+  },
+  table: {
+    minWidth: 650,
+    borderCollapse: 'collapse',
+  },
+  iconTitle: {
+    marginLeft: theme.spacing(1.25),
+  },
+  mobileTable: {
+    width: '100%',
+    borderCollapse: 'collapse',
+  },
+  option: {
+    transform: 'translateZ(0)',
+  },
 }))
 
-const CheckboxInput = ({ checked, onFilterChange, edited, label }) => {
+type ValueOf<T> = T[keyof T]
+
+interface ICheckboxProps {
+  checked: boolean
+  onFilterChange: (prop: keyof ICourseFilters, value: ValueOf<ICourseFilters>) => void
+  edited: keyof ICourseFilters
+  label: string
+}
+
+const CheckboxInput: FC<ICheckboxProps> = ({ checked, onFilterChange, edited, label }): JSX.Element => {
   const classes = useStyles()
   return (
     <FormControlLabel
@@ -89,74 +146,77 @@ const CheckboxInput = ({ checked, onFilterChange, edited, label }) => {
   )
 }
 
-const CoursesList = () => {
+const CoursesList: FC = () => {
   const classes = useStyles()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   const dispatch = useDispatch()
   const currentUserID = userAPI.getUID()
-  const isLoading = useSelector((state) => state.loader.isLoading)
-  const data = useSelector((state) => state.courses)
-  const [searchString, setSearchString] = useState(data.filters.searchString)
-  const [startDate, setStartDate] = useState(data.filters.startDate)
-  const [endDate, setEndDate] = useState(data.filters.endDate)
+  const isLoading = useSelector(getIsLoading)
+  const filters = useSelector(getCoursesFilters)
+  const currentPage = useSelector(getCurrentPage)
+  const pageSize = useSelector(getPageSize)
+  const totalCount = useSelector(getTotalCount)
+  const selectedCourse = useSelector(getSelectedCourse)
+  const coursesList = useSelector(getCoursesList)
+  const coursesRoots = useSelector(getCoursesRoots)
+  const [searchString, setSearchString] = useState(filters.searchString)
+  const [startDate, setStartDate] = useState(filters.startDate)
+  const [endDate, setEndDate] = useState(filters.endDate)
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [isListenersWindowOpen, setListenersWindowOpen] = React.useState(false)
-  const [isAddListenersWindowOpen, setAddListenersWindowOpen] = React.useState(
+  const [isListenersWindowOpen, setListenersWindowOpen] = useState(false)
+  const [isAddListenersWindowOpen, setAddListenersWindowOpen] = useState(
     false
   )
-  const minStartDate = data.filters.minStartDate
-  const maxEndDate = data.filters.maxEndDate
   const pageCountVariants = [5, 10, 20, 50]
 
   React.useEffect(() => {
-    const filters = data.filters
-    dispatch(requestCourses(data.currentPage, data.pageSize, filters))
+    dispatch(requestCourses(currentPage, pageSize, filters))
     // eslint-disable-next-line
   }, [dispatch])
 
-  const handlePageChange = (e, value) => {
-    if (value !== data.currentPage)
-      dispatch(changeListParams(value, data.pageSize, data.filters))
+  const handlePageChange = (event: ChangeEvent<unknown>, value: number) => {
+    if (value !== currentPage)
+      dispatch(changeListParams(value, pageSize, filters))
   }
 
-  const handlePageSizeChange = (e) => {
-    if (e.target.value !== data.pageSize)
+  const handlePageSizeChange = (event: any) => {
+    if (event.target.value !== pageSize)
       dispatch(
-        changeListParams(data.currentPage, e.target.value, data.filters)
+        changeListParams(currentPage, event.target.value, filters)
       )
   }
 
-  const handleFilterChange = (prop, value) => {
+  const handleFilterChange = (prop: keyof ICourseFilters, value: ValueOf<ICourseFilters>) => {
     let changes = { [prop]: value }
 
     switch (prop) {
       case 'CME':
-        if (!value && !data.filters.traditional) changes.traditional = true
+        if (!value && !filters.traditional) changes.traditional = true
         break
       case 'traditional':
-        if (!value && !data.filters.CME) changes.CME = true
+        if (!value && !filters.CME) changes.CME = true
         break
       case 'budgetaryOnly':
-        if (value && data.filters.nonBudgetaryOnly)
+        if (value && filters.nonBudgetaryOnly)
           changes.nonBudgetaryOnly = false
         break
       case 'nonBudgetaryOnly':
-        if (value && data.filters.budgetaryOnly) changes.budgetaryOnly = false
+        if (value && filters.budgetaryOnly) changes.budgetaryOnly = false
         break
       case 'retraining':
-        if (!value && !data.filters.skillsDevelopment)
+        if (!value && !filters.skillsDevelopment)
           changes.skillsDevelopment = true
         break
       case 'skillsDevelopment':
-        if (!value && !data.filters.retraining) changes.retraining = true
+        if (!value && !filters.retraining) changes.retraining = true
         break
       case 'forDoctors':
-        if (!value && !data.filters.forNursingStaff)
+        if (!value && !filters.forNursingStaff)
           changes.forNursingStaff = true
         break
       case 'forNursingStaff':
-        if (!value && !data.filters.forDoctors) changes.forDoctors = true
+        if (!value && !filters.forDoctors) changes.forDoctors = true
         break
       case 'searchString':
         changes.searchString = value
@@ -171,15 +231,15 @@ const CoursesList = () => {
     }
 
     dispatch(
-      changeListParams(data.currentPage, data.pageSize, {
-        ...data.filters,
+      changeListParams(currentPage, pageSize, {
+        ...filters,
         ...changes,
       })
     )
   }
 
   // onDialogOpen
-  const submitRequestDialogOpen = (course) => {
+  const submitRequestDialogOpen = (course: ISelectedCourse) => {
     dispatch(
       confirmDialogActions.confirmDialogShow({
         title: `Записаться на обучение по программе`,
@@ -189,7 +249,7 @@ const CoursesList = () => {
     )
   }
 
-  const cancelRequestDialogOpen = (course) => {
+  const cancelRequestDialogOpen = (course: ISelectedCourse) => {
     dispatch(
       confirmDialogActions.confirmDialogShow({
         title: `Отозвать заявку`,
@@ -205,38 +265,40 @@ const CoursesList = () => {
   }
 
   // onDialogApprove
-  const submitRequest = (course) => {
+  const submitRequest = (course: ISelectedCourse) => {
     dispatch(createRequest(course))
     confirmDialogClose()
   }
 
-  const cancelRequest = (course) => {
-    const userRow = data.list
-      .find((listCourse) => parseInt(listCourse.ID) === parseInt(course.ID))
-      .users.find((user) => parseInt(user.id) === parseInt(currentUserID))
+  const cancelRequest = (course: ISelectedCourse) => {
+    const userRow = coursesList.filter(
+      (listCourse) => listCourse.ID === course.ID)[0].users.filter(
+        user => user.id.toString() === currentUserID.toString()
+      )[0]
 
     dispatch(cancelRequestAction(course, userRow.requestID))
     confirmDialogClose()
   }
 
-  const openListenersWindow = (course) => {
+  const openListenersWindow = (course: ISelectedCourse) => {
     dispatch(coursesActions.setSelectedCourse(course))
     setListenersWindowOpen(true)
   }
 
-  const openAddListenersWindow = (course) => {
+  const openAddListenersWindow = (course: ISelectedCourse) => {
     dispatch(coursesActions.setSelectedCourse(course))
     setAddListenersWindowOpen(true)
   }
 
-  const approveAddListenersWindow = (listeners) => {
+  const approveAddListenersWindow = (listeners: IUserOption[]) => {
     let listenersID = listeners.map((listener) => {
-      return parseInt(listener.id)
+      return listener.id
     })
 
-    dispatch(
-      createListenersRequests(data.selectedCourse.ID, listenersID)
-    )
+    if (selectedCourse)
+      dispatch(
+        createListenersRequests(selectedCourse.ID, listenersID)
+      )
 
     setAddListenersWindowOpen(false)
   }
@@ -252,39 +314,48 @@ const CoursesList = () => {
     setAddListenersWindowOpen(false)
   }
 
-  const minDateLimits = (value) => {
-    if (value < minStartDate || value > maxEndDate) return minStartDate
+  const minDateLimits = (value: string) => {
+    if (value < filters.minStartDate || value > filters.maxEndDate) return filters.minStartDate
     return value
   }
 
-  const maxDateLimits = (value) => {
-    if (value > maxEndDate || value < minStartDate) return maxEndDate
+  const maxDateLimits = (value: string) => {
+    if (value > filters.maxEndDate || value < filters.minStartDate) return filters.maxEndDate
     return value
   }
 
-  const approveFilterDate = (value, minDate, maxDate, filter) => {
+  const approveFilterDate = (value: string, minDate: string, maxDate: string, filter: keyof ICourseFilters) => {
     let currentDate = parseCourseDate(value, minDate, maxDate)
-    if (currentDate && currentDate !== data.filters[filter])
+    if (currentDate && currentDate !== filters[filter])
       handleFilterChange(filter, currentDate)
   }
 
+  const defaultAutocompleteValue = {
+    id: 0,
+    login: '',
+    name: '',
+    isUserAdded: false
+  }
+
   const [autocompleteOpen, setAutocompleteOpen] = React.useState(false)
-  const [autocompleteValue, setAutocompleteValue] = React.useState(null)
+  const [autocompleteValue, setAutocompleteValue] = React.useState(defaultAutocompleteValue)
   const [inputValue, setInputValue] = React.useState('')
   const [selectedFilter, setSelectedFilter] = React.useState('0')
-  const currentFilter = parseInt(selectedFilter)
-  const loading = data.listenersAddition.isLoading
+  const listenersAddition = useSelector(getListenersAddition)
+  const loading = listenersAddition.isLoading
 
-  const onInputChange = (e, value) => {
+  const onInputChange = (e: any, value: string) => {
     setInputValue(value)
     dispatch(getListenersOptions(value))
   }
 
-  const onSelectedFilterChange = (e) => {
+  const onSelectedFilterChange = (e: any) => {
     setSelectedFilter(e.target.value)
     setSearchString('')
-    setAutocompleteValue(null)
+    setAutocompleteValue(defaultAutocompleteValue)
   }
+
+  const volumeList = useSelector(getVolumeList)
 
   if (isLoading) return null
 
@@ -322,55 +393,55 @@ const CoursesList = () => {
           <Box margin={0.5}>
             <FormGroup>
               <CheckboxInput
-                checked={data.filters.enrolPossible}
+                checked={filters.enrolPossible}
                 onFilterChange={handleFilterChange}
                 edited="enrolPossible"
                 label="Только программы, на которые возможна запись"
               />
               <CheckboxInput
-                checked={data.filters.CME}
+                checked={filters.CME}
                 onFilterChange={handleFilterChange}
                 edited="CME"
                 label="Программы непрерывного медицинского образования"
               />
               <CheckboxInput
-                checked={data.filters.traditional}
+                checked={filters.traditional}
                 onFilterChange={handleFilterChange}
                 edited="traditional"
                 label="Программы традиционных курсов"
               />
               <CheckboxInput
-                checked={data.filters.budgetaryOnly}
+                checked={filters.budgetaryOnly}
                 onFilterChange={handleFilterChange}
                 edited="budgetaryOnly"
                 label="Только программы бюджетных курсов"
               />
               <CheckboxInput
-                checked={data.filters.nonBudgetaryOnly}
+                checked={filters.nonBudgetaryOnly}
                 onFilterChange={handleFilterChange}
                 edited="nonBudgetaryOnly"
                 label="Только программы не бюджетных курсов"
               />
               <CheckboxInput
-                checked={data.filters.retraining}
+                checked={filters.retraining}
                 onFilterChange={handleFilterChange}
                 edited="retraining"
                 label="Программы переподготовки"
               />
               <CheckboxInput
-                checked={data.filters.skillsDevelopment}
+                checked={filters.skillsDevelopment}
                 onFilterChange={handleFilterChange}
                 edited="skillsDevelopment"
                 label="Программы повышения квалификации"
               />
               <CheckboxInput
-                checked={data.filters.forDoctors}
+                checked={filters.forDoctors}
                 onFilterChange={handleFilterChange}
                 edited="forDoctors"
                 label="Программы для врачей"
               />
               <CheckboxInput
-                checked={data.filters.forNursingStaff}
+                checked={filters.forNursingStaff}
                 onFilterChange={handleFilterChange}
                 edited="forNursingStaff"
                 label="Программы для среднего медицинского персонала"
@@ -389,18 +460,17 @@ const CoursesList = () => {
                   margin="dense"
                   className={classes.smallSelect}
                   InputProps={{ disableUnderline: true }}
-                  value={data.filters.currentVolume}
+                  value={filters.currentVolume}
                   onChange={(e) =>
                     handleFilterChange('currentVolume', e.target.value)
                   }
                 >
                   <MenuItem value="0">Все</MenuItem>
-                  {data.volumeList.length &&
-                    data.volumeList.map((option, index) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
+                  {volumeList.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
                 </TextField>
               </Grid>
             </Grid>
@@ -410,27 +480,28 @@ const CoursesList = () => {
         <Grid container direction="row" alignItems="flex-start">
           <Grid item className={classes.inlineDateField}>
             <DateInput
+              //@ts-ignore
               input={{ value: startDate }}
               name="startDate"
               views={['year', 'date']}
-              minDate={minStartDate}
+              minDate={filters.minStartDate}
               maxDate={maxDateLimits(endDate)}
               dateformat="DD-MM-YYYY"
               placeholder="дд-мм-гггг"
               label="Начало периода"
-              onChange={(value) => setStartDate(parseDate(value))}
-              onAccept={(value) =>
+              onChange={(value: string) => setStartDate(parseDate(value))}
+              onAccept={(value: string) =>
                 approveFilterDate(
                   value,
-                  minStartDate,
+                  filters.minStartDate,
                   maxDateLimits(endDate),
                   'startDate'
                 )
               }
-              onBlur={(e) =>
+              onBlur={(e: any) =>
                 approveFilterDate(
                   e.target.value,
-                  minStartDate,
+                  filters.minStartDate,
                   endDate,
                   'startDate'
                 )
@@ -439,28 +510,29 @@ const CoursesList = () => {
           </Grid>
           <Grid item className={classes.inlineDateField}>
             <DateInput
+              //@ts-ignore
               input={{ value: endDate }}
               name="endDate"
               views={['year', 'date']}
               minDate={minDateLimits(startDate)}
-              maxDate={maxEndDate}
+              maxDate={filters.maxEndDate}
               dateformat="DD-MM-YYYY"
               placeholder="дд-мм-гггг"
               label="Окончание периода"
-              onChange={(value) => setEndDate(parseDate(value))}
-              onAccept={(value) =>
+              onChange={(value: string) => setEndDate(parseDate(value))}
+              onAccept={(value: string) =>
                 approveFilterDate(
                   value,
                   minDateLimits(startDate),
-                  maxEndDate,
+                  filters.maxEndDate,
                   'endDate'
                 )
               }
-              onBlur={(e) =>
+              onBlur={(e: any) =>
                 approveFilterDate(
                   e.target.value,
                   startDate,
-                  maxEndDate,
+                  filters.maxEndDate,
                   'endDate'
                 )
               }
@@ -509,20 +581,17 @@ const CoursesList = () => {
                 onOpen={() => setAutocompleteOpen(true)}
                 onClose={() => setAutocompleteOpen(false)}
                 noOptionsText="Список пуст"
-                getOptionSelected={(option, value) =>
-                  option.name === value.name
-                }
+                getOptionSelected={(option, value) => option.name === value.name}
                 getOptionDisabled={(option) => option.isUserAdded}
                 getOptionLabel={(option) =>
-                  `${option.name}${option.login ? ` (${option.login})` : ``}`
-                }
-                options={data.listenersAddition.options}
+                  `${option.name} (${option.login})`}
+                options={listenersAddition.options}
                 loading={loading}
                 inputValue={inputValue}
                 value={autocompleteValue}
-                onInputChange={onInputChange}
-                onChange={(e, value) => {
-                  setAutocompleteValue(value)
+                onInputChange={() => onInputChange}
+                onChange={(e: ChangeEvent<{}>, value: IUserOption | null) => {
+                  if (value) setAutocompleteValue(value)
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && autocompleteValue) {
@@ -535,8 +604,7 @@ const CoursesList = () => {
                 }}
                 renderOption={(option) => (
                   <>
-                    <span>{`${option.name}${option.login ? ` (${option.login})` : ``
-                      }`}</span>
+                    <span>{`${option.name} (${option.login})`}</span>
                     {option.isUserAdded && (
                       <CheckIcon className={classes.iconTitle} />
                     )}
@@ -550,9 +618,9 @@ const CoursesList = () => {
                       ...params.InputProps,
                       endAdornment: (
                         <>
-                          {loading ? (
+                          {loading && (
                             <CircularProgress color="inherit" size={20} />
-                          ) : null}
+                          )}
                           {params.InputProps.endAdornment}
                         </>
                       ),
@@ -570,10 +638,13 @@ const CoursesList = () => {
                 size="small"
                 color="primary"
                 onClick={() => {
-                  if (!currentFilter)
+                  if (!parseInt(selectedFilter))
                     handleFilterChange('searchString', searchString)
-                  else if (autocompleteValue)
-                    handleFilterChange('searchUser', autocompleteValue.id)
+                  else {
+                    if (autocompleteValue) {
+                      handleFilterChange('searchUser', autocompleteValue.id)
+                    }
+                  }
                 }}
               >
                 Поиск
@@ -586,14 +657,14 @@ const CoursesList = () => {
                 size="small"
                 color="primary"
                 onClick={() => {
-                  if (!currentFilter) {
+                  if (!parseInt(selectedFilter)) {
                     if (searchString.length) {
                       setSearchString('')
                       handleFilterChange('searchString', '')
                     }
                   } else {
                     if (autocompleteValue) {
-                      setAutocompleteValue(null)
+                      setAutocompleteValue(defaultAutocompleteValue)
                       handleFilterChange('searchUser', null)
                     }
                   }
@@ -605,7 +676,7 @@ const CoursesList = () => {
           </Grid>
         </Grid>
       </Paper>
-      {data.list.length ? (
+      {coursesList.length ? (
         <>
           <Grid
             container
@@ -620,7 +691,7 @@ const CoursesList = () => {
               margin="dense"
               className={classes.smallSelect}
               InputProps={{ disableUnderline: true }}
-              value={data.pageSize}
+              value={pageSize}
               onChange={handlePageSizeChange}
             >
               {pageCountVariants.map((count) => (
@@ -631,8 +702,8 @@ const CoursesList = () => {
             </TextField>
             <Pagination
               color="primary"
-              page={data.currentPage}
-              count={Math.ceil(data.totalCount / data.pageSize)}
+              page={currentPage}
+              count={Math.ceil(totalCount / pageSize)}
               onChange={handlePageChange}
             />
           </Grid>
@@ -654,7 +725,7 @@ const CoursesList = () => {
                     <TableCell style={{ minWidth: 185 }} align="center">
                       Подача заявки
                     </TableCell>
-                    {data.roots.group ? (
+                    {coursesRoots.group ? (
                       <TableCell align="center">
                         Слушатели, подавшие заявки
                       </TableCell>
@@ -662,10 +733,10 @@ const CoursesList = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data.list.map((course) => (
+                  {coursesList.map((course) => (
                     <Course
                       key={course.ID}
-                      roots={data.roots}
+                      roots={coursesRoots}
                       course={course}
                       onWindowOpen={openListenersWindow}
                       onAddWindowOpen={openAddListenersWindow}
@@ -681,10 +752,10 @@ const CoursesList = () => {
             <TableContainer component={Paper}>
               <Table size="small" className={classes.mobileTable}>
                 <TableBody>
-                  {data.list.map((course) => (
+                  {coursesList.map((course) => (
                     <CourseMobile
                       key={course.ID}
-                      roots={data.roots}
+                      roots={coursesRoots}
                       course={course}
                       onWindowOpen={openListenersWindow}
                       onAddWindowOpen={openAddListenersWindow}
@@ -701,7 +772,7 @@ const CoursesList = () => {
       ) : (
         <Typography>Список программ пуст</Typography>
       )}
-      {data.selectedCourse && (
+      {selectedCourse && (
         <>
           <ListenersWindow
             options={{ open: isListenersWindowOpen }}

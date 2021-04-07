@@ -1,6 +1,5 @@
-import { ThunkAction } from 'redux-thunk'
 import { ICourseBasic } from '../../types'
-import { AppStateType, BaseThunkType, InferActionsType } from './index'
+import { BaseThunkType, InferActionsType } from './index'
 import { requestsAPI } from '../../services/api'
 import { actions as snackbarActions } from './snackbar'
 import { actions as loaderActions } from './loader'
@@ -36,19 +35,19 @@ const initialState: IState = {
 
 export const requestsReducer = (state = initialState, action: requestsActionsTypes): IState => {
   switch (action.type) {
-    case 'REQUEST_CANCELED':
+    case 'dpo-lk/requests/CANCELED':
       return {
         ...state,
         list: state.list.filter(
           (request) => request.requestID !== action.payload
         ),
       }
-    case 'REQUESTS_LOADING_SUCCESS':
+    case 'dpo-lk/requests/LOADING_SUCCESS':
       return {
         ...state,
         list: action.payload,
       }
-    case 'REQUESTS_CME_REQUEST_UPDATE':
+    case 'dpo-lk/requests/CME_REQUEST_UPDATE':
       console.log(action)
       return {
         ...state,
@@ -64,13 +63,13 @@ export const requestsReducer = (state = initialState, action: requestsActionsTyp
           }
         }),
       }
-    case 'REQUESTS_SET_SELECTED_REQUEST':
+    case 'dpo-lk/requests/SET_SELECTED_REQUEST':
       console.log(action)
       return {
         ...state,
         selectedRequest: action.payload,
       }
-    case 'REQUESTS_DOCUMENTS_APPROVE':
+    case 'dpo-lk/requests/DOCUMENTS_APPROVE':
       console.log(action)
       return {
         ...state,
@@ -142,23 +141,23 @@ export const setDocumentsApprove = (requestID: number, status: number): ThunkTyp
 
 export const actions = {
   requestsLoadingSuccess: (data: Array<IRequest>) => ({
-    type: 'REQUESTS_LOADING_SUCCESS',
+    type: 'dpo-lk/requests/LOADING_SUCCESS',
     payload: data
   } as const),
   requestCanceled: (courseID: number) => ({
-    type: 'REQUEST_CANCELED',
+    type: 'dpo-lk/requests/CANCELED',
     payload: courseID
   } as const),
   CMERequestUpdated: (data: { speciality: string, number: string, rowID: number }) => ({
-    type: 'REQUESTS_CME_REQUEST_UPDATE',
+    type: 'dpo-lk/requests/CME_REQUEST_UPDATE',
     payload: data
   } as const),
   setSelectedRequest: (request: ISelectedRequest) => ({
-    type: 'REQUESTS_SET_SELECTED_REQUEST',
+    type: 'dpo-lk/requests/SET_SELECTED_REQUEST',
     payload: request
   } as const),
   documentsApprove: (data: { requestID: number, status: number }) => ({
-    type: 'REQUESTS_DOCUMENTS_APPROVE',
+    type: 'dpo-lk/requests/DOCUMENTS_APPROVE',
     payload: data
   } as const),
   ...loaderActions,

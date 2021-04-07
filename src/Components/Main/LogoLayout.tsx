@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const LogoLayout = () => {
+const LogoLayout: React.FC = (): JSX.Element => {
   const classes = useStyles()
 
   return (

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Field, reduxForm, submit } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm, submit } from 'redux-form'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import { getListenerInfo, saveCheckData } from '../../store/reducers/courses'
 import {
@@ -27,11 +27,11 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import ListenerInfoDocument from './ListenerInfoDocument'
 import { SAVE_FILES_DIRECTORY } from '../../store/const'
+import { getCoursesRoots, getSelectedListenerInfo } from '../../store/selectors/courses'
 import { userAPI } from '../../services/api'
-import styles from '../../styles'
+import { ICourseUser, IDocument } from '../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
   typography: {
     padding: theme.spacing(2, 0),
   },
@@ -41,41 +41,82 @@ const useStyles = makeStyles((theme) => ({
   startIcon: {
     marginRight: theme.spacing(1),
   },
+  link: {
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    },
+  },
 }))
 
-const ListenerInfo = ({ user, options, onClose }) => {
+interface IProps {
+  user: ICourseUser,
+  options: { open: boolean },
+  onClose: () => void
+}
+
+interface IValues {
+  documents?: IDocument[]
+  comment: string
+  work: any
+  workCheck?: number
+  requestCME: string | null
+  cathedraAllow: boolean
+  cathedraComment: string
+  cathedraLabel: string
+  instituteAllow: boolean
+  instituteComment: string
+  instituteLabel: string
+}
+
+const ListenerInfo: React.FC<IProps> = ({ user, options, onClose }) => {
   const dispatch = useDispatch()
-  const data = useSelector((state) => state.courses.listenerInfo)
-  const roots = useSelector((state) => state.courses.roots)
-  const rootsGroup = parseInt(roots.group)
+  const data = useSelector(getSelectedListenerInfo)
+  const roots = useSelector(getCoursesRoots)
+  const rootsGroup = roots.group
   const cathedraRoots = rootsGroup === 3
-  const instituteRoots = [1, 2].includes(rootsGroup)
+  const instituteRoots = rootsGroup === 1 || rootsGroup === 2
 
   React.useEffect(() => {
     dispatch(getListenerInfo(user.id))
   }, [dispatch, user.id])
 
-  const initialValues = {
+  const initialValues: IValues = {
     documents: data.documents,
     comment: user.comment,
     work: data.work,
     workCheck: data.workCheck,
     requestCME: user.requestCME,
+    cathedraAllow: false,
+    cathedraComment: '',
+    cathedraLabel: '',
+    instituteAllow: false,
+    instituteComment: '',
+    instituteLabel: ''
   }
 
   if (cathedraRoots || instituteRoots) {
     initialValues.cathedraAllow = Boolean(user.cathedraAllow)
-    initialValues.cathedraComment = user.checks.cathedra.comment
-    initialValues.cathedraLabel = user.checks.cathedra.label
+    if (user.checks.cathedra.comment && user.checks.cathedra.comment.length > 0) {
+      if (user.checks.cathedra.comment) initialValues.cathedraComment = user.checks.cathedra.comment
+      if (user.checks.cathedra.label) initialValues.cathedraLabel = user.checks.cathedra.label
+    }
   }
 
   if (instituteRoots) {
     initialValues.instituteAllow = Boolean(user.instituteAllow)
-    initialValues.instituteComment = user.checks.institute.comment
-    initialValues.instituteLabel = user.checks.institute.label
+    if (user.checks.institute.comment && user.checks.institute.comment.length > 0) {
+      initialValues.instituteComment = user.checks.institute.comment
+      if (user.checks.institute.label) initialValues.instituteLabel = user.checks.institute.label
+    }
   }
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: any) => {
+    console.log(values)
     dispatch(
       saveCheckData(user.id, user.rowID, values)
     )
@@ -118,7 +159,7 @@ const ListenerInfo = ({ user, options, onClose }) => {
             </TableBody>
           </Table>
         </TableContainer>
-        <ListenerInfoForm
+        <ListenerInfoReduxForm
           onSubmit={handleSubmit}
           initialValues={initialValues}
         />
@@ -127,17 +168,16 @@ const ListenerInfo = ({ user, options, onClose }) => {
   )
 }
 
-let ListenerInfoForm = (props) => {
+const ListenerInfoForm: React.FC<InjectedFormProps<IValues>> = ({ handleSubmit, initialValues }) => {
   const classes = useStyles()
-  const values = props.initialValues
   const [workInfoOpen, setWorkInfoOpen] = React.useState(false)
   const [requestCMEInfoOpen, setRequestCMEInfoOpen] = React.useState(false)
 
   let work = null
-  if (values.work) work = JSON.parse(values.work)
+  if (initialValues.work) work = JSON.parse(initialValues.work)
 
   let requestCME = null
-  if (values.requestCME) requestCME = JSON.parse(values.requestCME)
+  if (initialValues.requestCME) requestCME = JSON.parse(initialValues.requestCME)
 
   const radioButtons = [
     { value: '0', label: 'Не верно' },
@@ -147,13 +187,13 @@ let ListenerInfoForm = (props) => {
   const username = userAPI.getUserName().toLowerCase()
 
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Typography className={classes.typography}>Допуск к курсу</Typography>
       <FormGroup row>
-        {props.initialValues.cathedraAllow !== undefined && (
+        {initialValues.cathedraAllow && (
           <Field name="cathedraAllow" component={Switcher} label="Кафедра" />
         )}
-        {props.initialValues.instituteAllow !== undefined && (
+        {initialValues.instituteAllow && (
           <Field
             name="instituteAllow"
             component={Switcher}
@@ -167,20 +207,16 @@ let ListenerInfoForm = (props) => {
         component={Textarea}
         label="Примечание (видно только рецензентам!)"
       />
-      {props.initialValues.cathedraComment !== undefined && (
-        <Field
-          name="cathedraComment"
-          component={Textarea}
-          label={`Рецензия от кафедры${values.cathedraLabel}`}
-        />
-      )}
-      {props.initialValues.instituteComment !== undefined && (
-        <Field
-          name="instituteComment"
-          component={Textarea}
-          label={`Рецензия от института ДПО${values.instituteLabel}`}
-        />
-      )}
+      <Field
+        name="cathedraComment"
+        component={Textarea}
+        label={`Рецензия от кафедры${initialValues.cathedraLabel}`}
+      />
+      <Field
+        name="instituteComment"
+        component={Textarea}
+        label={`Рецензия от института ДПО${initialValues.instituteLabel}`}
+      />
       {requestCME && (
         <>
           <Grid
@@ -300,8 +336,8 @@ let ListenerInfoForm = (props) => {
         </>
       )}
       <Typography className={classes.typography}>Документы</Typography>
-      {values.documents.length > 0 ? (
-        values.documents.map((document, index) => {
+      {initialValues.documents && initialValues.documents.length > 0 ? (
+        initialValues.documents.map((document, index) => {
           return (
             <ListenerInfoDocument
               key={document.id}
@@ -317,7 +353,7 @@ let ListenerInfoForm = (props) => {
   )
 }
 
-ListenerInfoForm = reduxForm({
+const ListenerInfoReduxForm = reduxForm<IValues>({
   form: 'listenerInfoForm',
   enableReinitialize: true,
 })(ListenerInfoForm)

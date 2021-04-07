@@ -16,14 +16,14 @@ type SnackbarActionsTypes = InferActionsType<typeof actions>
 
 export const snackbarReducer = (state = initialState, action: SnackbarActionsTypes): IState => {
   switch (action.type) {
-    case 'SNACKBAR_SHOW_MESSAGE':
+    case 'dpo-lk/snackbar/SHOW_MESSAGE':
       return {
         ...state,
         isOpen: true,
         message: action.payload.message,
         severity: action.payload.severity
       }
-    case 'SNACKBAR_CLOSE_MESSAGE':
+    case 'dpo-lk/snackbar/CLOSE_MESSAGE':
       return {
         ...state,
         isOpen: false,
@@ -35,10 +35,10 @@ export const snackbarReducer = (state = initialState, action: SnackbarActionsTyp
 
 export const actions = {
   showMessageAction: (message: string, severity: SeverityType) => ({
-    type: 'SNACKBAR_SHOW_MESSAGE',
+    type: 'dpo-lk/snackbar/SHOW_MESSAGE',
     payload: { message, severity }
   } as const),
   closeMessageAction: () => ({
-    type: 'SNACKBAR_CLOSE_MESSAGE'
+    type: 'dpo-lk/snackbar/CLOSE_MESSAGE'
   } as const)
 }

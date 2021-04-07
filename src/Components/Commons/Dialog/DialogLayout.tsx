@@ -11,9 +11,9 @@ import {
   useMediaQuery,
 } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
-import { useTheme, Theme, makeStyles } from '@material-ui/core/styles'
+import { useTheme, makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme) => ({
   closeButton: {
     position: 'absolute',
     right: 0,

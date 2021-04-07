@@ -1,6 +1,6 @@
 import React from 'react'
 import { compose } from 'redux'
-import MainLayout from '../Main/MainLayout'
+import MainLayout from './MainLayout'
 import withAuth from '../Authorization/withAuth'
 
 const NotFound = () => {

@@ -25,22 +25,22 @@ type ThunkType = BaseThunkType<authActionsTypes>
 
 export const authReducer = (state = initialState, action: authActionsTypes): IState => {
   switch (action.type) {
-    case 'SET_CONFIRM_PARAMS':
+    case 'dpo-lk/auth/SET_CONFIRM_PARAMS':
       return {
         ...state,
         confirm: action.payload,
       }
-    case 'SET_PASSWORD_PARAMS':
+    case 'dpo-lk/auth/SET_PASSWORD_PARAMS':
       return {
         ...state,
         changePassword: action.payload,
       }
-    case 'CLEAR_CONFIRM_PARAMS':
+    case 'dpo-lk/auth/CLEAR_CONFIRM_PARAMS':
       return {
         ...state,
         confirm: null,
       }
-    case 'CLEAR_PASSWORD_PARAMS':
+    case 'dpo-lk/auth/CLEAR_PASSWORD_PARAMS':
       return {
         ...state,
         changePassword: null,
@@ -52,24 +52,24 @@ export const authReducer = (state = initialState, action: authActionsTypes): ISt
 
 export const actions = {
   setConfirmParams: (params: any) => ({
-    type: 'SET_CONFIRM_PARAMS',
+    type: 'dpo-lk/auth/SET_CONFIRM_PARAMS',
     payload: params
   } as const),
   setPasswordParams: (params: any) => ({
-    type: 'SET_PASSWORD_PARAMS',
+    type: 'dpo-lk/auth/SET_PASSWORD_PARAMS',
     payload: params
   } as const),
   clearConfirmParams: () => ({
-    type: 'CLEAR_CONFIRM_PARAMS'
+    type: 'dpo-lk/auth/CLEAR_CONFIRM_PARAMS'
   } as const),
   clearPasswordParams: () => ({
-    type: 'CLEAR_PASSWORD_PARAMS'
+    type: 'dpo-lk/auth/CLEAR_PASSWORD_PARAMS'
   } as const),
   ...snackbarActions,
   ...loaderActions
 }
 
-export const checkParams = (id: number, key: string, type: string): ThunkType => {
+export const checkParams = (id: string, key: string, type: string): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     let params = {}
@@ -104,7 +104,7 @@ export const checkParams = (id: number, key: string, type: string): ThunkType =>
   }
 }
 
-export const changePassword = (id: number, key: string, password: string, repeat: string): ThunkType => {
+export const changePassword = (id: string, key: string, password: string, repeat: string): ThunkType => {
   return async (dispatch) => {
     if (password.length >= PASSWORD_LENGTH && repeat.length >= PASSWORD_LENGTH) {
       if (password === repeat) {

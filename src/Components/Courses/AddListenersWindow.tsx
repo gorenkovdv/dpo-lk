@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { makeStyles, Theme } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 import {
   Button,
   IconButton,
@@ -22,7 +22,7 @@ import { getListenersOptions, actions as coursesActions } from '../../store/redu
 import { getListenersAddition, getSelectedCourse } from '../../store/selectors/courses'
 import { IUserOption } from '../../types'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme) => ({
   modalTableContainer: {
     maxHeight: 380,
   },
@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 interface IProps {
-  options: Array<IUserOption>,
+  options: { open: boolean },
   onClose: any,
   onApprove: any
 }
@@ -58,7 +58,7 @@ const AddListenersWindow: React.FC<IProps> = ({ options, onClose, onApprove }) =
   const classes = useStyles()
   const dispatch = useDispatch()
   const [open, setOpen] = React.useState(false)
-  const [inputValue, setInputValue] = React.useState('')
+  const [inputValue, setInputValue] = React.useState("")
   const [autocompleteValue, setAutocompleteValue] = React.useState(defaultValue)
   const data = useSelector(getListenersAddition)
   const course = useSelector(getSelectedCourse)
@@ -113,7 +113,7 @@ const AddListenersWindow: React.FC<IProps> = ({ options, onClose, onApprove }) =
         loading={loading}
         inputValue={inputValue}
         value={autocompleteValue}
-        onInputChange={onInputChange}
+        onInputChange={() => onInputChange}
         onChange={(e: ChangeEvent<{}>, value: IUserOption | null) => {
           if (value) setAutocompleteValue(value)
         }}

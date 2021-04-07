@@ -1,9 +1,5 @@
 import { AppStateType } from '../reducers'
 
-export const getSnackbarParams = (state: AppStateType) => {
-    return state.snackbar
-}
+export const getSnackbarParams = (state: AppStateType) => state.snackbar
 
-export const getConfirmDialogParams = (state: AppStateType) => {
-    return state.confirmDialog
-}
+export const getConfirmDialogParams = (state: AppStateType) => state.confirmDialog

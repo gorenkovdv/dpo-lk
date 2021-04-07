@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import {
   AppBar,
@@ -54,7 +54,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const AppBarLayout = (props) => {
+interface IProps {
+  pagesType: string
+  onDrawerToggle: () => void
+}
+
+const AppBarLayout: React.FC<IProps & RouteComponentProps> = ({ pagesType, onDrawerToggle }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
 
@@ -63,9 +68,8 @@ const AppBarLayout = (props) => {
 
   const menuId = 'primary-search-account-menu'
   const mobileMenuId = 'primary-search-account-menu-mobile'
-  const pagesType = props.pagesType
 
-  const handleMobileMenuOpen = (event) => {
+  const handleMobileMenuOpen = (event: any) => {
     setMobileMoreAnchorEl(event.currentTarget)
   }
 
@@ -121,7 +125,7 @@ const AppBarLayout = (props) => {
           color="inherit"
           aria-label="open drawer"
           edge="start"
-          onClick={props.onDrawerToggle}
+          onClick={onDrawerToggle}
           className={classes.menuButton}
         >
           <MenuIcon />

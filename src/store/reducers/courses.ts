@@ -2,61 +2,18 @@ import { coursesAPI, requestsAPI, userAPI } from '../../services/api'
 import { actions as snackbarActions } from '../reducers/snackbar'
 import { actions as loaderActions } from '../reducers/loader'
 import { BaseThunkType, InferActionsType } from './index'
-import { ICourseBasic, IDocument, IUserOption } from '../../types'
+import {
+  ICourse,
+  IDocument,
+  IUserOption,
+  ICourseUser,
+  ICourseRoots,
+  ISelectedCourse,
+  ICourseFilters
+} from '../../types'
 import moment from 'moment'
 
-interface ICourseUser {
-  id: number
-  requestID: number
-  rowID: number
-  fullname: string
-  cathedraAllow?: number
-  instituteAllow?: number
-  comment: string
-  lastUpdate: string | null
-  requestCME: string | null
-  checks: {
-    cathedra: ICourseUserCheck,
-    institute: ICourseUserCheck
-  }
-}
 
-interface ICourseUserCheck {
-  comment: string
-  date: string | null
-  label: string
-  person: string | undefined
-}
-
-interface ICourse extends ICourseBasic {
-  StartDateTooltip: string
-  BeginDateMonth: string
-  users: Array<ICourseUser>
-}
-
-interface IFilters {
-  searchString: string
-  searchUser: number | null
-  enrolPossible: boolean
-  CME: boolean
-  traditional: boolean
-  budgetaryOnly: boolean
-  nonBudgetaryOnly: boolean
-  retraining: boolean
-  skillsDevelopment: boolean
-  forDoctors: boolean
-  forNursingStaff: boolean
-  currentVolume: number
-  startDate: string
-  endDate: string
-  minStartDate: string
-  maxEndDate: string
-}
-
-interface ISelectedCourse {
-  ID: number
-  Name: string
-}
 interface IListenerInfo {
   documents?: Array<IDocument>
   fullname?: string
@@ -67,8 +24,8 @@ interface IListenerInfo {
   phone?: string
   workCheck?: number
   isListenerInfoLoading: boolean
+  work?: any
 }
-
 interface INewListener {
   lastname: string,
   firstname: string,
@@ -77,9 +34,9 @@ interface INewListener {
   snils: string,
 }
 
-interface IState {
+export interface IState {
   list: Array<ICourse>
-  filters: IFilters
+  filters: ICourseFilters
   volumeList: Array<number>
   totalCount: number
   pageSize: number
@@ -92,10 +49,7 @@ interface IState {
     options: Array<IUserOption>
     list: Array<IUserOption>
   }
-  roots: {
-    group: number | null
-    cathedra: string | null | undefined
-  }
+  roots: ICourseRoots
 }
 
 type coursesActionsTypes = InferActionsType<typeof actions>
@@ -146,7 +100,7 @@ const initialState: IState = {
 
 export const coursesReducer = (state = initialState, action: coursesActionsTypes): IState => {
   switch (action.type) {
-    case 'COURSE_SET_LISTENER_INFO_LOADING':
+    case 'dpo-lk/courses/SET_LISTENER_INFO_LOADING':
       return {
         ...state,
         listenerInfo: {
@@ -154,12 +108,12 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
           isListenerInfoLoading: true,
         },
       }
-    case 'COURSES_SET_SELECTED_COURSE':
+    case 'dpo-lk/courses/SET_SELECTED_COURSE':
       return {
         ...state,
         selectedCourse: action.payload,
       }
-    case 'COURSES_SET_ADDITION_DIALOG_OPEN':
+    case 'dpo-lk/courses/SET_ADDITION_DIALOG_OPEN':
       return {
         ...state,
         listenersAddition: {
@@ -167,18 +121,18 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
           isDialogOpen: action.payload,
         },
       }
-    case 'COURSES_CHANGE_REQUEST_STATUS':
+    case 'dpo-lk/courses/CHANGE_REQUEST_STATUS':
       return {
         ...state,
         list: state.list.map((course, index) => {
-          if (course.ID === action.payload.courseID) {
+          if (course.ID.toString() === action.payload.courseID.toString()) {
             return {
               ...course,
               users: action.payload.requestID
                 ? state.list[index].users.filter(
                   (user) =>
-                    user.requestID !==
-                    action.payload.requestID
+                    user.requestID.toString() !==
+                    action.payload.requestID?.toString()
                 )
                 : state.list[index].users.concat(action.payload.users),
             }
@@ -186,17 +140,16 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
           return course
         }),
       }
-    case 'COURSES_REQUEST_USER_REMOVED':
+    case 'dpo-lk/courses/REQUEST_USER_REMOVED':
       return {
         ...state,
         list: state.list.map((course, index) => {
-          if (course.ID === action.payload.courseID) {
+          if (course.ID.toString() === action.payload.courseID.toString()) {
             return {
               ...course,
               users: state.list[index].users.filter(
                 (user) => {
-                  console.log(user.rowID, action.payload.rowID)
-                  return user.rowID !== action.payload.rowID
+                  return user.rowID.toString() !== action.payload.rowID.toString()
                 }
               ),
             }
@@ -204,7 +157,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
           return course
         }),
       }
-    case 'COURSES_LOADING_SUCCESS':
+    case 'dpo-lk/courses/LOADING_SUCCESS':
       return {
         ...state,
         list: action.payload.courses,
@@ -227,7 +180,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
           cathedra: action.payload.rootCathedra,
         },
       }
-    case 'COURSES_SET_LISTENER_INFO':
+    case 'dpo-lk/courses/SET_LISTENER_INFO':
       return {
         ...state,
         listenerInfo: {
@@ -235,7 +188,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
           isListenerInfoLoading: false,
         },
       }
-    case 'COURSES_CHECK_DATA_SAVED':
+    case 'dpo-lk/courses/CHECK_DATA_SAVED':
       return {
         ...state,
         listenerInfo: {
@@ -298,7 +251,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
           }
         }),
       }
-    case 'COURSES_LISTENERS_OPTIONS_LOADING':
+    case 'dpo-lk/courses/LISTENERS_OPTIONS_LOADING':
       return {
         ...state,
         listenersAddition: {
@@ -306,7 +259,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
           isLoading: true,
         },
       }
-    case 'COURSES_SET_LISTENERS_OPTIONS':
+    case 'dpo-lk/courses/SET_LISTENERS_OPTIONS':
       return {
         ...state,
         listenersAddition: {
@@ -316,7 +269,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
             let isUserAdded = false
 
             state.listenersAddition.list.map((addedUser) => {
-              if (addedUser.id === user.id) isUserAdded = true
+              if (addedUser.id.toString() === user.id.toString()) isUserAdded = true
               return null
             })
 
@@ -324,7 +277,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
               .filter((item) => state.selectedCourse && item.ID === state.selectedCourse.ID)
               .map((searchingCourse) => {
                 searchingCourse.users.map((addedUser) => {
-                  if (addedUser.id === user.id) isUserAdded = true
+                  if (addedUser.id.toString() === user.id.toString()) isUserAdded = true
                   return null
                 })
                 return null
@@ -339,7 +292,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
           }),
         },
       }
-    case 'COURSES_ADD_LISTENER_TO_LIST':
+    case 'dpo-lk/courses/ADD_LISTENER_TO_LIST':
       console.log()
       return {
         ...state,
@@ -353,17 +306,17 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
             .concat(action.payload),
         },
       }
-    case 'COURSES_REMOVE_LISTENER_FROM_LIST':
+    case 'dpo-lk/courses/REMOVE_LISTENER_FROM_LIST':
       return {
         ...state,
         listenersAddition: {
           ...state.listenersAddition,
           list: state.listenersAddition.list.filter(
-            (user) => user.id !== action.payload
+            (user) => user.id.toString() !== action.payload.userID.toString()
           ),
         },
       }
-    case 'COURSES_CLEAR_ADDITION_LISTENERS':
+    case 'dpo-lk/courses/CLEAR_ADDITION_LISTENERS':
       return {
         ...state,
         listenersAddition: {
@@ -377,7 +330,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
   }
 }
 
-export const requestCourses = (page: number, count: number, filters: IFilters): ThunkType => {
+export const requestCourses = (page: number, count: number, filters: ICourseFilters): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     const response = await coursesAPI.getCoursesList(page, count, filters)
@@ -397,7 +350,7 @@ export const requestCourses = (page: number, count: number, filters: IFilters): 
   }
 }
 
-export const changeListParams = (page: number, count: number, filters: IFilters): ThunkType => {
+export const changeListParams = (page: number, count: number, filters: ICourseFilters): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     const response = await coursesAPI.getCoursesList(page, count, filters)
@@ -454,7 +407,7 @@ export const cancelRequest = (course: ISelectedCourse, requestID: number): Thunk
   }
 }
 
-export const createListenersRequests = (courseID: number, users: Array<ICourseUser>): ThunkType => {
+export const createListenersRequests = (courseID: number, users: Array<number>): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
     const response = await coursesAPI.createListenersRequests(courseID, users)
@@ -524,7 +477,6 @@ export const getListenersOptions = (value: string): ThunkType => {
 }
 
 export const saveCheckData = (userID: number, rowID: number, data: any): ThunkType => {
-  console.log(data)
   return async (dispatch) => {
     const simpleDocumentsCheck = data.documents.map((document: IDocument) => {
       return {
@@ -566,53 +518,53 @@ export const addNewListener = (values: INewListener): ThunkType => {
 
 export const actions = {
   setListenerInfoLoading: () => ({
-    type: 'COURSE_SET_LISTENER_INFO_LOADING'
+    type: 'dpo-lk/courses/SET_LISTENER_INFO_LOADING'
   } as const),
   coursesLoadingSuccess: (data: any) => ({
-    type: 'COURSES_LOADING_SUCCESS',
+    type: 'dpo-lk/courses/LOADING_SUCCESS',
     payload: data
   } as const),
-  setSelectedCourse: (data: ISelectedCourse) => ({
-    type: 'COURSES_SET_SELECTED_COURSE',
+  setSelectedCourse: (data: ISelectedCourse | null) => ({
+    type: 'dpo-lk/courses/SET_SELECTED_COURSE',
     payload: data
   } as const),
   setListenerInfo: (data: IListenerInfo) => ({
-    type: 'COURSES_SET_LISTENER_INFO',
+    type: 'dpo-lk/courses/SET_LISTENER_INFO',
     payload: data
   } as const),
   changeRequestStatus: (data: { courseID: number, users: ICourseUser, requestID?: number }) => ({
-    type: 'COURSES_CHANGE_REQUEST_STATUS',
+    type: 'dpo-lk/courses/CHANGE_REQUEST_STATUS',
     payload: data
   } as const),
   requestUserRemoved: (data: { courseID: number, userID: number, rowID: number }) => ({
-    type: 'COURSES_REQUEST_USER_REMOVED',
+    type: 'dpo-lk/courses/REQUEST_USER_REMOVED',
     payload: data
   } as const),
   checkDataSaved: (data: any) => ({
-    type: 'COURSES_CHECK_DATA_SAVED',
+    type: 'dpo-lk/courses/CHECK_DATA_SAVED',
     payload: data
   } as const),
   setListenersOptionsLoading: () => ({
-    type: 'COURSES_LISTENERS_OPTIONS_LOADING'
+    type: 'dpo-lk/courses/LISTENERS_OPTIONS_LOADING'
   } as const),
   setListenersOptions: (data: Array<{ id: number, username: string, fullname: string }>) => ({
-    type: 'COURSES_SET_LISTENERS_OPTIONS',
+    type: 'dpo-lk/courses/SET_LISTENERS_OPTIONS',
     payload: data
   } as const),
   addListenerToList: (data: IUserOption) => ({
-    type: 'COURSES_ADD_LISTENER_TO_LIST',
+    type: 'dpo-lk/courses/ADD_LISTENER_TO_LIST',
     payload: data
   } as const),
   setAdditionDialogOpen: (isDialogOpen: boolean) => ({
-    type: 'COURSES_SET_ADDITION_DIALOG_OPEN',
+    type: 'dpo-lk/courses/SET_ADDITION_DIALOG_OPEN',
     payload: isDialogOpen
   } as const),
   removeListenerFromList: (userID: number) => ({
-    type: 'COURSES_REMOVE_LISTENER_FROM_LIST',
-    payload: userID
+    type: 'dpo-lk/courses/REMOVE_LISTENER_FROM_LIST',
+    payload: { userID }
   } as const),
   clearAdditionListeners: () => ({
-    type: 'COURSES_CLEAR_ADDITION_LISTENERS'
+    type: 'dpo-lk/courses/CLEAR_ADDITION_LISTENERS'
   } as const),
   ...snackbarActions,
   ...loaderActions

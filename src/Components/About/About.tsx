@@ -2,13 +2,13 @@ import React from 'react'
 import { compose } from 'redux'
 import { withRouter } from 'react-router-dom'
 import { Typography, Button } from '@material-ui/core'
-import { makeStyles, Theme } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 import AssignmentIcon from '@material-ui/icons/AssignmentTwoTone'
 import MainLayout from '../Main/MainLayout'
 import withAuth from '../Authorization/withAuth'
 import document from '../../files/Poryadok-predostavleniya-dokumentov-dlya-obucheniya.pdf'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme) => ({
   button: {
     marginTop: 20,
     width: '100%',

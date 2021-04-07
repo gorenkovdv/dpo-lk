@@ -1,5 +1,5 @@
 import React from 'react'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Grid,
@@ -39,11 +39,43 @@ import {
   fileDeleteAction
 } from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
-import styles from '../../../styles'
+import { getIsLoading } from '../../../store/selectors/loader'
+import { getEducationData, getEducationTypes } from '../../../store/selectors/listener'
+import { IDocument, IEducationType } from '../../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
-  button: { ...styles(theme).documentButton },
+  button: {
+    marginTop: 20,
+    width: '100%',
+    maxWidth: 250,
+    [theme.breakpoints.down('xs')]: {
+      maxWidth: '100%',
+    },
+  },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
+  iconTitle: {
+    marginLeft: theme.spacing(1.25),
+  },
+  textField: {
+    boxSizing: 'border-box',
+    width: '100%',
+  },
+  typography: {
+    boxSizing: 'border-box',
+    padding: theme.spacing(1, 0),
+  },
+  link: {
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    },
+  },
 }))
 
 const tooltips = [
@@ -101,17 +133,16 @@ const tooltips = [
 ]
 tooltips[5] = tooltips[4]
 
-const Education = ({ username }) => {
+const Education: React.FC<{ username: string }> = ({ username }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const isLoading = useSelector((state) => state.loader.isLoading)
-  const allData = useSelector((state) => state.listenerData)
-  const data = allData.list
-  const level = data.education.currentLevel || 0
-  const index = data.education.currentDocument || 0
-  const currentData = data.education.levels
-  const currentDocument =
-    currentData && currentData[level] ? currentData[level][index] : null
+  const isLoading = useSelector(getIsLoading)
+  const data = useSelector(getEducationData)
+  const educationTypes = useSelector(getEducationTypes)
+  const level = data.currentLevel || 0
+  const index = data.currentDocument || 0
+  const currentData = data.levels
+  const currentDocument = currentData[level] ? currentData[level][index] : null
   const isDocumentNew = currentDocument ? currentDocument.isDocumentNew : false
   const defaultFileURL = `education${level}${index}.pdf`
 
@@ -120,14 +151,19 @@ const Education = ({ username }) => {
   }, [dispatch])
 
   const handleNewDocument = () => {
-    let newDoc = {
+    let newDoc: IDocument = {
+      id: 0,
+      name: '',
+      comment: '',
       organization: '',
       speciality: '',
-      fullName: level < 4 ? data.education.fullName : null,
+      fullName: level < 4 ? data.fullName : null,
       firstDate: null,
+      firstDateName: '',
       secondDate: null,
+      secondDateName: '',
       serial: '',
-      hours: level > 3 ? 0 : null,
+      hours: level > 3 ? "0" : null,
       newFile: null,
       fileURL: null,
       isDocumentNew: true,
@@ -136,7 +172,7 @@ const Education = ({ username }) => {
     dispatch(createNewDocumentAction(newDoc, 4))
   }
 
-  const confirmTransition = (value, type) => {
+  const confirmTransition = (value: number, type: string) => {
     const typeText = type === `level` ? `уровню образования` : `документу`
     dispatch(
       confirmDialogActions.confirmDialogShow({
@@ -147,29 +183,29 @@ const Education = ({ username }) => {
     )
   }
 
-  const handleLevelChange = (e) => {
+  const handleLevelChange = (e: any) => {
     if (e.target.value !== level) {
       if (isDocumentNew) confirmTransition(e.target.value, 'level')
       else goToLevel(e.target.value)
     }
   }
 
-  const goToLevel = (level) => {
+  const goToLevel = (level: number) => {
     dispatch(selectEducationLevelAction(level))
   }
 
-  const goToDocument = (index) => {
+  const goToDocument = (index: number) => {
     dispatch(selectDocumentAction(index, 4))
   }
 
-  const selectDocument = (e) => {
+  const selectDocument = (e: any) => {
     if (e.target.value !== index) {
       if (isDocumentNew) confirmTransition(e.target.value, 'document')
       else goToDocument(e.target.value)
     }
   }
 
-  const handleDocumentRedirect = (value, type) => {
+  const handleDocumentRedirect = (value: number, type: string) => {
     dispatch(confirmDialogActions.confirmDialogClose())
 
     if (type === 'document') goToDocument(value)
@@ -178,7 +214,7 @@ const Education = ({ username }) => {
     dispatch(dropNewEducationDocumentAction())
   }
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: IValues) => {
     dispatch(updateData(
       {
         ...values,
@@ -186,7 +222,7 @@ const Education = ({ username }) => {
         document: index,
         newDocument: isDocumentNew,
         newFile: values.newFile ? values.newFile.base64 : null,
-        fileURL: values.newFile ? defaultFileURL : currentDocument.fileURL,
+        fileURL: values.newFile ? defaultFileURL : currentDocument && currentDocument.fileURL,
       },
       4
     )
@@ -210,7 +246,7 @@ const Education = ({ username }) => {
             <HelpIcon />
           </IconButton>
         </HtmlTooltip>
-        {data.educationTypes && (
+        {educationTypes && educationTypes.length > 0 && (
           <TextField
             select
             autoComplete="off"
@@ -221,7 +257,7 @@ const Education = ({ username }) => {
             value={level}
             onChange={handleLevelChange}
           >
-            {data.educationTypes.map((option, index) => (
+            {educationTypes.map((option, index) => (
               <MenuItem key={index} value={index}>
                 {option.name}
               </MenuItem>
@@ -265,8 +301,7 @@ const Education = ({ username }) => {
           >
             {currentData[level].map((option, index) => (
               <MenuItem key={index} value={index}>
-                {`${data.educationTypes[level].name} ${index + 1} ${currentData[level][index].isDocumentNew ? ' (новый)' : ''
-                  }`}
+                {`${educationTypes[level].name} ${index + 1} ${currentData[level][index].isDocumentNew ? ' (новый)' : ''}`}
               </MenuItem>
             ))}
           </TextField>
@@ -278,13 +313,13 @@ const Education = ({ username }) => {
         </>
       )}
       {currentDocument && (
-        <EducationDataForm
+        <EducationDataReduxForm
           onSubmit={handleSubmit}
           initialValues={currentDocument}
-          educationTypes={data.educationTypes}
+          educationTypes={educationTypes}
           index={index}
           level={level}
-          documentId={currentDocument.id ? currentDocument.id : null}
+          documentId={currentDocument.id ? currentDocument.id : 0}
           fileURL={currentDocument.fileURL}
           isDocumentNew={isDocumentNew}
           username={username}
@@ -294,7 +329,28 @@ const Education = ({ username }) => {
   )
 }
 
-let EducationDataForm = (props) => {
+interface IProps {
+  educationTypes: IEducationType[]
+  index: number
+  level: number
+  documentId: number
+  fileURL: string | null
+  isDocumentNew?: boolean
+  username: string
+}
+
+interface IValues {
+  organization: string
+  speciality: string
+  fullName?: string | null
+  firstDate: string | null
+  secondDate: string | null
+  hours?: string | null
+  serial: string
+  newFile: any
+}
+
+const EducationDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const level = props.level
@@ -398,7 +454,7 @@ let EducationDataForm = (props) => {
             target="_blank"
           >
             <Grid container direction="row" alignItems="center">
-              <PdfIcon className={classes.iconColor} />
+              <PdfIcon />
               <Typography style={{ marginLeft: 5, marginRight: 5 }}>
                 Скан-копия
               </Typography>
@@ -448,7 +504,7 @@ let EducationDataForm = (props) => {
   )
 }
 
-EducationDataForm = reduxForm({
+const EducationDataReduxForm = reduxForm<IValues, IProps>({
   form: 'educationDataForm',
   enableReinitialize: true,
 })(EducationDataForm)

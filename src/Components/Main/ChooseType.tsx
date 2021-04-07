@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Field, reduxForm, submit } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm, submit } from 'redux-form'
 import { Grid, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
@@ -10,14 +10,19 @@ import { required, isStringContainsUnderscore } from '../../utils/validate'
 import withAuth from '../Authorization/withAuth'
 import { checkEntityRoots, addEntityRepresentative } from '../../store/reducers/entityData'
 import { logout } from '../../store/reducers/auth'
+import { getEntities } from '../../store/selectors/entity'
 import history from '../../history'
-import styles from '../../styles'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
   link: {
-    ...styles(theme).link,
-    cursor: 'pointer',
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    }
   },
   button: {
     display: 'block',
@@ -30,12 +35,18 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 14,
     },
   },
+  pointer: {
+    cursor: "pointer"
+  },
+  fullWidth: {
+    width: '100%',
+  },
 }))
 
 const ChooseType = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const data = useSelector((state) => state.entityData.entities)
+  const data = useSelector(getEntities)
 
   const [
     selectEntityDialogParams,
@@ -55,14 +66,14 @@ const ChooseType = () => {
     dispatch(checkEntityRoots())
   }, [dispatch])
 
-  const selectEntityDialogShow = (e) => {
+  const selectEntityDialogShow = () => {
     setSelectEntityDialogParams({
       open: true,
       disabled: false,
     })
   }
 
-  const selectEntityDialogClose = (e) => {
+  const selectEntityDialogClose = () => {
     setSelectEntityDialogParams({ open: false, disabled: true })
   }
 
@@ -70,7 +81,7 @@ const ChooseType = () => {
     dispatch(logout())
   }
 
-  const handleClick = (type) => (e) => {
+  const handleClick = (type: string) => (event: React.MouseEvent) => {
     sessionStorage.pagesType = type
     if (type === 'listener') history.push('/profile')
     else {
@@ -79,7 +90,7 @@ const ChooseType = () => {
     }
   }
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: IValues) => {
     selectEntityDialogClose()
     dispatch(addEntityRepresentative(values.ITN))
   }
@@ -111,7 +122,7 @@ const ChooseType = () => {
           </Button>
         </Grid>
       </Grid>
-      <Typography onClick={handleLogout} className={classes.link}>
+      <Typography onClick={handleLogout} className={`${classes.link} ${classes.pointer}`}>
         Выход
       </Typography>
       <DialogLayout
@@ -123,21 +134,25 @@ const ChooseType = () => {
         title="Вход в личный кабинет"
         text="Для входа в личный кабинет представителя юридического лица необходимо указать ИНН юридического лица"
       >
-        <ITNForm onSubmit={handleSubmit} />
+        <ITNReduxForm onSubmit={handleSubmit} />
       </DialogLayout>
     </>
   )
 }
 
-let ITNForm = (props) => {
-  const ITNFieldRef = React.useRef(null)
+interface IValues {
+  ITN: string
+}
+
+const ITNForm: React.FC<InjectedFormProps<IValues>> = ({ handleSubmit }) => {
+  const ITNFieldRef = React.useRef(null as any)
 
   React.useEffect(() => {
     ITNFieldRef.current.focus()
   }, [])
 
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Field
         fullWidth
         inputRef={ITNFieldRef}
@@ -153,6 +168,6 @@ let ITNForm = (props) => {
   )
 }
 
-ITNForm = reduxForm({ form: 'ITNForm' })(ITNForm)
+const ITNReduxForm = reduxForm<IValues>({ form: 'ITNForm' })(ITNForm)
 
 export default withAuth(ChooseType)

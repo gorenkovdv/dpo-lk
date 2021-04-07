@@ -19,7 +19,8 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import PeopleIcon from '@material-ui/icons/People'
 import moodleIcon from '../../img/moodle.png'
 import cmeIcon from '../../img/CME.png'
-import * as moment from 'moment'
+import { ICourse, ICourseRoots, ISelectedCourse, ICourseFC } from '../../types'
+import moment from 'moment'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,7 +40,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const Course = ({
+interface IProps {
+  roots: ICourseRoots
+  course: ICourse
+  onWindowOpen: ICourseFC
+  onAddWindowOpen: ICourseFC
+  onSubmitRequest: ICourseFC
+  onCancelRequest: ICourseFC
+  currentUserID: number
+}
+
+const Course: React.FC<IProps> = ({
   roots,
   course,
   onWindowOpen,
@@ -47,27 +58,27 @@ const Course = ({
   onSubmitRequest,
   onCancelRequest,
   currentUserID,
-}) => {
+}): JSX.Element => {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const isListener = sessionStorage.pagesType === 'listener'
-  let currentCourse = { ID: course.ID, Name: course.Name }
-  const rootsGroup = parseInt(roots.group)
+  let currentCourse: ISelectedCourse = { ID: course.ID, Name: course.Name }
+  const rootsGroup = roots.group
 
   const currentUserRequests = course.users.filter(
-    (user) => parseInt(user.id) === parseInt(currentUserID)
+    (user) => user.id.toString() === currentUserID.toString()
   )
 
   const isRequestDateExpired =
     moment().format('YYYY-MM-DD') <=
     moment(course.RequestDate).format('YYYY-MM-DD')
 
-  const haveRoots = (course) => {
+  const haveRoots = (course: ICourse) => {
     if (!rootsGroup) return false
 
     return (
-      [1, 2].includes(rootsGroup) ||
-      (rootsGroup === 3 && course.DepartmentGUID === roots.cathedra)
+      ["1", "2"].includes(rootsGroup.toString()) ||
+      (rootsGroup.toString() === "3" && course.DepartmentGUID === roots.cathedra)
     )
   }
 
@@ -105,7 +116,7 @@ const Course = ({
               </a>
             </Tooltip>
           )}
-          {parseInt(course.IsCME) === 1 && (
+          {course.IsCME === 1 && (
             <Tooltip title="Непрерывное медицинское образование">
               <img className={classes.imageIcon} src={cmeIcon} alt="cmeIcon" />
             </Tooltip>
@@ -125,7 +136,7 @@ const Course = ({
         </TableCell>
         <TableCell align="center">{course.Volume}</TableCell>
         <TableCell align="center">
-          {parseInt(course.Price) !== 0 ? course.Price : 'Бюджет'}
+          {course.Price !== 0 ? course.Price : 'Бюджет'}
         </TableCell>
         <TableCell align="center">
           {isRequestDateExpired ? (
@@ -178,7 +189,7 @@ const Course = ({
                 )}
                 <Grid item>
                   <IconButton onClick={() => onAddWindowOpen(currentCourse)}>
-                    <AddIcon size="large" />
+                    <AddIcon fontSize="large" />
                   </IconButton>
                 </Grid>
               </Grid>
@@ -244,7 +255,7 @@ const Course = ({
                   <TableRow>
                     <TableCell align="right">Стоимость обучения</TableCell>
                     <TableCell align="left">
-                      {parseInt(course.Price) !== 0
+                      {course.Price !== 0
                         ? course.Price
                         : 'за счёт средств бюджета'}
                     </TableCell>

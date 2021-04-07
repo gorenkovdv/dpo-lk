@@ -2,7 +2,7 @@ import { profileAPI, documentAPI } from '../../services/api'
 import { actions as snackbarActions } from './snackbar'
 import { actions as loaderActions } from './loader'
 import { BaseThunkType, InferActionsType } from './index'
-import { IDocument } from '../../types'
+import { IDocument, IEducationType, IAddress } from '../../types'
 
 interface IPage {
   currentDocument: number,
@@ -16,17 +16,6 @@ interface IEducationPage {
   levels: Array<Array<IDocument>>
 }
 
-interface IAddress {
-  postcode: string
-  country: string
-  region: string
-  locality: string
-  localityType: number
-  street: string
-  house: string
-  room?: string
-}
-
 interface IWork extends IAddress {
   listenerPosition: string
   accessionDate: string
@@ -34,7 +23,7 @@ interface IWork extends IAddress {
   workPhone: string
   fileURL: string | null
   newFile?: string | null
-  positionTypes: Array<string>
+  positionTypes: string[]
 }
 
 interface IStateList {
@@ -44,6 +33,7 @@ interface IStateList {
   work: IWork
   education: IEducationPage
   sertificates: IPage
+  educationTypes: IEducationType[],
   others: IPage
 }
 
@@ -126,6 +116,7 @@ const initialState: IState = {
       currentDocument: 0,
       documents: []
     },
+    educationTypes: []
   },
   selectedTab: 0,
   documentsTab: 0,
@@ -133,22 +124,22 @@ const initialState: IState = {
 
 export function listenerDataReducer(state = initialState, action: listenerDataActionsTypes): IState {
   switch (action.type) {
-    case 'LISTENER_DATA_LOAD_SUCCESS':
+    case 'dpo-lk/listener/LOAD_SUCCESS':
       return {
         ...state,
         list: action.payload,
       }
-    case 'LISTENER_DATA_SET_SELECTED_TAB':
+    case 'dpo-lk/listener/SET_SELECTED_TAB':
       return {
         ...state,
         selectedTab: action.payload,
       }
-    case 'LISTENER_DATA_SET_DOCUMENTS_TAB':
+    case 'dpo-lk/listener/SET_DOCUMENTS_TAB':
       return {
         ...state,
         documentsTab: action.payload,
       }
-    case 'LISTENER_DATA_SET_REG_ADDRESS':
+    case 'dpo-lk/listener/SET_REG_ADDRESS':
       return {
         ...state,
         list: {
@@ -156,7 +147,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           registration: action.payload,
         },
       }
-    case 'LISTENER_DATA_SET_FACT_ADDRESS':
+    case 'dpo-lk/listener/SET_FACT_ADDRESS':
       return {
         ...state,
         list: {
@@ -164,7 +155,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           fact: action.payload,
         },
       }
-    case 'LISTENER_DATA_SET_PASSPORT_DATA':
+    case 'dpo-lk/listener/SET_PASSPORT_DATA':
       return {
         ...state,
         list: {
@@ -172,7 +163,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           passport: action.payload,
         },
       }
-    case 'LISTENER_DATA_SET_WORK_DATA':
+    case 'dpo-lk/listener/SET_WORK_DATA':
       return {
         ...state,
         list: {
@@ -183,7 +174,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_SET_EDUCATION_DATA':
+    case 'dpo-lk/listener/SET_EDUCATION_DATA':
       return {
         ...state,
         list: {
@@ -203,7 +194,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_SET_SERTIFICATES_DATA':
+    case 'dpo-lk/listener/SET_SERTIFICATES_DATA':
       return {
         ...state,
         list: {
@@ -220,7 +211,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_SET_OTHERS_DATA':
+    case 'dpo-lk/listener/SET_OTHERS_DATA':
       return {
         ...state,
         list: {
@@ -237,7 +228,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_WORK_FILE_DELETED':
+    case 'dpo-lk/listener/WORK_FILE_DELETED':
       return {
         ...state,
         list: {
@@ -249,7 +240,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_CHANGE_EDUCATION_LEVEL':
+    case 'dpo-lk/listener/CHANGE_EDUCATION_LEVEL':
       return {
         ...state,
         list: {
@@ -261,7 +252,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_CHANGE_EDUCATION_DOCUMENT':
+    case 'dpo-lk/listener/CHANGE_EDUCATION_DOCUMENT':
       return {
         ...state,
         list: {
@@ -272,7 +263,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_CHANGE_SERTIFICATES_DOCUMENT':
+    case 'dpo-lk/listener/CHANGE_SERTIFICATES_DOCUMENT':
       return {
         ...state,
         list: {
@@ -283,7 +274,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_CHANGE_OTHERS_DOCUMENT':
+    case 'dpo-lk/listener/CHANGE_OTHERS_DOCUMENT':
       return {
         ...state,
         list: {
@@ -294,7 +285,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_CREATE_NEW_EDUCATION_DOCUMENT':
+    case 'dpo-lk/listener/CREATE_NEW_EDUCATION_DOCUMENT':
       return {
         ...state,
         list: {
@@ -312,7 +303,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_CREATE_NEW_SERTIFICATE':
+    case 'dpo-lk/listener/CREATE_NEW_SERTIFICATE':
       return {
         ...state,
         list: {
@@ -328,7 +319,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_CREATE_NEW_OTHERS_DOCUMENT':
+    case 'dpo-lk/listener/CREATE_NEW_OTHERS_DOCUMENT':
       return {
         ...state,
         list: {
@@ -344,7 +335,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_DROP_NEW_EDUCATION_DOCUMENT':
+    case 'dpo-lk/listener/DROP_NEW_EDUCATION_DOCUMENT':
       return {
         ...state,
         list: {
@@ -357,7 +348,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_DROP_NEW_SERTIFICATE':
+    case 'dpo-lk/listener/DROP_NEW_SERTIFICATE':
       return {
         ...state,
         list: {
@@ -371,7 +362,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_DROP_NEW_OTHERS_DOCUMENT':
+    case 'dpo-lk/listener/DROP_NEW_OTHERS_DOCUMENT':
       return {
         ...state,
         list: {
@@ -385,7 +376,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_EDUCATION_FILE_DELETED':
+    case 'dpo-lk/listener/EDUCATION_FILE_DELETED':
       return {
         ...state,
         list: {
@@ -402,7 +393,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_SERTIFICATE_FILE_DELETED':
+    case 'dpo-lk/listener/SERTIFICATE_FILE_DELETED':
       return {
         ...state,
         list: {
@@ -417,7 +408,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_OTHERS_FILE_DELETED':
+    case 'dpo-lk/listener/OTHERS_FILE_DELETED':
       return {
         ...state,
         list: {
@@ -432,7 +423,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_EDUCATION_DOCUMENT_DELETED':
+    case 'dpo-lk/listener/EDUCATION_DOCUMENT_DELETED':
       return {
         ...state,
         list: {
@@ -446,7 +437,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_SERTIFICATES_DOCUMENT_DELETED':
+    case 'dpo-lk/listener/SERTIFICATES_DOCUMENT_DELETED':
       return {
         ...state,
         list: {
@@ -460,7 +451,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
           },
         },
       }
-    case 'LISTENER_DATA_OTHERS_DOCUMENT_DELETED':
+    case 'dpo-lk/listener/OTHERS_DOCUMENT_DELETED':
       return {
         ...state,
         list: {
@@ -600,109 +591,109 @@ export const fileDeleteAction = (documentId: number, type: number): SyncThunkTyp
 
 const actions = {
   regDataUpdated: (data: IAddress) => ({
-    type: 'LISTENER_DATA_SET_REG_ADDRESS',
+    type: 'dpo-lk/listener/SET_REG_ADDRESS',
     payload: data
   } as const),
   factDataUpdated: (data: IAddress) => ({
-    type: 'LISTENER_DATA_SET_FACT_ADDRESS',
+    type: 'dpo-lk/listener/SET_FACT_ADDRESS',
     payload: data
   } as const),
   passportDataUpdated: (data: IPassport) => ({
-    type: 'LISTENER_DATA_SET_PASSPORT_DATA',
+    type: 'dpo-lk/listener/SET_PASSPORT_DATA',
     payload: data
   } as const),
   workDataUpdated: (data: IWork) => ({
-    type: 'LISTENER_DATA_SET_WORK_DATA',
+    type: 'dpo-lk/listener/SET_WORK_DATA',
     payload: data
   } as const),
   educationDataUpdated: (data: IDocument) => ({
-    type: 'LISTENER_DATA_SET_EDUCATION_DATA',
+    type: 'dpo-lk/listener/SET_EDUCATION_DATA',
     payload: data
   } as const),
   sertificatesDataUpdated: (data: IDocument) => ({
-    type: 'LISTENER_DATA_SET_SERTIFICATES_DATA',
+    type: 'dpo-lk/listener/SET_SERTIFICATES_DATA',
     payload: data
   } as const),
   otherDataUpdated: (data: IDocument) => ({
-    type: 'LISTENER_DATA_SET_OTHERS_DATA',
+    type: 'dpo-lk/listener/SET_OTHERS_DATA',
     payload: data
   } as const),
   createNewEducationDocument: (document: IDocument) => ({
-    type: 'LISTENER_DATA_CREATE_NEW_EDUCATION_DOCUMENT',
+    type: 'dpo-lk/listener/CREATE_NEW_EDUCATION_DOCUMENT',
     payload: document
   } as const),
   createNewSertificate: (document: IDocument) => ({
-    type: 'LISTENER_DATA_CREATE_NEW_SERTIFICATE',
+    type: 'dpo-lk/listener/CREATE_NEW_SERTIFICATE',
     payload: document
   } as const),
   createNewOtherDocument: (document: IDocument) => ({
-    type: 'LISTENER_DATA_CREATE_NEW_OTHERS_DOCUMENT',
+    type: 'dpo-lk/listener/CREATE_NEW_OTHERS_DOCUMENT',
     payload: document
   } as const),
   selectEducationDocument: (index: number) => ({
-    type: 'LISTENER_DATA_CHANGE_EDUCATION_DOCUMENT',
+    type: 'dpo-lk/listener/CHANGE_EDUCATION_DOCUMENT',
     payload: index
   } as const),
   selectSertificate: (index: number) => ({
-    type: 'LISTENER_DATA_CHANGE_SERTIFICATES_DOCUMENT',
+    type: 'dpo-lk/listener/CHANGE_SERTIFICATES_DOCUMENT',
     payload: index
   } as const),
   selectOtherDocument: (index: number) => ({
-    type: 'LISTENER_DATA_CHANGE_OTHERS_DOCUMENT',
+    type: 'dpo-lk/listener/CHANGE_OTHERS_DOCUMENT',
     payload: index
   } as const),
   educationDocumentDeleted: (documentId: number) => ({
-    type: 'LISTENER_DATA_EDUCATION_DOCUMENT_DELETED',
+    type: 'dpo-lk/listener/EDUCATION_DOCUMENT_DELETED',
     payload: documentId
   } as const),
   sertificateDocumentDeleted: (documentId: number) => ({
-    type: 'LISTENER_DATA_SERTIFICATES_DOCUMENT_DELETED',
+    type: 'dpo-lk/listener/SERTIFICATES_DOCUMENT_DELETED',
     payload: documentId
   } as const),
   otherDocumentDeleted: (documentId: number) => ({
-    type: 'LISTENER_DATA_OTHERS_DOCUMENT_DELETED',
+    type: 'dpo-lk/listener/OTHERS_DOCUMENT_DELETED',
     payload: documentId
   } as const),
   educationFileDeleted: (documentId: number) => ({
-    type: 'LISTENER_DATA_EDUCATION_FILE_DELETED',
+    type: 'dpo-lk/listener/EDUCATION_FILE_DELETED',
     payload: documentId
   } as const),
   sertificateFileDeleted: (documentId: number) => ({
-    type: 'LISTENER_DATA_SERTIFICATE_FILE_DELETED',
+    type: 'dpo-lk/listener/SERTIFICATE_FILE_DELETED',
     payload: documentId
   } as const),
   otherFileDeleted: (documentId: number) => ({
-    type: 'LISTENER_DATA_OTHERS_FILE_DELETED',
+    type: 'dpo-lk/listener/OTHERS_FILE_DELETED',
     payload: documentId
   } as const),
   dropNewOtherDocument: (redirectIndex: number) => ({
-    type: 'LISTENER_DATA_DROP_NEW_OTHERS_DOCUMENT',
+    type: 'dpo-lk/listener/DROP_NEW_OTHERS_DOCUMENT',
     payload: redirectIndex,
   } as const),
   dropNewSertificate: (redirectIndex: number) => ({
-    type: 'LISTENER_DATA_DROP_NEW_SERTIFICATE',
+    type: 'dpo-lk/listener/DROP_NEW_SERTIFICATE',
     payload: redirectIndex
   } as const),
   selectEducationLevel: (level: number) => ({
-    type: 'LISTENER_DATA_CHANGE_EDUCATION_LEVEL',
+    type: 'dpo-lk/listener/CHANGE_EDUCATION_LEVEL',
     payload: level
   } as const),
   dropNewEducationDocument: () => ({
-    type: 'LISTENER_DATA_DROP_NEW_EDUCATION_DOCUMENT'
+    type: 'dpo-lk/listener/DROP_NEW_EDUCATION_DOCUMENT'
   } as const),
   workFileDeleted: () => ({
-    type: 'LISTENER_DATA_WORK_FILE_DELETED'
+    type: 'dpo-lk/listener/WORK_FILE_DELETED'
   } as const),
   listenerDataLoadingSuccess: (data: IStateList) => ({
-    type: 'LISTENER_DATA_LOAD_SUCCESS',
+    type: 'dpo-lk/listener/LOAD_SUCCESS',
     payload: data
   } as const),
   setSelectedTab: (value: number) => ({
-    type: 'LISTENER_DATA_SET_SELECTED_TAB',
+    type: 'dpo-lk/listener/SET_SELECTED_TAB',
     payload: value
   } as const),
   setDocumentsTab: (value: number) => ({
-    type: 'LISTENER_DATA_SET_DOCUMENTS_TAB',
+    type: 'dpo-lk/listener/SET_DOCUMENTS_TAB',
     payload: value
   } as const),
   ...loaderActions,

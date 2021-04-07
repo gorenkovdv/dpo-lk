@@ -3,7 +3,7 @@ import { InferActionsType } from './index'
 interface IStateParams {
   title: string,
   text: string,
-  onApprove?: () => (params: any) => void
+  onApprove?: () => void
 }
 
 interface IState extends IStateParams {
@@ -22,13 +22,13 @@ type confirmDialogActionsTypes = InferActionsType<typeof actions>
 
 export const confirmDialogReducer = (state = initialState, action: confirmDialogActionsTypes): IState => {
   switch (action.type) {
-    case 'CONFIRM_DIALOG_SHOW':
+    case 'dpo-lk/confirmDialog/SHOW':
       return {
         open: true,
         disabled: false,
         ...action.payload,
       }
-    case 'CONFIRM_DIALOG_CLOSE':
+    case 'dpo-lk/confirmDialog/CLOSE':
       return {
         ...state,
         open: false,
@@ -41,9 +41,9 @@ export const confirmDialogReducer = (state = initialState, action: confirmDialog
 
 export const actions = {
   confirmDialogShow: (params: IStateParams) => ({
-    type: 'CONFIRM_DIALOG_SHOW', payload: params
+    type: 'dpo-lk/confirmDialog/SHOW', payload: params
   } as const),
   confirmDialogClose: () => ({
-    type: 'CONFIRM_DIALOG_CLOSE'
+    type: 'dpo-lk/confirmDialog/CLOSE'
   } as const)
 }

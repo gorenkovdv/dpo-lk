@@ -1,5 +1,5 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 import {
   Typography,
@@ -27,11 +27,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
-  /*toolbar: {
-    position: 'fixed',
-    width: DRAWER_WIDTH,
-    zIndex: 100,
-  },*/
   drawer: {
     [theme.breakpoints.up('md')]: {
       width: DRAWER_WIDTH,
@@ -60,10 +55,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const DrawerLayout = (props) => {
+interface IProps {
+  container: any
+  pagesType: string
+  username: string
+  mobileOpen: boolean
+  onDrawerToggle: () => void
+}
+
+const DrawerLayout: React.FC<IProps & RouteComponentProps> = (props) => {
   const classes = useStyles()
   const theme = useTheme()
-  const pagesType = props.pagesType
 
   const items = [
     {
@@ -135,7 +137,7 @@ const DrawerLayout = (props) => {
 
   const drawer = (
     <div>
-      <div className={classes.toolbar}>
+      <div>
         <LogoLayout />
       </div>
       <Divider />
@@ -147,7 +149,7 @@ const DrawerLayout = (props) => {
         {items.map((item, index) => {
           if (item !== null) {
             return (
-              (item.for === pagesType || item.for === 'both') && (
+              (item.for === props.pagesType || item.for === 'both') && (
                 <ListItem
                   button
                   key={item.key}

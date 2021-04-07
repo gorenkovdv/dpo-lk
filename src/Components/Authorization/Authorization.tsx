@@ -3,14 +3,14 @@ import { NavLink, Redirect } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { Field, reduxForm, InjectedFormProps } from 'redux-form'
 import { Grid, Button, InputAdornment } from '@material-ui/core'
-import { makeStyles, Theme } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 import { Input, PasswordInput } from '../Commons/FormsControls/FormsControls'
 import { VpnKey as KeyIcon, Person as PersonIcon } from '@material-ui/icons'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import { authAPI } from '../../services/api'
 import { login } from '../../store/reducers/auth'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme) => ({
   h3: {
     textAlign: 'center',
     fontWeight: 500,
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-interface IAuthData {
+interface IValues {
   username: string,
   password: string
 }
@@ -64,7 +64,7 @@ const Authorization: React.FC = (): JSX.Element => {
     }
   })
 
-  const handleSubmit = (values: IAuthData) => {
+  const handleSubmit = (values: IValues) => {
     dispatch(
       login(values.username, values.password || '')
     )
@@ -85,7 +85,7 @@ const Authorization: React.FC = (): JSX.Element => {
   )
 }
 
-const AuthForm: React.FC<InjectedFormProps<IAuthData>> = ({ handleSubmit }) => {
+const AuthForm: React.FC<InjectedFormProps<IValues>> = ({ handleSubmit }) => {
   const classes = useStyles()
 
   const [showPassword, setShowPassword] = React.useState(false)
@@ -103,7 +103,7 @@ const AuthForm: React.FC<InjectedFormProps<IAuthData>> = ({ handleSubmit }) => {
           margin="normal"
           label="Логин"
           endadornment={
-            <InputAdornment position="start">
+            <InputAdornment position="end">
               <PersonIcon className={classes.inputEndIcon} />
             </InputAdornment>}
         />
@@ -136,6 +136,6 @@ const AuthForm: React.FC<InjectedFormProps<IAuthData>> = ({ handleSubmit }) => {
   )
 }
 
-const AuthReduxForm = reduxForm<IAuthData>({ form: 'authForm' })(AuthForm)
+const AuthReduxForm = reduxForm<IValues>({ form: 'authForm' })(AuthForm)
 
 export default Authorization

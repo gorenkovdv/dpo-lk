@@ -12,12 +12,12 @@ type loaderActionsTypes = InferActionsType<typeof actions>
 
 export const loaderReducer = (state = initialState, action: loaderActionsTypes): IState => {
   switch (action.type) {
-    case 'LOADER_REQUEST_LOADING':
+    case 'dpo-lk/loader/REQUEST_LOADING':
       return {
         ...state,
         isLoading: true,
       }
-    case 'LOADER_LOADING_SUCCESS':
+    case 'dpo-lk/loader/LOADING_SUCCESS':
       return {
         ...state,
         isLoading: false,
@@ -29,9 +29,9 @@ export const loaderReducer = (state = initialState, action: loaderActionsTypes):
 
 export const actions = {
   setLoading: () => ({
-    type: 'LOADER_REQUEST_LOADING'
+    type: 'dpo-lk/loader/REQUEST_LOADING'
   } as const),
   loadingSuccess: () => ({
-    type: 'LOADER_LOADING_SUCCESS'
+    type: 'dpo-lk/loader/LOADING_SUCCESS'
   } as const),
 }

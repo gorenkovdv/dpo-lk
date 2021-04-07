@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import { NavLink, withRouter } from 'react-router-dom'
+import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import {
   Grid,
   Button,
@@ -11,15 +11,55 @@ import { PasswordInput } from '../Commons/FormsControls/FormsControls'
 import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import { actions as authActions, checkParams, changePassword } from '../../store/reducers/auth'
-import styles from '../../styles'
+import { getChangePasswordParams } from '../../store/selectors/auth'
+import { getIsLoading } from '../../store/selectors/loader'
 
-const useStyles = makeStyles(theme => ({ ...styles(theme) }))
+const useStyles = makeStyles(theme => ({
+  h3: {
+    textAlign: 'center',
+    fontWeight: 500,
+    marginTop: 15,
+    marginBottom: 15,
+    fontSize: 26,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: 20,
+    },
+  },
+  link: {
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    },
+  },
+  button: {
+    marginTop: 20,
+    width: '100%',
+  },
+  form: {
+    boxSizing: 'border-box',
+    padding: theme.spacing(1),
+    width: 400,
+    maxWidth: '100%',
+  },
+  error: {
+    color: theme.palette.error.main
+  }
+}))
 
-const ChangePassword = props => {
+interface RouteParams {
+  id: string,
+  key: string
+}
+
+const ChangePassword: React.FC<RouteComponentProps<RouteParams>> = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const params = useSelector(state => state.auth.changePassword)
-  const isLoading = useSelector(state => state.loader.isLoading)
+  const params = useSelector(getChangePasswordParams)
+  const isLoading = useSelector(getIsLoading)
 
   useEffect(() => {
     dispatch(authActions.clearPasswordParams())
@@ -30,7 +70,7 @@ const ChangePassword = props => {
     dispatch(checkParams(matchParams.id, matchParams.key, 'changePassword'))
   }, [dispatch, props])
 
-  const handleSubmit = values => {
+  const handleSubmit = (values: IValues) => {
     dispatch(changePassword(
       props.match.params.id,
       props.match.params.key,
@@ -62,7 +102,7 @@ const ChangePassword = props => {
             alignItems="center"
           >
             {params.showForm
-              ? <ChangePasswordForm buttonText={buttonText} onSubmit={handleSubmit} />
+              ? <ChangePasswordReduxForm buttonText={buttonText} onSubmit={handleSubmit} />
               : <p className={classes.error}>Неверные параметры смены пароля</p>
             }
           </Grid>
@@ -75,9 +115,17 @@ const ChangePassword = props => {
   )
 }
 
-let ChangePasswordForm = props => {
+interface IValues {
+  password: string
+  repeatPassword: string
+}
+
+interface IProps {
+  buttonText: string
+}
+
+const ChangePasswordForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = ({ handleSubmit, buttonText }) => {
   const classes = useStyles()
-  const buttonText = props.buttonText
   const [showPassword, setShowPassword] = React.useState(false)
 
   const handleShowPassword = () => {
@@ -87,7 +135,7 @@ let ChangePasswordForm = props => {
   return (
     <form
       className={classes.form}
-      onSubmit={props.handleSubmit}
+      onSubmit={handleSubmit}
     >
       <Grid
         container
@@ -122,6 +170,8 @@ let ChangePasswordForm = props => {
   )
 }
 
-ChangePasswordForm = reduxForm({ form: 'changePasswordForm' })(ChangePasswordForm)
+const ChangePasswordReduxForm = reduxForm<IValues, IProps>({
+  form: 'changePasswordForm'
+})(ChangePasswordForm)
 
 export default withRouter(ChangePassword)

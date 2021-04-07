@@ -31,25 +31,106 @@ export interface ICourseBasic {
     Territory: string
 }
 
+export interface ICourseUser {
+    id: number
+    requestID: number
+    rowID: number
+    fullname: string
+    cathedraAllow?: number
+    instituteAllow?: number
+    comment: string
+    lastUpdate: string | null
+    requestCME: string | null
+    checks: {
+        cathedra: ICourseUserCheck,
+        institute: ICourseUserCheck
+    }
+}
+
+export interface ICourse extends ICourseBasic {
+    StartDateTooltip: string
+    BeginDateMonth: string
+    users: Array<ICourseUser>
+}
+
+export interface ICourseUserCheck {
+    comment: string
+    date: string | null
+    label: string
+    person: string | undefined
+}
+
+export interface ICourseFilters {
+    searchString: string
+    searchUser: number | null
+    enrolPossible: boolean
+    CME: boolean
+    traditional: boolean
+    budgetaryOnly: boolean
+    nonBudgetaryOnly: boolean
+    retraining: boolean
+    skillsDevelopment: boolean
+    forDoctors: boolean
+    forNursingStaff: boolean
+    currentVolume: number
+    startDate: string
+    endDate: string
+    minStartDate: string
+    maxEndDate: string
+}
+
+export interface IAddress {
+    postcode: string
+    country: string
+    region: string
+    locality: string
+    localityType: number
+    street: string
+    house: string
+    room?: string
+}
+
+export interface ISelectedCourse {
+    ID: number
+    Name: string
+}
+
+export type ICourseFC = (course: ISelectedCourse) => void
+
+export interface ICourseRoots {
+    group: number | null
+    cathedra?: string | null
+}
+
+export interface IEducationType {
+    id: number
+    level: number
+    name: string
+    firstDateName: string
+    secondDateName: string
+    documentName: string
+}
+
 export interface IDocument {
     id: number
     level?: number
     type?: number
     name: string
     organization: string
-    hours: string
+    hours?: string | null
     comment: string
-    documentCheck: number
+    documentCheck?: number
     documentName?: string
     fileURL: string | null
-    fullName: string | null
-    firstDate: string
+    fullName?: string | null
+    firstDate: string | null
     firstDateName: string
     secondDate: string | null
     secondDateName: string | null
     serial: string
     speciality: string
     isDocumentNew?: boolean
+    newFile?: string | null
 }
 
 export interface IProfile {

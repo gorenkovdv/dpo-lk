@@ -1,9 +1,9 @@
 import React from 'react'
-import { makeStyles, Theme } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 import { Grid, Typography } from '@material-ui/core'
 import logo from '../../../img/agmu-logo.png'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme) => ({
     image: {
         marginBottom: theme.spacing(1),
         marginTop: theme.spacing(1),
@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }))
 
-const HeaderLayout: React.FC = (): JSX.Element => {
+const HeaderLayout: React.FC = () => {
     const classes = useStyles()
     return (
         <div>

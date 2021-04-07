@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const MainLayout = (Component) => (props) => {
+const MainLayout = (Component: React.ComponentType<any>): React.FC<any> => (props) => {
   const { container } = props
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -57,7 +57,7 @@ const MainLayout = (Component) => (props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <div className={classes.root}>
+      <div>
         <CssBaseline />
         <AppBarLayout
           pagesType={pagesType}

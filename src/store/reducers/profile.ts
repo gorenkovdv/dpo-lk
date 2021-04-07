@@ -34,7 +34,7 @@ type ThunkType = BaseThunkType<profileActionsTypes>
 
 export const profileReducer = (state = initialState, action: profileActionsTypes): IState => {
   switch (action.type) {
-    case 'PROFILE_INFO_UPDATE_SUCCESS':
+    case `dpo-lk/profile/UPDATE_SUCCESS`:
       return {
         ...state,
         list: action.payload,
@@ -67,7 +67,7 @@ export const updateProfile = (data: IProfileStateList): ThunkType => {
 
 export const actions = {
   updatingSuccess: (data: IProfileStateList) => ({
-    type: 'PROFILE_INFO_UPDATE_SUCCESS',
+    type: `dpo-lk/profile/UPDATE_SUCCESS`,
     payload: data
   } as const),
   ...loaderActions,

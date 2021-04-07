@@ -19,10 +19,9 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import { SAVE_FILES_DIRECTORY } from '../../store/const'
 import { userAPI } from '../../services/api'
-import styles from '../../styles'
+import { IDocument } from '../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
   typography: {
     padding: theme.spacing(2, 0),
   },
@@ -32,9 +31,24 @@ const useStyles = makeStyles((theme) => ({
   startIcon: {
     marginRight: theme.spacing(1),
   },
+  link: {
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    },
+  },
 }))
 
-const ListenerInfoDocument = ({ document, index }) => {
+interface IProps {
+  document: IDocument,
+  index: number
+}
+
+const ListenerInfoDocument: React.FC<IProps> = ({ document, index }) => {
   const classes = useStyles()
   const [documentInfoOpen, setDocumentInfoOpen] = React.useState(false)
   const username = userAPI.getUserName().toLowerCase()
@@ -90,7 +104,7 @@ const ListenerInfoDocument = ({ document, index }) => {
           <TableContainer component={Paper}>
             <Table size="small">
               <TableBody>
-                {parseInt(document.type) !== 6 ? (
+                {document.type?.toString() !== "6" ? (
                   <>
                     <TableRow>
                       <TableCell style={{ width: '30%' }} align="right">

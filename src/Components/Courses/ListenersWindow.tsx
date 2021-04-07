@@ -22,33 +22,41 @@ import DialogLayout from '../Commons/Dialog/DialogLayout'
 import ListenerInfoWindow from './ListenerInfoWindow'
 import { removeRequestUser } from '../../store/reducers/courses'
 import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
-import styles from '../../styles'
+import { getCoursesList, getSelectedCourse } from '../../store/selectors/courses'
+import { ICourseUser } from '../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
   modalTableContainer: {
     maxHeight: 550,
   },
   checkGrid: {
     margin: theme.spacing(3, 0),
   },
+  table: {
+    minWidth: 650,
+    borderCollapse: 'collapse',
+  },
 }))
 
-const ListenerWindowContent = ({ options, onClose }) => {
+interface IProps {
+  options: { open: boolean }
+  onClose: () => void
+}
+
+const ListenerWindowContent: React.FC<IProps> = ({ options, onClose }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const [listenerInfoWindowOpen, setListenerInfoWindowOpen] = React.useState(
     false
   )
-  const [selectedListener, setSelectedListener] = React.useState(null)
+  const [selectedListener, setSelectedListener] = React.useState(null as ICourseUser | null)
 
-  const course = useSelector((state) =>
-    state.courses.list.find(
-      (item) => item.ID === state.courses.selectedCourse.ID
-    )
-  )
+  const selectedCourse = useSelector(getSelectedCourse)
+  const course = useSelector(getCoursesList).filter(
+    (item) => item.ID.toString() === selectedCourse?.ID.toString()
+  )[0]
 
-  const openListenerInfoWindow = (user) => {
+  const openListenerInfoWindow = (user: ICourseUser) => {
     setSelectedListener(user)
     setListenerInfoWindowOpen(true)
   }
@@ -58,7 +66,7 @@ const ListenerWindowContent = ({ options, onClose }) => {
   }
 
   //onDialogOpen
-  const removeRequestDialogOpen = (user) => {
+  const removeRequestDialogOpen = (user: ICourseUser) => {
     dispatch(
       confirmDialogActions.confirmDialogShow({
         title: `Удалить заявку`,
@@ -73,7 +81,7 @@ const ListenerWindowContent = ({ options, onClose }) => {
     dispatch(confirmDialogActions.confirmDialogClose())
   }
 
-  const removeUser = (user) => {
+  const removeUser = (user: ICourseUser) => {
     dispatch(removeRequestUser(course.ID, user.rowID))
     removeRequestDialogClose()
   }
@@ -108,7 +116,7 @@ const ListenerWindowContent = ({ options, onClose }) => {
                       <Grid container direction="column">
                         <Typography>{user.fullname}</Typography>
                         <small style={{ color: 'blue', fontWeight: 'bold' }}>
-                          {user.username}
+                          {/*user.username*/}
                         </small>
                         {user.lastUpdate && (
                           <small>Последнее изменение: {user.lastUpdate}</small>

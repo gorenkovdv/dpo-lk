@@ -17,7 +17,8 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import PeopleIcon from '@material-ui/icons/People'
 import moodleIcon from '../../img/moodle.png'
 import cmeIcon from '../../img/CME.png'
-import * as moment from 'moment'
+import { ICourse, ICourseFC, ICourseRoots } from '../../types'
+import moment from 'moment'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,7 +44,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const CourseMobile = ({
+interface IProps {
+  roots: ICourseRoots
+  course: ICourse
+  onWindowOpen: ICourseFC
+  onAddWindowOpen: ICourseFC
+  onSubmitRequest: ICourseFC
+  onCancelRequest: ICourseFC
+  currentUserID: number
+}
+
+const CourseMobile: React.FC<IProps> = ({
   roots,
   course,
   onWindowOpen,
@@ -56,17 +67,17 @@ const CourseMobile = ({
   const [open, setOpen] = React.useState(false)
   const isListener = sessionStorage.pagesType === 'listener'
   let currentCourse = { ID: course.ID, Name: course.Name }
-  const rootsGroup = parseInt(roots.group)
+  const rootsGroup = roots.group
 
   const currentUserRequests = course.users.filter(
-    (user) => parseInt(user.id) === parseInt(currentUserID)
+    (user) => user.id === currentUserID
   )
 
   const isRequestDateExpired =
     moment().format('YYYY-MM-DD') <=
     moment(course.RequestDate).format('YYYY-MM-DD')
 
-  const haveRoots = (course) => {
+  const haveRoots = (course: ICourse) => {
     if (!rootsGroup) return false
 
     return (
@@ -128,7 +139,7 @@ const CourseMobile = ({
                     </Tooltip>
                   </Grid>
                 )}
-                {parseInt(course.IsCME) === 1 && (
+                {course.IsCME === 1 && (
                   <Grid className={classes.imageContainer} item>
                     <Tooltip title="Непрерывное медицинское образование">
                       <img
@@ -167,7 +178,7 @@ const CourseMobile = ({
               <Typography>Специальность: {course.Speciality}</Typography>
 
               <Typography>
-                {parseInt(course.Price) !== 0
+                {course.Price !== 0
                   ? 'Стоимость на 1 чел. (руб): ' + course.Price
                   : 'Бюджет'}
               </Typography>

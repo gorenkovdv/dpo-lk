@@ -1,5 +1,5 @@
 import React from 'react'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Grid,
@@ -26,32 +26,49 @@ import {
   streetTooltip,
 } from '../../Commons/Tooltips/AddressTooltips'
 import { requestListenerData, updateData } from '../../../store/reducers/listenerData'
-import styles from '../../../styles'
+import { getFactAddress, getRegAddress, getSelectedTab } from '../../../store/selectors/listener'
+import { getIsLoading } from '../../../store/selectors/loader'
+import { IAddress } from '../../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
-  button: { ...styles(theme).documentButton },
+  button: {
+    marginTop: 20,
+    width: '100%',
+    maxWidth: 250,
+    [theme.breakpoints.down('xs')]: {
+      maxWidth: '100%',
+    },
+  },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
+  iconTitle: {
+    marginLeft: theme.spacing(1.25),
+  },
 }))
 
-const FactAddress = () => {
+const FactAddress: React.FC = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const data = useSelector((state) => state.listenerData)
+  const factAddress = useSelector(getFactAddress)
+  const regAddress = useSelector(getRegAddress)
+  const selectedTab = useSelector(getSelectedTab)
+  const isLoading = useSelector(getIsLoading)
   const [isAddressesEqual, setAddressesEqual] = React.useState(false)
 
   React.useEffect(() => {
-    dispatch(requestListenerData(data.selectedTab))
-  }, [dispatch, data.selectedTab])
+    dispatch(requestListenerData(selectedTab))
+  }, [dispatch, selectedTab])
 
-  const handleSwitch = (checked) => {
+  const handleSwitch = (checked: boolean) => {
     setAddressesEqual(checked)
   }
 
-  const handleSubmit = (values) => {
-    dispatch(updateData(values, data.selectedTab))
+  const handleSubmit = (values: IAddress) => {
+    dispatch(updateData(values, selectedTab))
   }
 
-  if (data.isLoading)
+  if (isLoading)
     return (
       <Grid container direction="row" justify="center">
         <LoaderLayout />
@@ -87,12 +104,11 @@ const FactAddress = () => {
           </IconButton>
         </HtmlTooltip>
       </Grid>
-      <FactAddressForm
+      <FactAddressReduxForm
         onSubmit={handleSubmit}
         initialValues={
-          !isAddressesEqual ? data.list.fact : data.list.registration
+          !isAddressesEqual ? factAddress : regAddress
         }
-        disableFields={!isAddressesEqual ? 0 : 1}
         isAddressesEqual={isAddressesEqual}
         handleSwitch={handleSwitch}
       />
@@ -100,12 +116,20 @@ const FactAddress = () => {
   )
 }
 
-let FactAddressForm = (props) => {
+interface IProps {
+  isAddressesEqual: boolean
+  handleSwitch: (checked: boolean) => void
+}
+
+const FactAddressForm: React.FC<InjectedFormProps<IAddress, IProps> & IProps> = ({
+  handleSubmit,
+  handleSwitch,
+  isAddressesEqual
+}) => {
   const classes = useStyles()
-  const disable = props.disableFields ? true : false
 
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Grid
         container
         direction="column"
@@ -116,8 +140,8 @@ let FactAddressForm = (props) => {
           <FormControlLabel
             control={
               <Switch
-                checked={props.isAddressesEqual}
-                onChange={(e) => props.handleSwitch(e.target.checked)}
+                checked={isAddressesEqual}
+                onChange={(e) => handleSwitch(e.target.checked)}
                 color="primary"
               />
             }
@@ -128,26 +152,30 @@ let FactAddressForm = (props) => {
           name="country"
           label="Страна"
           component={Input}
-          disabled={disable}
+          disabled={isAddressesEqual}
         />
         <Field
           name="region"
           label="Регион (область, край)"
           component={Input}
-          disabled={disable}
+          disabled={isAddressesEqual}
         />
         <Field
           name="locality"
           label="Населённый пункт"
           component={Input}
-          adornment={<InputAdornment>{localityTooltip}</InputAdornment>}
-          disabled={disable}
+          adornment={
+            <InputAdornment position="start">
+              {localityTooltip}
+            </InputAdornment>
+          }
+          disabled={isAddressesEqual}
         />
         <Field
           name="localityType"
           label="Тип населённого пункта"
           component={Select}
-          disabled={disable}
+          disabled={isAddressesEqual}
         >
           <MenuItem value="">
             <em>Не указано</em>
@@ -160,21 +188,30 @@ let FactAddressForm = (props) => {
           mask={`999999`}
           label="Почтовый индекс"
           component={MaskedInput}
-          disabled={disable}
+          disabled={isAddressesEqual}
         />
         <Field
           name="street"
           label="Улица"
           component={Input}
-          disabled={disable}
-          adornment={<InputAdornment>{streetTooltip}</InputAdornment>}
+          disabled={isAddressesEqual}
+          adornment={
+            <InputAdornment position="start">
+              {streetTooltip}
+            </InputAdornment>
+          }
         />
-        <Field name="house" label="Дом" component={Input} disabled={disable} />
+        <Field
+          name="house"
+          label="Дом"
+          component={Input}
+          disabled={isAddressesEqual}
+        />
         <Field
           name="room"
           label="Квартира"
           component={Input}
-          disabled={disable}
+          disabled={isAddressesEqual}
         />
       </Grid>
       <Button
@@ -190,7 +227,7 @@ let FactAddressForm = (props) => {
   )
 }
 
-FactAddressForm = reduxForm({
+const FactAddressReduxForm = reduxForm<IAddress, IProps>({
   form: 'factAddressForm',
   enableReinitialize: true,
 })(FactAddressForm)
