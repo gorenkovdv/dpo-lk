@@ -19,17 +19,34 @@ import RequestDocumentsWindow from './RequestDocumentsWindow'
 import RequestCMEForm from './RequestCMEForm'
 import withAuth from '../Authorization/withAuth'
 import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
-import { getRequests, setDocumentsApprove, cancelRequest as cancelRequestAction, updateCMERequest, actions as requestsActions } from '../../store/reducers/requests'
-import styles from '../../styles'
+import {
+  getRequests,
+  setDocumentsApprove,
+  cancelRequest as cancelRequestAction,
+  updateCMERequest,
+  actions as requestsActions
+} from '../../store/reducers/requests'
 import Request from './Request'
+import { getIsLoading } from '../../store/selectors/loader'
+import { getRequestsList, getSelectedRequest } from '../../store/selectors/requests'
+import { ISelectedRequest, IRequest } from '../../types'
 
-const useStyles = makeStyles((theme) => ({ ...styles(theme) }))
+const useStyles = makeStyles((theme) => ({
+  table: {
+    minWidth: 650,
+    borderCollapse: 'collapse',
+  },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
+}))
 
 const RequestsList = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const isLoading = useSelector((state) => state.loader.isLoading)
-  const data = useSelector((state) => state.requests)
+  const isLoading = useSelector(getIsLoading)
+  const data = useSelector(getRequestsList)
+  const selectedRequest = useSelector(getSelectedRequest)
 
   React.useEffect(() => {
     dispatch(getRequests())
@@ -45,7 +62,7 @@ const RequestsList = () => {
   })
 
   // onDialogOpen
-  const cancelRequestDialogShow = (request) => {
+  const cancelRequestDialogShow = (request: ISelectedRequest) => {
     dispatch(
       confirmDialogActions.confirmDialogShow({
         title: `Отменить заявку`,
@@ -65,12 +82,12 @@ const RequestsList = () => {
     )
   }
 
-  const requestCMEDialogOpen = (request) => {
+  const requestCMEDialogOpen = (request: ISelectedRequest) => {
     dispatch(requestsActions.setSelectedRequest(request))
     setRequestCMEDialogParams({ open: true, disabled: false })
   }
 
-  const documentsDialogOpen = (request) => {
+  const documentsDialogOpen = (request: ISelectedRequest) => {
     dispatch(requestsActions.setSelectedRequest(request))
     setIsDocumentsDialogOpen(true)
   }
@@ -89,40 +106,40 @@ const RequestsList = () => {
   }
 
   // onDialogApprove
-  const cancelRequest = (request) => {
+  const cancelRequest = (request: ISelectedRequest) => {
     dispatch(cancelRequestAction(request))
     confirmDialogClose()
   }
 
   const cancelDocumentsApprove = () => {
-    dispatch(setDocumentsApprove(data.selectedRequest.ID, 0))
+    if (selectedRequest) dispatch(setDocumentsApprove(selectedRequest.ID, 0))
     confirmDialogClose()
     documentsDialogClose()
   }
 
   const documentsDialogApprove = () => {
-    dispatch(setDocumentsApprove(data.selectedRequest.ID, 1))
+    if (selectedRequest) dispatch(setDocumentsApprove(selectedRequest.ID, 1))
     documentsDialogClose()
   }
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: any) => {
     dispatch(
       updateCMERequest({
         ...values,
-        rowID: data.selectedRequest.rowID,
+        rowID: selectedRequest && selectedRequest.rowID,
       })
     )
     requestCMEDialogClose()
   }
 
   let initialValues = {}
-  if (data.selectedRequest) {
-    const selectedRequest = data.list.find(
-      (request) => request.rowID === data.selectedRequest.rowID
-    )
+  if (selectedRequest) {
+    const selectedRequestConst: IRequest = data.filter(
+      (request) => request.rowID.toString() === selectedRequest.rowID.toString()
+    )[0]
 
-    if (selectedRequest.RequestCME) {
-      const parsedCME = JSON.parse(selectedRequest.RequestCME)
+    if (selectedRequestConst.RequestCME) {
+      const parsedCME = JSON.parse(selectedRequestConst.RequestCME)
       initialValues = {
         speciality: parsedCME[0],
         number: parsedCME[1],
@@ -138,7 +155,7 @@ const RequestsList = () => {
         Заявки на обучение по программам повышения квалификации и
         профессиональной переподготовки
       </Typography>
-      {data.list.length ? (
+      {data.length ? (
         <TableContainer component={Paper}>
           <Table size="small" className={classes.table}>
             <TableHead>
@@ -158,7 +175,7 @@ const RequestsList = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.list.map((row) => (
+              {data.map((row) => (
                 <Request
                   key={row.requestID}
                   onCancelRequest={cancelRequestDialogShow}
@@ -173,7 +190,7 @@ const RequestsList = () => {
       ) : (
         <Typography>Нет активных заявок</Typography>
       )}
-      {data.selectedRequest && (
+      {selectedRequest && (
         <>
           <DialogLayout
             options={requestCMEDialogParams}
@@ -182,7 +199,7 @@ const RequestsList = () => {
             approveText="Подтвердить"
             cancelText="Отмена"
             title="Заявка с портала НМО"
-            text={`Программа «${data.selectedRequest.courseName}»`}
+            text={`Программа «${selectedRequest.courseName}»`}
           >
             <RequestCMEForm
               onSubmit={handleSubmit}

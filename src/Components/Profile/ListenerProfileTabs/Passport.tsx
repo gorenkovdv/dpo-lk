@@ -1,5 +1,5 @@
 import React from 'react'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { Grid, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
@@ -11,28 +11,41 @@ import {
 } from '../../Commons/FormsControls/FormsControls'
 import LoaderLayout from '../../Commons/Loader/LoaderLayout'
 import { requestListenerData, updateData } from '../../../store/reducers/listenerData'
+import { getPassportData, getSelectedTab } from '../../../store/selectors/listener'
+import { getIsLoading } from '../../../store/selectors/loader'
 import { parseDate } from '../../../utils/parse'
-import styles from '../../../styles'
+import { IPassport } from '../../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
-  button: { ...styles(theme).documentButton },
+  button: {
+    marginTop: 20,
+    width: '100%',
+    maxWidth: 250,
+    [theme.breakpoints.down('xs')]: {
+      maxWidth: '100%',
+    },
+  },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
 }))
 
-const Passport = () => {
+const Passport: React.FC = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const data = useSelector((state) => state.listenerData)
+  const data = useSelector(getPassportData)
+  const selectedTab = useSelector(getSelectedTab)
+  const isLoading = useSelector(getIsLoading)
 
   React.useEffect(() => {
-    dispatch(requestListenerData(data.selectedTab))
-  }, [dispatch, data.selectedTab])
+    dispatch(requestListenerData(selectedTab))
+  }, [dispatch, selectedTab])
 
-  const handleSubmit = (values) => {
-    dispatch(updateData(values, data.selectedTab))
+  const handleSubmit = (values: any) => {
+    dispatch(updateData(values, selectedTab))
   }
 
-  if (data.isLoading)
+  if (isLoading)
     return (
       <Grid container direction="row" justify="center">
         <LoaderLayout />
@@ -44,15 +57,15 @@ const Passport = () => {
       <Typography className={classes.h6} variant="h6">
         Паспорт
       </Typography>
-      <PassportDataForm
+      <PassportDataReduxForm
         onSubmit={handleSubmit}
-        initialValues={data.list.passport}
+        initialValues={data}
       />
     </>
   )
 }
 
-let PassportDataForm = (props) => {
+const PassportDataForm: React.FC<InjectedFormProps<IPassport>> = (props) => {
   const classes = useStyles()
 
   return (
@@ -100,7 +113,7 @@ let PassportDataForm = (props) => {
   )
 }
 
-PassportDataForm = reduxForm({
+const PassportDataReduxForm = reduxForm<IPassport>({
   form: 'passportDataForm',
   enableReinitialize: true,
 })(PassportDataForm)

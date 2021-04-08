@@ -72,7 +72,11 @@ const MainLayout = (Component: React.ComponentType<any>): React.FC<any> => (prop
         />
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <Component {...props} pagesType={pagesType} />
+          <Component
+            username={username}
+            pagesType={pagesType}
+            {...props}
+          />
         </main>
 
         <LoaderLayout />

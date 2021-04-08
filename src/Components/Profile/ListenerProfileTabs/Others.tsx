@@ -9,7 +9,6 @@ import {
   Typography,
   MenuItem,
   Tooltip,
-  InputBaseProps,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import {

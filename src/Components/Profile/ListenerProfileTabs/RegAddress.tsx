@@ -1,5 +1,5 @@
 import React from 'react'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Grid,
@@ -23,27 +23,43 @@ import {
   streetTooltip,
 } from '../../Commons/Tooltips/AddressTooltips'
 import { requestListenerData, updateData } from '../../../store/reducers/listenerData'
-import styles from '../../../styles'
+import { getRegAddress, getSelectedTab } from '../../../store/selectors/listener'
+import { getIsLoading } from '../../../store/selectors/loader'
+import { IAddress } from '../../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
-  button: { ...styles(theme).documentButton },
+  button: {
+    marginTop: 20,
+    width: '100%',
+    maxWidth: 250,
+    [theme.breakpoints.down('xs')]: {
+      maxWidth: '100%',
+    },
+  },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
+  iconTitle: {
+    marginLeft: theme.spacing(1.25),
+  },
 }))
 
-const RegAddress = () => {
+const RegAddress: React.FC = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const data = useSelector((state) => state.listenerData)
+  const data = useSelector(getRegAddress)
+  const selectedTab = useSelector(getSelectedTab)
+  const isLoading = useSelector(getIsLoading)
 
   React.useEffect(() => {
-    dispatch(requestListenerData(data.selectedTab))
-  }, [dispatch, data.selectedTab])
+    dispatch(requestListenerData(selectedTab))
+  }, [dispatch, selectedTab])
 
-  const handleSubmit = (values) => {
-    dispatch(updateData(values, data.selectedTab))
+  const handleSubmit = (values: any) => {
+    dispatch(updateData(values, selectedTab))
   }
 
-  if (data.isLoading)
+  if (isLoading)
     return (
       <Grid container direction="row" justify="center">
         <LoaderLayout />
@@ -77,18 +93,18 @@ const RegAddress = () => {
           </IconButton>
         </HtmlTooltip>
       </Grid>
-      <RegAddressForm
+      <RegAddressReduxForm
         onSubmit={handleSubmit}
-        initialValues={data.list.registration}
+        initialValues={data}
       />
     </>
   )
 }
 
-let RegAddressForm = (props) => {
+const RegAddressForm: React.FC<InjectedFormProps<IAddress>> = ({ handleSubmit }) => {
   const classes = useStyles()
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Grid
         container
         direction="column"
@@ -101,7 +117,11 @@ let RegAddressForm = (props) => {
           name="locality"
           label="Населённый пункт"
           component={Input}
-          adornment={<InputAdornment>{localityTooltip}</InputAdornment>}
+          adornment={
+            <InputAdornment position="start">
+              {localityTooltip}
+            </InputAdornment>
+          }
         />
         <Field
           name="localityType"
@@ -124,7 +144,11 @@ let RegAddressForm = (props) => {
           name="street"
           label="Улица"
           component={Input}
-          adornment={<InputAdornment>{streetTooltip}</InputAdornment>}
+          adornment={
+            <InputAdornment position="start">
+              {streetTooltip}
+            </InputAdornment>
+          }
         />
         <Field name="house" label="Дом" component={Input} />
         <Field name="room" label="Квартира" component={Input} />
@@ -142,7 +166,7 @@ let RegAddressForm = (props) => {
   )
 }
 
-RegAddressForm = reduxForm({
+const RegAddressReduxForm = reduxForm<IAddress>({
   form: 'regAddressForm',
   enableReinitialize: true,
 })(RegAddressForm)

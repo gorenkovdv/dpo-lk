@@ -1,17 +1,22 @@
 import React from 'react'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { MaskedInput, Input } from '../Commons/FormsControls/FormsControls'
 import { required, isStringContainsUnderscore } from '../../utils/validate'
 
-let RequestCMEForm = (props) => {
-  const specialityFieldRef = React.useRef(null)
+interface IValues {
+  speciality: string
+  number: string
+}
+
+const RequestCMEForm: React.FC<InjectedFormProps<IValues>> = ({ handleSubmit }) => {
+  const specialityFieldRef: React.RefObject<HTMLInputElement> = React.createRef();
 
   React.useEffect(() => {
-    specialityFieldRef.current.focus()
-  }, [])
+    specialityFieldRef.current && specialityFieldRef.current.focus()
+  }, [specialityFieldRef])
 
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Field
         inputRef={specialityFieldRef}
         name="speciality"
@@ -32,6 +37,8 @@ let RequestCMEForm = (props) => {
   )
 }
 
-RequestCMEForm = reduxForm({ form: 'requestCMEForm' })(RequestCMEForm)
+const RequestCMEReduxForm = reduxForm<IValues>({
+  form: 'requestCMEForm'
+})(RequestCMEForm)
 
-export default RequestCMEForm
+export default RequestCMEReduxForm

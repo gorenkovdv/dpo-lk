@@ -10,13 +10,12 @@ import Sertificates from './ListenerProfileTabs/Sertificates'
 import Others from './ListenerProfileTabs/Others'
 import withAuth from '../Authorization/withAuth'
 import { setDocumentsTabAction } from '../../store/reducers/listenerData'
-import { userAPI } from '../../services/api'
-import styles from '../../styles'
+import { getSelectedDocumentsTab } from '../../store/selectors/listener'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
   button: {
-    ...styles(theme).button,
+    marginTop: 20,
+    width: '100%',
     maxWidth: 250,
     [theme.breakpoints.down('xs')]: {
       maxWidth: '100%',
@@ -32,17 +31,27 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 14,
     },
   },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
 }))
 
-const ListenerDocuments = (props) => {
+interface ITabPanel {
+  value: number
+  index: Number
+}
+
+interface IProps {
+  username: string
+  pagesType: string
+}
+
+const ListenerDocuments: React.FC<IProps> = ({ username, pagesType }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const selectedTab = useSelector((state) => state.listenerData.documentsTab)
-  const username = userAPI.getUserName().toLowerCase()
-  const pagesType = props.pagesType
+  const selectedTab = useSelector(getSelectedDocumentsTab)
 
-  const TabPanel = (props) => {
-    const { children, value, index, ...other } = props
+  const TabPanel: React.FC<ITabPanel> = ({ children, value, index, ...props }) => {
 
     return (
       <Typography
@@ -52,14 +61,14 @@ const ListenerDocuments = (props) => {
         id={`scrollable-auto-tabpanel-${index}`}
         key={`scrollable-auto-tabpanel-${index}`}
         aria-labelledby={`scrollable-auto-tab-${index}`}
-        {...other}
+        {...props}
       >
         {value === index && <Box>{children}</Box>}
       </Typography>
     )
   }
 
-  const handleTabChange = (e, value) => {
+  const handleTabChange = (event: React.ChangeEvent<{}>, value: number) => {
     dispatch(setDocumentsTabAction(value))
   }
 
@@ -72,7 +81,6 @@ const ListenerDocuments = (props) => {
       </Typography>
       <AppBar position="static" color="default" className={classes.appBar}>
         <Tabs
-          className={classes.tabs}
           value={selectedTab}
           onChange={handleTabChange}
           indicatorColor="primary"

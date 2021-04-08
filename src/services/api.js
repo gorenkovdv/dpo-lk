@@ -117,7 +117,6 @@ export const profileAPI = {
     return await instance.get(
       `get_listener_data.php?uid=${userAPI.getUID()}&tab=${tab}`
     ).then(response => {
-      console.log(response.data)
       return response
     })
   },

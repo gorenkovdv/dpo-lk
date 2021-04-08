@@ -1,5 +1,5 @@
 import React from 'react'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   IconButton,
@@ -39,33 +39,74 @@ import {
   fileDeleteAction
 } from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
-import styles from '../../../styles'
+import { getSertificates, getSelectedTab } from '../../../store/selectors/listener'
+import { getIsLoading } from '../../../store/selectors/loader'
+import { IDocument } from '../../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
-  button: { ...styles(theme).documentButton },
+  button: {
+    marginTop: 20,
+    width: '100%',
+    maxWidth: 250,
+    [theme.breakpoints.down('xs')]: {
+      maxWidth: '100%',
+    },
+  },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
+  iconTitle: {
+    marginLeft: theme.spacing(1.25),
+  },
+  textField: {
+    boxSizing: 'border-box',
+    width: '100%',
+  },
+  link: {
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    }
+  },
+  typography: {
+    boxSizing: 'border-box',
+    padding: theme.spacing(1, 0),
+  }
 }))
 
-const Sertificates = ({ username }) => {
+const Sertificates: React.FC<{ username: string }> = ({ username }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const allData = useSelector((state) => state.listenerData)
-  const data = allData.list
-  const index = data.sertificates.currentDocument || 0
-  const currentData = data.sertificates.documents
+  const data = useSelector(getSertificates)
+  const selectedTab = useSelector(getSelectedTab)
+  const isLoading = useSelector(getIsLoading)
+  const index = data.currentDocument || 0
+  const currentData = data.documents
   const currentDocument = currentData ? currentData[index] : null
   const isDocumentNew = currentDocument ? currentDocument.isDocumentNew : false
   const defaultFileURL = `sertificate${index}.pdf`
+
+  console.log(selectedTab)
 
   React.useEffect(() => {
     dispatch(requestListenerData(5))
   }, [dispatch])
 
-  const handleNewDocument = (e) => {
-    let newDoc = {
+  const handleNewDocument = () => {
+    let newDoc: IDocument = {
+      id: 0,
+      name: '',
+      comment: '',
       organization: '',
       speciality: '',
       firstDate: null,
+      firstDateName: '',
+      secondDate: null,
+      secondDateName: '',
       serial: '',
       newFile: null,
       fileURL: null,
@@ -75,11 +116,11 @@ const Sertificates = ({ username }) => {
     dispatch(createNewDocumentAction(newDoc, 5))
   }
 
-  const goToDocument = (index) => {
+  const goToDocument = (index: number) => {
     dispatch(selectDocumentAction(index, 5))
   }
 
-  const confirmTransition = (value) => {
+  const confirmTransition = (value: number) => {
     dispatch(
       confirmDialogActions.confirmDialogShow({
         title: `Выбрать документ`,
@@ -89,33 +130,33 @@ const Sertificates = ({ username }) => {
     )
   }
 
-  const selectDocument = (e) => {
+  const selectDocument = (e: any) => {
     if (e.target.value !== index) {
       if (isDocumentNew) confirmTransition(e.target.value)
       else goToDocument(e.target.value)
     }
   }
 
-  const handleDocumentRedirect = (value) => {
+  const handleDocumentRedirect = (value: number) => {
     dispatch(confirmDialogActions.confirmDialogClose())
     dispatch(dropNewSertificateAction(value))
   }
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: IValues) => {
     dispatch(updateData(
       {
         ...values,
         document: index,
         newDocument: isDocumentNew,
         newFile: values.newFile ? values.newFile.base64 : null,
-        fileURL: values.newFile ? defaultFileURL : currentDocument.fileURL,
+        fileURL: values.newFile ? defaultFileURL : currentDocument && currentDocument.fileURL,
       },
       5
     )
     )
   }
 
-  if (allData.isLoading)
+  if (isLoading)
     return (
       <Grid container direction="row" justify="center">
         <LoaderLayout />
@@ -187,11 +228,11 @@ const Sertificates = ({ username }) => {
         <Typography>Нет документов</Typography>
       )}
       {currentDocument && (
-        <SertificatesDataForm
+        <SertificatesDataReduxForm
           onSubmit={handleSubmit}
           initialValues={currentDocument}
           index={index}
-          documentId={currentDocument.id ? currentDocument.id : null}
+          documentId={currentDocument.id ? currentDocument.id : 0}
           fileURL={currentDocument.fileURL}
           isDocumentNew={isDocumentNew}
           username={username}
@@ -201,7 +242,23 @@ const Sertificates = ({ username }) => {
   )
 }
 
-let SertificatesDataForm = (props) => {
+interface IValues {
+  organization: string
+  speciality: string
+  firstDate: string | null
+  serial: string
+  newFile: any
+}
+
+interface IProps {
+  index: number
+  documentId: number
+  fileURL: string | null
+  isDocumentNew?: boolean
+  username: string
+}
+
+const SertificatesDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const username = props.username
@@ -266,7 +323,11 @@ let SertificatesDataForm = (props) => {
         placeholder="дд-мм-гггг"
         label="Дата комиссии"
       />
-      <Field name="serial" label="Номер документа" component={Input} />
+      <Field
+        name="serial"
+        label="Номер документа"
+        component={Input}
+      />
       <Grid container direction="row" alignItems="center">
         <Typography className={classes.typography}>
           Скан-копия документа
@@ -282,7 +343,7 @@ let SertificatesDataForm = (props) => {
             target="_blank"
           >
             <Grid container direction="row" alignItems="center">
-              <PdfIcon className={classes.iconColor} />
+              <PdfIcon />
               <Typography style={{ marginLeft: 5, marginRight: 5 }}>
                 Скан-копия
               </Typography>
@@ -290,12 +351,16 @@ let SertificatesDataForm = (props) => {
           </a>
           <Tooltip title="Удалить файл">
             <IconButton onClick={deleteFileDialogShow} size="small">
-              <DeleteIcon className={classes.iconColor} />
+              <DeleteIcon />
             </IconButton>
           </Tooltip>
         </Grid>
       ) : null}
-      <Field name="newFile" filetypes={[`.pdf`]} component={FileInput} />
+      <Field
+        name="newFile"
+        filetypes={[`.pdf`]}
+        component={FileInput}
+      />
       <Button
         type="submit"
         style={{ marginRight: 10 }}
@@ -332,7 +397,7 @@ let SertificatesDataForm = (props) => {
   )
 }
 
-SertificatesDataForm = reduxForm({
+const SertificatesDataReduxForm = reduxForm<IValues, IProps>({
   form: 'sertificatesDataForm',
   enableReinitialize: true,
 })(SertificatesDataForm)

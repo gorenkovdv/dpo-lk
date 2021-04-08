@@ -5,14 +5,20 @@ import { authAPI } from '../../services/api'
 import { PASSWORD_LENGTH } from '../../store/const'
 import history from '../../history'
 
-interface IConfirm {
-  reset: boolean,
+interface IChangePassword {
   showForm: boolean
+  reset: boolean
 }
 
+interface IConfirm {
+  error: string
+  response: number
+  login: string | null
+  reset: boolean
+}
 interface IState {
   confirm: IConfirm | null
-  changePassword: any
+  changePassword: IChangePassword | null
 }
 
 const initialState: IState = {
@@ -51,11 +57,11 @@ export const authReducer = (state = initialState, action: authActionsTypes): ISt
 }
 
 export const actions = {
-  setConfirmParams: (params: any) => ({
+  setConfirmParams: (params: IConfirm) => ({
     type: 'dpo-lk/auth/SET_CONFIRM_PARAMS',
     payload: params
   } as const),
-  setPasswordParams: (params: any) => ({
+  setPasswordParams: (params: IChangePassword) => ({
     type: 'dpo-lk/auth/SET_PASSWORD_PARAMS',
     payload: params
   } as const),
@@ -72,10 +78,8 @@ export const actions = {
 export const checkParams = (id: string, key: string, type: string): ThunkType => {
   return async (dispatch) => {
     dispatch(loaderActions.setLoading())
-    let params = {}
+    let params = null
     const response = await authAPI.checkParams(id, key)
-
-    console.log(response.data)
 
     if (response.data.response) dispatch(loaderActions.loadingSuccess())
 

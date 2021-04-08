@@ -8,9 +8,9 @@ export interface IState {
 }
 
 interface IProfileStateList {
-  lastname: string
-  firstname: string
-  middlename: string
+  lastname?: string
+  firstname?: string
+  middlename?: string
   birthdate: string
   snils: string
   phone: string

@@ -11,13 +11,13 @@ import Passport from './ListenerProfileTabs/Passport'
 import Work from './ListenerProfileTabs/Work'
 import withAuth from '../Authorization/withAuth'
 import { setSelectedTabAction } from '../../store/reducers/listenerData'
-import { userAPI } from '../../services/api'
-import styles from '../../styles'
+import { getSelectedTab } from '../../store/selectors/listener'
+import { ITabPanel } from '../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
   button: {
-    ...styles(theme).button,
+    marginTop: 20,
+    width: '100%',
     maxWidth: 250,
     [theme.breakpoints.down('xs')]: {
       maxWidth: '100%',
@@ -33,19 +33,22 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 14,
     },
   },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
 }))
 
-const ListenerData = (props) => {
+interface IProps {
+  username: string,
+  pagesType: string
+}
+
+const ListenerData: React.FC<IProps> = ({ username, pagesType }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const selectedTab = useSelector((state) => state.listenerData.selectedTab)
-  const pagesType = props.pagesType
+  const selectedTab = useSelector(getSelectedTab)
 
-  const username = userAPI.getUserName().toLowerCase()
-
-  const TabPanel = (props) => {
-    const { children, value, index, ...other } = props
-
+  const TabPanel: React.FC<ITabPanel> = ({ children, value, index, ...props }) => {
     return (
       <Typography
         component="div"
@@ -54,23 +57,14 @@ const ListenerData = (props) => {
         id={`scrollable-auto-tabpanel-${index}`}
         key={`scrollable-auto-tabpanel-${index}`}
         aria-labelledby={`scrollable-auto-tab-${index}`}
-        {...other}
+        {...props}
       >
         {value === index && <Box>{children}</Box>}
       </Typography>
     )
   }
 
-  const tabProps = (index) => {
-    return {
-      id: `scrollable-auto-tab-${index}`,
-      key: `scrollable-auto-tab-${index}`,
-      'aria-controls': `scrollable-auto-tabpanel-${index}`,
-      className: classes.tab,
-    }
-  }
-
-  const handleTabChange = (e, value) => {
+  const handleTabChange = (e: React.ChangeEvent<{}>, value: number) => {
     dispatch(setSelectedTabAction(value))
   }
 
@@ -83,7 +77,6 @@ const ListenerData = (props) => {
       </Typography>
       <AppBar position="static" color="default" className={classes.appBar}>
         <Tabs
-          className={classes.tabs}
           value={selectedTab}
           onChange={handleTabChange}
           indicatorColor="primary"
@@ -91,10 +84,10 @@ const ListenerData = (props) => {
           variant="scrollable"
           scrollButtons="on"
         >
-          <Tab label="Адрес регистрации" {...tabProps(0)} />
-          <Tab label="Адрес проживания" {...tabProps(1)} />
-          <Tab label="Паспорт" {...tabProps(2)} />
-          <Tab label="Сведения о работе" {...tabProps(3)} />
+          <Tab label="Адрес регистрации" className={classes.tab} />
+          <Tab label="Адрес проживания" className={classes.tab} />
+          <Tab label="Паспорт" className={classes.tab} />
+          <Tab label="Сведения о работе" className={classes.tab} />
         </Tabs>
       </AppBar>
       <TabPanel value={selectedTab} index={0}>

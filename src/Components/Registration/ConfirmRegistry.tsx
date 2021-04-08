@@ -1,26 +1,55 @@
 import React, { useEffect } from 'react'
-import { withRouter, NavLink } from 'react-router-dom'
+import { withRouter, NavLink, RouteComponentProps } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { Typography, Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import HeaderLayout from '../Commons/Header/HeaderLayout'
 import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import { actions as authActions, checkParams } from '../../store/reducers/auth'
-import styles from '../../styles'
+import { getConfirm } from '../../store/selectors/auth'
+import { getIsLoading } from '../../store/selectors/loader'
 
 const useStyles = makeStyles(theme => ({
-  ...styles(theme),
   typography: {
-    ...styles(theme).typography,
+    boxSizing: 'border-box',
+    padding: theme.spacing(1, 0),
     textAlign: 'center',
+  },
+  error: {
+    color: theme.palette.error.main
+  },
+  h3: {
+    textAlign: 'center',
+    fontWeight: 500,
+    marginTop: 15,
+    marginBottom: 15,
+    fontSize: 26,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: 20,
+    },
+  },
+  link: {
+    textAlign: 'center',
+    margin: theme.spacing(1, 0),
+    textDecoration: 'none',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.main,
+      textDecoration: 'underline',
+    },
   },
 }))
 
-const ConfirmRegistry = props => {
+interface RouteParams {
+  id: string
+  key: string
+}
+
+const ConfirmRegistry: React.FC<RouteComponentProps<RouteParams>> = props => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const params = useSelector(state => state.auth.confirm)
-  const isLoading = useSelector(state => state.loader.isLoading)
+  const params = useSelector(getConfirm)
+  const isLoading = useSelector(getIsLoading)
 
   useEffect(() => {
     dispatch(authActions.clearConfirmParams())

@@ -96,6 +96,7 @@ export interface ISelectedCourse {
 }
 
 export type ICourseFC = (course: ISelectedCourse) => void
+export type IRequestFC = (request: ISelectedRequest) => void
 
 export interface ICourseRoots {
     group: number | null
@@ -109,6 +110,25 @@ export interface IEducationType {
     firstDateName: string
     secondDateName: string
     documentName: string
+}
+
+export interface IPassport {
+    number: string
+    series: string
+    unitCode: string
+    birthPlace: string
+    issuedBy: string
+    issuedDate: string
+}
+
+export interface IWork extends IAddress {
+    listenerPosition: string
+    accessionDate: string
+    hrPhone: string
+    workPhone: string
+    fileURL: string | null
+    newFile?: any
+    positionTypes: string[]
 }
 
 export interface IDocument {
@@ -147,4 +167,26 @@ export interface IUserOption {
     login: string
     name: string
     isUserAdded: boolean
+}
+
+export interface ISelectedRequest {
+    ID: number,
+    Price: number,
+    rowID: number,
+    DocumentsApproved: number,
+    courseName: string
+}
+
+export interface IRequest extends ICourseBasic {
+    DocumentsApproved: number
+    RequestCreateDate: string
+    RequestCME: string | null
+    requestID: number
+    rowID: number
+}
+
+
+export interface ITabPanel {
+    value: number
+    index: number
 }

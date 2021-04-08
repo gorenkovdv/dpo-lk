@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Redirect, withRouter } from 'react-router-dom'
 import { compose } from 'redux'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { Typography, InputAdornment, MenuItem, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
@@ -19,23 +19,34 @@ import {
 import MainLayout from '../Main/MainLayout'
 import withAuth from '../Authorization/withAuth'
 import { requestEntityData, updateEntityData } from '../../store/reducers/entityData'
-import styles from '../../styles'
+import { getIsLoading } from '../../store/selectors/loader'
+import { getEntityData } from '../../store/selectors/entity'
+import { IEntityDataList } from '../../store/reducers/entityData'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
-  button: { ...styles(theme).documentButton },
+  button: {
+    marginTop: 20,
+    width: '100%',
+    maxWidth: 250,
+    [theme.breakpoints.down('xs')]: {
+      maxWidth: '100%',
+    },
+  },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
 }))
 
-const EntityData = (props) => {
+const EntityData: React.FC<any> = (props) => {
   const dispatch = useDispatch()
-  const isLoading = useSelector((state) => state.loader.isLoading)
-  const data = useSelector((state) => state.entityData)
+  const isLoading = useSelector(getIsLoading)
+  const data = useSelector(getEntityData)
 
   useEffect(() => {
     dispatch(requestEntityData())
   }, [dispatch])
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: any) => {
     dispatch(updateEntityData(values))
   }
 
@@ -43,17 +54,23 @@ const EntityData = (props) => {
 
   if (isLoading) return null
 
-  return data.list.roots ? (
-    <EntityDataForm onSubmit={handleSubmit} initialValues={data.list} />
+  return data.roots ? (
+    <EntityDataReduxForm onSubmit={handleSubmit} initialValues={data} />
   ) : (
     <Typography>У Вас нет прав на редактирование данной формы</Typography>
   )
 }
 
-let EntityDataForm = (props) => {
+interface IValues {
+  position: string
+  organization: string
+  CTMU: string
+}
+
+const EntityDataForm: React.FC<InjectedFormProps<IEntityDataList>> = ({ handleSubmit }) => {
   const classes = useStyles()
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Field
         name="position"
         label="Должность представителя"
@@ -88,13 +105,25 @@ let EntityDataForm = (props) => {
       <Typography className={classes.h6} variant="h6">
         Юридический адрес
       </Typography>
-      <Field name="country" label="Страна" component={Input} />
-      <Field name="region" label="Регион (область, край)" component={Input} />
+      <Field
+        name="country"
+        label="Страна"
+        component={Input}
+      />
+      <Field
+        name="region"
+        label="Регион (область, край)"
+        component={Input}
+      />
       <Field
         name="locality"
         label="Населённый пункт"
         component={Input}
-        adornment={<InputAdornment>{localityTooltip}</InputAdornment>}
+        adornment={
+          <InputAdornment position="start">
+            {localityTooltip}
+          </InputAdornment>
+        }
       />
       <Field
         name="localityType"
@@ -117,9 +146,17 @@ let EntityDataForm = (props) => {
         name="street"
         label="Улица"
         component={Input}
-        adornment={<InputAdornment>{streetTooltip}</InputAdornment>}
+        adornment={
+          <InputAdornment position="start">
+            {streetTooltip}
+          </InputAdornment>
+        }
       />
-      <Field name="house" label="Номер дома" component={Input} />
+      <Field
+        name="house"
+        label="Номер дома"
+        component={Input}
+      />
       <Field
         name="workPhone"
         label="Рабочий телефон"
@@ -135,7 +172,10 @@ let EntityDataForm = (props) => {
       <Typography className={classes.h6} variant="h6">
         Банк
       </Typography>
-      <Field name="bank" label="Наименование" component={Textarea} />
+      <Field
+        name="bank"
+        label="Наименование"
+        component={Textarea} />
       <Field
         name="BIC"
         label="БИК"
@@ -161,6 +201,8 @@ let EntityDataForm = (props) => {
   )
 }
 
-EntityDataForm = reduxForm({ form: 'entityDataForm' })(EntityDataForm)
+const EntityDataReduxForm = reduxForm<IEntityDataList>({
+  form: 'entityDataForm'
+})(EntityDataForm)
 
 export default compose(withAuth, withRouter, MainLayout)(EntityData)

@@ -1,28 +1,11 @@
-import { ICourseBasic } from '../../types'
+import { ISelectedRequest, IRequest } from '../../types'
 import { BaseThunkType, InferActionsType } from './index'
 import { requestsAPI } from '../../services/api'
 import { actions as snackbarActions } from './snackbar'
 import { actions as loaderActions } from './loader'
-
-interface IRequest extends ICourseBasic {
-  DocumentsApproved: number
-  RequestCreateDate: string
-  RequestCME: string | null
-  requestID: number
-  rowID: number
-}
-
 interface IState {
   list: Array<IRequest>
   selectedRequest: ISelectedRequest | null
-}
-
-interface ISelectedRequest {
-  ID: number,
-  Price: number,
-  rowID: number,
-  DocumentsApproved: number,
-  courseName: string
 }
 
 type requestsActionsTypes = InferActionsType<typeof actions>

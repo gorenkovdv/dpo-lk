@@ -2,7 +2,7 @@ import { profileAPI, documentAPI } from '../../services/api'
 import { actions as snackbarActions } from './snackbar'
 import { actions as loaderActions } from './loader'
 import { BaseThunkType, InferActionsType } from './index'
-import { IDocument, IEducationType, IAddress } from '../../types'
+import { IDocument, IEducationType, IAddress, IPassport, IWork } from '../../types'
 
 interface IPage {
   currentDocument: number,
@@ -16,16 +16,6 @@ interface IEducationPage {
   levels: Array<Array<IDocument>>
 }
 
-interface IWork extends IAddress {
-  listenerPosition: string
-  accessionDate: string
-  hrPhone: string
-  workPhone: string
-  fileURL: string | null
-  newFile?: string | null
-  positionTypes: string[]
-}
-
 interface IStateList {
   registration: IAddress
   fact: IAddress
@@ -35,15 +25,6 @@ interface IStateList {
   sertificates: IPage
   educationTypes: IEducationType[],
   others: IPage
-}
-
-interface IPassport {
-  number: string
-  series: string
-  unitCode: string
-  birthPlace: string
-  issuedBy: string
-  issuedDate: string
 }
 
 interface IState {

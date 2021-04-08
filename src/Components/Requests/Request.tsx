@@ -9,7 +9,6 @@ import {
   TableRow,
 } from '@material-ui/core'
 import { Clear as ClearIcon } from '@material-ui/icons'
-import styles from '../../styles'
 import moodleIcon from '../../img/moodle.png'
 import cmeIcon from '../../img/CME.png'
 import cardIcon from '../../img/personal_card.png'
@@ -17,16 +16,29 @@ import moneyIcon from '../../img/money.png'
 import contrAnsIcon from '../../img/contr_ans.png'
 import sertIcon from '../../img/sert.png'
 import { userAPI } from '../../services/api'
+import { IRequest, IRequestFC } from '../../types'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
   imageIcon: {
     width: 24,
     marginRight: theme.spacing(0.5),
   },
+  block: {
+    display: 'block'
+  },
+  pointer: {
+    cursor: 'pointer',
+  },
 }))
 
-const Request = ({
+interface IProps {
+  row: IRequest,
+  onCancelRequest: IRequestFC
+  onDocumentsDialogOpen: IRequestFC
+  onRequestCMEDialogOpen: IRequestFC
+}
+
+const Request: React.FC<IProps> = ({
   row,
   onCancelRequest,
   onDocumentsDialogOpen,
@@ -42,19 +54,18 @@ const Request = ({
     Price: row.Price,
     DocumentsApproved: row.DocumentsApproved,
   }
-  const IsCME = parseInt(row.IsCME)
 
   return (
     <>
       <TableRow key={row.ID}>
         <TableCell>
           <Typography noWrap>{`Заявка от ${row.RequestCreateDate}`}</Typography>
-          {IsCME ? (
+          {Boolean(row.IsCME) ? (
             <Tooltip title="Непрерывное медицинское образование">
               <img className={classes.imageIcon} src={cmeIcon} alt="cmeIcon" />
             </Tooltip>
           ) : null}
-          {parseInt(row.Price) > 0 && (
+          {row.Price > 0 && (
             <Tooltip title="Хозрасчётный курс">
               <img
                 className={classes.imageIcon}
@@ -96,7 +107,7 @@ const Request = ({
           )}
         </TableCell>
         <TableCell align="center">
-          {parseInt(row.Price) > 0 ? (
+          {row.Price > 0 ? (
             <IconButton onClick={() => onDocumentsDialogOpen(currentRequest)}>
               <img
                 style={{ width: 35 }}
@@ -109,7 +120,7 @@ const Request = ({
           )}
         </TableCell>
         <TableCell align="center">
-          {IsCME ? (
+          {Boolean(row.IsCME) ? (
             <Tooltip title="Заявка с портала НМО">
               <IconButton
                 onClick={() => onRequestCMEDialogOpen(currentRequest)}
@@ -135,7 +146,7 @@ const Request = ({
           </Tooltip>
         </TableCell>
         <TableCell>
-          {IsCME && !row.RequestCME ? (
+          {Boolean(row.IsCME) && !Boolean(row.RequestCME) ? (
             <Grid
               container
               direction="row"
@@ -157,7 +168,7 @@ const Request = ({
               </Grid>
             </Grid>
           ) : null}
-          {parseInt(row.Price) > 0 && !parseInt(row.DocumentsApproved) ? (
+          {row.Price > 0 && Boolean(row.DocumentsApproved) ? (
             <Grid
               container
               direction="row"

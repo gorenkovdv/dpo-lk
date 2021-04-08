@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'redux'
-import { Field, reduxForm } from 'redux-form'
+import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Button,
@@ -28,24 +28,40 @@ import {
 } from '../../utils/validate'
 import { parseDate } from '../../utils/parse'
 import { requestProfile, updateProfile } from '../../store/reducers/profile'
-import styles from '../../styles'
+import { getIsLoading } from '../../store/selectors/loader'
+import { getProfile } from '../../store/selectors/profile'
 
 const useStyles = makeStyles((theme) => ({
-  ...styles(theme),
   button: {
-    ...styles(theme).button,
+    marginTop: 20,
+    width: '100%',
     maxWidth: 250,
+  },
+  h6: {
+    margin: theme.spacing(1.25, 0),
+  },
+  textField: {
+    boxSizing: 'border-box',
+    width: '100%',
+  },
+  inputStartIcon: {
+    marginRight: theme.spacing(1.25),
+    color: 'gray',
   },
 }))
 
-const Profile = (props) => {
+interface IProps {
+  pagesType: string
+}
+
+const Profile: React.FC<IProps> = ({ pagesType }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const isLoading = useSelector((state) => state.loader.isLoading)
-  const data = useSelector((state) => state.profile)
+  const isLoading = useSelector(getIsLoading)
+  const data = useSelector(getProfile)
 
   const title =
-    props.pagesType === 'listener'
+    pagesType === 'listener'
       ? 'Регистрационные данные слушателя'
       : 'Регистрационные данные представителя юридического лица'
 
@@ -53,7 +69,7 @@ const Profile = (props) => {
     dispatch(requestProfile())
   }, [dispatch])
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: IValues) => {
     dispatch(updateProfile(values))
   }
 
@@ -69,7 +85,7 @@ const Profile = (props) => {
         autoComplete="off"
         variant="outlined"
         label="Фамилия"
-        value={data.list.lastname}
+        value={data.lastname}
         className={classes.textField}
       />
       <TextField
@@ -77,7 +93,7 @@ const Profile = (props) => {
         autoComplete="off"
         variant="outlined"
         label="Имя"
-        value={data.list.firstname}
+        value={data.firstname}
         className={classes.textField}
       />
       <TextField
@@ -85,18 +101,25 @@ const Profile = (props) => {
         autoComplete="off"
         variant="outlined"
         label="Отчество"
-        value={data.list.middlename}
+        value={data.middlename}
         className={classes.textField}
       />
-      <ProfileForm onSubmit={handleSubmit} initialValues={data.list} />
+      <ProfileReduxForm onSubmit={handleSubmit} initialValues={data} />
     </>
   )
 }
 
-let ProfileForm = (props) => {
+interface IValues {
+  email: string
+  phone: string
+  snils: string
+  birthdate: string
+}
+
+const ProfileForm: React.FC<InjectedFormProps<IValues>> = ({ handleSubmit }) => {
   const classes = useStyles()
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <>
         <Field
           name="email"
@@ -105,7 +128,7 @@ let ProfileForm = (props) => {
           label="Электронная почта (email)"
           placeholder="Электронная почта"
           adornment={
-            <InputAdornment>
+            <InputAdornment position="start">
               <EmailIcon className={classes.inputStartIcon} />
             </InputAdornment>
           }
@@ -119,7 +142,7 @@ let ProfileForm = (props) => {
           label="Телефон"
           placeholder="Телефон"
           adornment={
-            <InputAdornment>
+            <InputAdornment position="start">
               <PhoneIcon className={classes.inputStartIcon} />
             </InputAdornment>
           }
@@ -156,6 +179,9 @@ let ProfileForm = (props) => {
   )
 }
 
-ProfileForm = reduxForm({ form: 'profileForm' })(ProfileForm)
+const ProfileReduxForm = reduxForm<IValues>({
+  form: 'profileForm',
+  enableReinitialize: true
+})(ProfileForm)
 
 export default compose(withAuth, withRouter, MainLayout)(Profile)

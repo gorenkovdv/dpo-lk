@@ -4,7 +4,7 @@ import { actions as loaderActions } from './loader'
 import { BaseThunkType, InferActionsType } from './index'
 import history from '../../history'
 
-interface IStateList {
+export interface IEntityDataList {
   BIC: string
   CTMU: string
   IEC: string
@@ -26,7 +26,7 @@ interface IStateList {
 }
 
 interface IState {
-  list: IStateList,
+  list: IEntityDataList,
   entities: Array<number>
 }
 
