@@ -20,6 +20,7 @@ import DialogLayout from '../Commons/Dialog/DialogLayout'
 import AddNewListenerWindow from './AddNewListenerWindow'
 import { getListenersOptions, actions as coursesActions } from '../../store/reducers/courses'
 import { getListenersAddition, getSelectedCourse } from '../../store/selectors/courses'
+import { parseUserOption } from '../../utils/parse'
 import { IUserOption } from '../../types'
 
 const useStyles = makeStyles((theme) => ({
@@ -47,19 +48,12 @@ interface IProps {
   onApprove: any
 }
 
-const defaultValue = {
-  id: 0,
-  login: '',
-  name: '',
-  isUserAdded: false
-}
-
 const AddListenersWindow: React.FC<IProps> = ({ options, onClose, onApprove }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const [open, setOpen] = React.useState(false)
-  const [inputValue, setInputValue] = React.useState("")
-  const [autocompleteValue, setAutocompleteValue] = React.useState(defaultValue)
+  const [inputValue, setInputValue] = React.useState('')
+  const [autocompleteValue, setAutocompleteValue] = React.useState(null as IUserOption | null)
   const data = useSelector(getListenersAddition)
   const course = useSelector(getSelectedCourse)
   const dialogOpen = data.isDialogOpen
@@ -71,9 +65,9 @@ const AddListenersWindow: React.FC<IProps> = ({ options, onClose, onApprove }) =
   }
 
   const onAddButtonClick = () => {
-    setAutocompleteValue(defaultValue)
+    setAutocompleteValue(null)
 
-    if (autocompleteValue.id > 0) dispatch(coursesActions.addListenerToList(autocompleteValue))
+    if (autocompleteValue && autocompleteValue.id > 0) dispatch(coursesActions.addListenerToList(autocompleteValue))
   }
 
   const removeListener = (userID: number) => {
@@ -106,14 +100,12 @@ const AddListenersWindow: React.FC<IProps> = ({ options, onClose, onApprove }) =
         noOptionsText="Список пуст"
         getOptionSelected={(option, value) => option.name === value.name}
         getOptionDisabled={(option) => option.isUserAdded}
-        getOptionLabel={(option) =>
-          `${option.name} (${option.login})`
-        }
+        getOptionLabel={parseUserOption}
         options={data.options}
         loading={loading}
         inputValue={inputValue}
         value={autocompleteValue}
-        onInputChange={() => onInputChange}
+        onInputChange={onInputChange}
         onChange={(e: ChangeEvent<{}>, value: IUserOption | null) => {
           if (value) setAutocompleteValue(value)
         }}
@@ -123,7 +115,7 @@ const AddListenersWindow: React.FC<IProps> = ({ options, onClose, onApprove }) =
         }}
         renderOption={(option) => (
           <>
-            <span>{`${option.name} (${option.login})`}</span>
+            <span>{parseUserOption(option)}</span>
             {option.isUserAdded && <CheckIcon className={classes.iconTitle} />}
           </>
         )}

@@ -2,6 +2,7 @@ export type SeverityType = 'error' | 'info' | 'success' | 'warning'
 
 export interface ICourseBasic {
     ID: number
+    Contractor?: number
     GUID: string
     Name: string
     Price: number

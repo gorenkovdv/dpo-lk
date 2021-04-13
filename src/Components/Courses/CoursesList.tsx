@@ -61,6 +61,7 @@ import {
   getCoursesRoots
 } from '../../store/selectors/courses'
 import { ICourseFilters, ISelectedCourse, IUserOption } from '../../types'
+import { parseUserOption } from '../../utils/parse'
 
 const useStyles = makeStyles((theme) => ({
   inlineDateField: {
@@ -330,21 +331,14 @@ const CoursesList: FC = () => {
       handleFilterChange(filter, currentDate)
   }
 
-  const defaultAutocompleteValue = {
-    id: 0,
-    login: '',
-    name: '',
-    isUserAdded: false
-  }
-
   const [autocompleteOpen, setAutocompleteOpen] = React.useState(false)
-  const [autocompleteValue, setAutocompleteValue] = React.useState(defaultAutocompleteValue)
+  const [autocompleteValue, setAutocompleteValue] = React.useState(null as IUserOption | null)
   const [inputValue, setInputValue] = React.useState('')
   const [selectedFilter, setSelectedFilter] = React.useState('0')
   const listenersAddition = useSelector(getListenersAddition)
   const loading = listenersAddition.isLoading
 
-  const onInputChange = (e: any, value: string) => {
+  const onInputChange = (e: ChangeEvent<{}>, value: string) => {
     setInputValue(value)
     dispatch(getListenersOptions(value))
   }
@@ -352,7 +346,7 @@ const CoursesList: FC = () => {
   const onSelectedFilterChange = (e: any) => {
     setSelectedFilter(e.target.value)
     setSearchString('')
-    setAutocompleteValue(defaultAutocompleteValue)
+    setAutocompleteValue(null)
   }
 
   const volumeList = useSelector(getVolumeList)
@@ -583,13 +577,12 @@ const CoursesList: FC = () => {
                 noOptionsText="Список пуст"
                 getOptionSelected={(option, value) => option.name === value.name}
                 getOptionDisabled={(option) => option.isUserAdded}
-                getOptionLabel={(option) =>
-                  `${option.name} (${option.login})`}
+                getOptionLabel={parseUserOption}
                 options={listenersAddition.options}
                 loading={loading}
                 inputValue={inputValue}
                 value={autocompleteValue}
-                onInputChange={() => onInputChange}
+                onInputChange={onInputChange}
                 onChange={(e: ChangeEvent<{}>, value: IUserOption | null) => {
                   if (value) setAutocompleteValue(value)
                 }}
@@ -604,7 +597,7 @@ const CoursesList: FC = () => {
                 }}
                 renderOption={(option) => (
                   <>
-                    <span>{`${option.name} (${option.login})`}</span>
+                    <span>{parseUserOption(option)}</span>
                     {option.isUserAdded && (
                       <CheckIcon className={classes.iconTitle} />
                     )}
@@ -664,7 +657,7 @@ const CoursesList: FC = () => {
                     }
                   } else {
                     if (autocompleteValue) {
-                      setAutocompleteValue(defaultAutocompleteValue)
+                      setAutocompleteValue(null)
                       handleFilterChange('searchUser', null)
                     }
                   }

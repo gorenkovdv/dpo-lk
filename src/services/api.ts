@@ -1,5 +1,6 @@
 import axios from 'axios'
 import qs from 'qs'
+import { ICourseFilters } from '../types'
 
 const instance = axios.create({
   baseURL: 'http://localhost/scripts/',
@@ -25,37 +26,37 @@ export const userAPI = {
 }
 
 export const authAPI = {
-  async login(username, password) {
+  async login(username: string, password: string) {
     return await instance.post(
       `login.php`,
-      qs.stringify({ username: username, password: password })
+      qs.stringify({ username, password })
     )
   },
 
-  async addUser(profile) {
+  async addUser(profile: any) {
     return await instance.post(`registration.php`, qs.stringify(profile))
   },
 
-  async findUser(value) {
+  async findUser(value: string) {
     return await instance.get(`find_user.php?value=${value}`)
   },
 
-  async changePassword(uid, key, password) {
+  async changePassword(id: string, key: string, password: string) {
     return await instance.post(
       `change_password.php`,
-      qs.stringify({ uid: uid, password: password, key: key })
+      qs.stringify({ id, password, key })
     )
   },
 
-  async checkParams(id, key) {
+  async checkParams(id: string, key: string) {
     return await instance.get(`check_params.php?id=${id}&key=${key}`)
   },
 
-  setToken(token) {
+  setToken(token: any) {
     sessionStorage.setItem('token', JSON.stringify(token))
   },
 
-  setData(data) {
+  setData(data: any) {
     sessionStorage.setItem('uid', data.uid)
     sessionStorage.setItem('access', data.response)
     sessionStorage.setItem('username', data.username)
@@ -106,25 +107,23 @@ export const profileAPI = {
     return await instance.get(`get_profile.php?uid=${userAPI.getUID()}`)
   },
 
-  async setProfile(profile) {
+  async setProfile(profile: any) {
     return await instance.put(
       `set_profile.php`,
       qs.stringify({ ...profile, uid: userAPI.getUID() })
     )
   },
 
-  async getListenerData(tab) {
+  async getListenerData(tab: number) {
     return await instance.get(
       `get_listener_data.php?uid=${userAPI.getUID()}&tab=${tab}`
-    ).then(response => {
-      return response
-    })
+    )
   },
 
-  async setListenerData(data, block) {
+  async setListenerData(data: any, block: number) {
     return await instance.put(
       `set_listener_data.php`,
-      qs.stringify({ ...data, uid: userAPI.getUID(), block: block })
+      qs.stringify({ ...data, uid: userAPI.getUID(), block })
     )
   },
 }
@@ -134,7 +133,7 @@ export const entityAPI = {
     return await instance.get(`get_entity_data.php?uid=${userAPI.getUID()}`)
   },
 
-  async setEntityData(data) {
+  async setEntityData(data: any) {
     let entity = 1
     return await instance.put(
       `set_entity_data.php`,
@@ -146,7 +145,7 @@ export const entityAPI = {
     return await instance.get(`check_entity_roots.php?uid=${userAPI.getUID()}`)
   },
 
-  async addEntityRepresentative(ITN) {
+  async addEntityRepresentative(ITN: string) {
     return await instance.post(
       `add_entity_representative.php`,
       qs.stringify({ uid: userAPI.getUID(), ITN })
@@ -155,7 +154,7 @@ export const entityAPI = {
 }
 
 export const documentAPI = {
-  async deleteDocument(docId) {
+  async deleteDocument(docId: number) {
     return await instance.delete('delete_document.php', {
       data: qs.stringify({
         id: docId,
@@ -166,7 +165,7 @@ export const documentAPI = {
     })
   },
 
-  async deleteDocumentsFile(docId) {
+  async deleteDocumentsFile(docId: number) {
     return await instance.delete('delete_document.php', {
       data: qs.stringify({
         id: docId,
@@ -188,36 +187,37 @@ export const documentAPI = {
 }
 
 export const coursesAPI = {
-  async getCoursesList(page, count, filters) {
+  async getCoursesList(page: number, count: number, filters: ICourseFilters) {
     return await instance.post(
       `get_courses_list.php`,
       qs.stringify({ uid: userAPI.getUID(), page, count, filters })
     )
   },
-  async getListenerInfo(userId) {
+  async getListenerInfo(userId: number) {
     return await instance.get(`get_listener_info.php?uid=${userId}`)
   },
 
-  async saveCheckData(userID, rowID, data) {
+  async saveCheckData(userID: number, rowID: number, data: any) {
     return await instance.post(
       `save_check_data.php`,
       qs.stringify({ userID, rowID, data })
     )
   },
-  async getListenersOptions(value) {
+  async getListenersOptions(value: string) {
     return await instance.get(`get_listeners_options.php?value=${value}`)
   },
 
-  async createListenersRequests(courseID, listeners) {
+  async createListenersRequests(courseID: number, listeners: number[]) {
     return await instance.post(
       `create_request.php`,
       qs.stringify({
         listeners: JSON.stringify(listeners),
         courseID,
+        contractor: userAPI.getUID()
       })
     )
   },
-  async addNewListener(values) {
+  async addNewListener(values: any) {
     return await instance.post(`add_new_listener.php`, qs.stringify(values))
   },
 }
@@ -227,7 +227,7 @@ export const requestsAPI = {
     return await instance.get(`get_requests_list.php?uid=${userAPI.getUID()}`)
   },
 
-  async createRequest(courseID) {
+  async createRequest(courseID: number) {
     let uid = parseInt(userAPI.getUID())
     return await instance.post(
       `create_request.php`,
@@ -238,7 +238,7 @@ export const requestsAPI = {
     )
   },
 
-  async cancelRequest(requestID) {
+  async cancelRequest(requestID: number) {
     return await instance.post(
       `cancel_request.php`,
       qs.stringify({
@@ -247,7 +247,7 @@ export const requestsAPI = {
     )
   },
 
-  async removeRequestUser(rowID) {
+  async removeRequestUser(rowID: number) {
     return await instance.post(
       `cancel_request.php`,
       qs.stringify({
@@ -256,11 +256,11 @@ export const requestsAPI = {
     )
   },
 
-  async updateCMERequest(data) {
+  async updateCMERequest(data: any) {
     return await instance.post(`update_CME_request.php`, qs.stringify(data))
   },
 
-  async setDocumentsApprove(requestID, status) {
+  async setDocumentsApprove(requestID: number, status: number) {
     return await instance.post(
       `request_documents_approve.php`,
       qs.stringify({

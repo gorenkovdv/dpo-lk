@@ -21,6 +21,7 @@ import moodleIcon from '../../img/moodle.png'
 import cmeIcon from '../../img/CME.png'
 import { ICourse, ICourseRoots, ISelectedCourse, ICourseFC } from '../../types'
 import moment from 'moment'
+import { userAPI } from '../../services/api'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,6 +82,8 @@ const Course: React.FC<IProps> = ({
       (rootsGroup.toString() === "3" && course.DepartmentGUID === roots.cathedra)
     )
   }
+
+  const disabled = Boolean(course.Contractor && course.Contractor?.toString() !== userAPI.getUID().toString())
 
   return (
     <>
@@ -149,6 +152,7 @@ const Course: React.FC<IProps> = ({
                   variant={
                     currentUserRequests.length > 0 ? 'outlined' : 'contained'
                   }
+                  disabled={disabled}
                   color="primary"
                   onClick={() =>
                     currentUserRequests.length > 0

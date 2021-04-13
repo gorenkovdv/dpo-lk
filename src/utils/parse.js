@@ -22,3 +22,5 @@ export const parseMonth = (value) => {
   if (!value) return null
   return moment(value, 'MM-YYYY').format('MM-YYYY')
 }
+
+export const parseUserOption = (option) => `${option.name} ${option.login.length > 0 ? `(${option.login})` : ``}`

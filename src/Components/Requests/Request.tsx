@@ -146,7 +146,7 @@ const Request: React.FC<IProps> = ({
           </Tooltip>
         </TableCell>
         <TableCell>
-          {Boolean(row.IsCME) && !Boolean(row.RequestCME) ? (
+          {row.IsCME && !row.RequestCME ? (
             <Grid
               container
               direction="row"
@@ -190,14 +190,16 @@ const Request: React.FC<IProps> = ({
           ) : null}
         </TableCell>
         <TableCell>
-          <Tooltip title="Отменить заявку">
-            <IconButton
-              onClick={() => onCancelRequest(currentRequest)}
-              size="small"
-            >
-              <ClearIcon />
-            </IconButton>
-          </Tooltip>
+          {row.Contractor?.toString() === userAPI.getUID().toString() &&
+            (<Tooltip title="Отменить заявку">
+              <IconButton
+                onClick={() => onCancelRequest(currentRequest)}
+                size="small"
+              >
+                <ClearIcon />
+              </IconButton>
+            </Tooltip>)
+          }
         </TableCell>
       </TableRow>
     </>
