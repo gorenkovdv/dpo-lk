@@ -1,10 +1,9 @@
-import React, { ChangeEvent } from 'react'
+import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import {
   Button,
   IconButton,
-  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -12,15 +11,13 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TextField,
 } from '@material-ui/core'
-import { Check as CheckIcon, Clear as ClearIcon } from '@material-ui/icons/'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import { Clear as ClearIcon } from '@material-ui/icons/'
+import Autocomplete from '../Commons/FormsControls/Autocomplete'
 import DialogLayout from '../Commons/Dialog/DialogLayout'
 import AddNewListenerWindow from './AddNewListenerWindow'
-import { getListenersOptions, actions as coursesActions } from '../../store/reducers/courses'
+import { actions as coursesActions, getListenersOptions } from '../../store/reducers/courses'
 import { getListenersAddition, getSelectedCourse } from '../../store/selectors/courses'
-import { parseUserOption } from '../../utils/parse'
 import { IUserOption } from '../../types'
 
 const useStyles = makeStyles((theme) => ({
@@ -30,12 +27,6 @@ const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1),
   },
-  option: {
-    transform: 'translateZ(0)',
-  },
-  iconTitle: {
-    marginLeft: theme.spacing(1.25),
-  },
   table: {
     minWidth: 650,
     borderCollapse: 'collapse',
@@ -44,22 +35,23 @@ const useStyles = makeStyles((theme) => ({
 
 interface IProps {
   options: { open: boolean },
-  onClose: any,
-  onApprove: any
+  onClose: () => void,
+  onApprove: (listeners: IUserOption[]) => void
 }
 
 const AddListenersWindow: React.FC<IProps> = ({ options, onClose, onApprove }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const [open, setOpen] = React.useState(false)
   const [inputValue, setInputValue] = React.useState('')
+  const [autocompleteOpen, setAutocompleteOpen] = React.useState(false)
   const [autocompleteValue, setAutocompleteValue] = React.useState(null as IUserOption | null)
   const data = useSelector(getListenersAddition)
   const course = useSelector(getSelectedCourse)
   const dialogOpen = data.isDialogOpen
   const loading = data.isLoading
 
-  const onInputChange = (event: ChangeEvent<{}>, value: string) => {
+  const onInputChange = (event: React.ChangeEvent<{}>, value: string) => {
+    if (value === '') setAutocompleteValue(null)
     setInputValue(value)
     dispatch(getListenersOptions(value))
   }
@@ -93,49 +85,15 @@ const AddListenersWindow: React.FC<IProps> = ({ options, onClose, onApprove }) =
       title={course ? `Запись слушателей на курс «${course.Name}»` : ''}
     >
       <Autocomplete
-        style={{ width: '100%' }}
-        open={open}
-        onOpen={() => setOpen(true)}
-        onClose={() => setOpen(false)}
-        noOptionsText="Список пуст"
-        getOptionSelected={(option, value) => option.name === value.name}
-        getOptionDisabled={(option) => option.isUserAdded}
-        getOptionLabel={parseUserOption}
+        isOpen={autocompleteOpen}
+        onOpen={() => setAutocompleteOpen(true)}
+        onClose={() => setAutocompleteOpen(false)}
         options={data.options}
-        loading={loading}
-        inputValue={inputValue}
+        isLoading={loading}
         value={autocompleteValue}
+        setValue={(value: IUserOption) => setAutocompleteValue(value)}
+        inputValue={inputValue}
         onInputChange={onInputChange}
-        onChange={(e: ChangeEvent<{}>, value: IUserOption | null) => {
-          if (value) setAutocompleteValue(value)
-        }}
-        classes={{
-          option: classes.option,
-          noOptions: classes.option,
-        }}
-        renderOption={(option) => (
-          <>
-            <span>{parseUserOption(option)}</span>
-            {option.isUserAdded && <CheckIcon className={classes.iconTitle} />}
-          </>
-        )}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Введите полностью или частично ФИО слушателя"
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {loading ? (
-                    <CircularProgress color="inherit" size={20} />
-                  ) : null}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
-            }}
-          />
-        )}
       />
       <Button
         className={classes.button}

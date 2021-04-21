@@ -100,7 +100,7 @@ const initialState: IState = {
     educationTypes: []
   },
   selectedTab: 0,
-  documentsTab: 0,
+  documentsTab: 4,
 }
 
 export function listenerDataReducer(state = initialState, action: listenerDataActionsTypes): IState {
@@ -326,6 +326,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
             levels: state.list.education.levels.map((level) =>
               level.filter((document) => !document.isDocumentNew)
             ),
+            currentDocument: 0
           },
         },
       }
@@ -339,7 +340,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
             documents: state.list.sertificates.documents.filter(
               (document) => !document.isDocumentNew
             ),
-            currentDocument: action.payload,
+            currentDocument: 0,
           },
         },
       }
@@ -353,7 +354,7 @@ export function listenerDataReducer(state = initialState, action: listenerDataAc
             documents: state.list.others.documents.filter(
               (document) => !document.isDocumentNew
             ),
-            currentDocument: action.payload,
+            currentDocument: 0,
           },
         },
       }
@@ -528,12 +529,12 @@ export const dropNewEducationDocumentAction = (): SyncThunkType => (dispatch) =>
   dispatch(actions.dropNewEducationDocument())
 }
 
-export const dropNewSertificateAction = (redirectIndex: number): SyncThunkType => (dispatch) => {
-  dispatch(actions.dropNewSertificate(redirectIndex))
+export const dropNewSertificateAction = (): SyncThunkType => (dispatch) => {
+  dispatch(actions.dropNewSertificate())
 }
 
-export const dropNewOtherDocumentAction = (redirectIndex: number): SyncThunkType => (dispatch) => {
-  dispatch(actions.dropNewOtherDocument(redirectIndex))
+export const dropNewOtherDocumentAction = (): SyncThunkType => (dispatch) => {
+  dispatch(actions.dropNewOtherDocument())
 }
 
 export const documentDeleteAction = (documentId: number, type: number): SyncThunkType => {
@@ -647,13 +648,11 @@ const actions = {
     type: 'dpo-lk/listener/OTHERS_FILE_DELETED',
     payload: documentId
   } as const),
-  dropNewOtherDocument: (redirectIndex: number) => ({
+  dropNewOtherDocument: () => ({
     type: 'dpo-lk/listener/DROP_NEW_OTHERS_DOCUMENT',
-    payload: redirectIndex,
   } as const),
-  dropNewSertificate: (redirectIndex: number) => ({
+  dropNewSertificate: () => ({
     type: 'dpo-lk/listener/DROP_NEW_SERTIFICATE',
-    payload: redirectIndex
   } as const),
   selectEducationLevel: (level: number) => ({
     type: 'dpo-lk/listener/CHANGE_EDUCATION_LEVEL',

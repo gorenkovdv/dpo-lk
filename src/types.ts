@@ -1,4 +1,6 @@
 export type SeverityType = 'error' | 'info' | 'success' | 'warning'
+export type MarginType = 'dense' | 'none' | 'normal'
+export type VariantType = 'filled' | 'standard' | 'outlined'
 
 export interface ICourseBasic {
     ID: number
@@ -151,7 +153,7 @@ export interface IDocument {
     serial: string
     speciality: string
     isDocumentNew?: boolean
-    newFile?: string | null
+    newFile?: INewFile | null
 }
 
 export interface IProfile {
@@ -190,4 +192,9 @@ export interface IRequest extends ICourseBasic {
 export interface ITabPanel {
     value: number
     index: number
+}
+
+export interface INewFile {
+    filename: string
+    base64: string
 }

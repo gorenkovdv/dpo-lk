@@ -55,7 +55,7 @@ const RegAddress: React.FC = () => {
     dispatch(requestListenerData(selectedTab))
   }, [dispatch, selectedTab])
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: IAddress) => {
     dispatch(updateData(values, selectedTab))
   }
 

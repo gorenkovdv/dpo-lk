@@ -2,6 +2,7 @@ import React from 'react'
 import { compose } from 'redux'
 import { submit } from 'redux-form'
 import { useDispatch, useSelector } from 'react-redux'
+import { makeStyles } from '@material-ui/core/styles'
 import {
   Typography,
   Paper,
@@ -12,13 +13,6 @@ import {
   TableHead,
   TableRow,
 } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import MainLayout from '../Main/MainLayout'
-import DialogLayout from '../Commons/Dialog/DialogLayout'
-import RequestDocumentsWindow from './RequestDocumentsWindow'
-import RequestCMEForm from './RequestCMEForm'
-import withAuth from '../Authorization/withAuth'
-import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
 import {
   getRequests,
   setDocumentsApprove,
@@ -26,10 +20,17 @@ import {
   updateCMERequest,
   actions as requestsActions
 } from '../../store/reducers/requests'
-import Request from './Request'
+import MainLayout from '../Main/MainLayout'
+import DialogLayout from '../Commons/Dialog/DialogLayout'
+import withAuth from '../Authorization/withAuth'
+import { actions as confirmDialogActions } from '../../store/reducers/confirmDialog'
 import { getIsLoading } from '../../store/selectors/loader'
 import { getRequestsList, getSelectedRequest } from '../../store/selectors/requests'
 import { ISelectedRequest, IRequest } from '../../types'
+import RequestDocumentsWindow from './RequestDocumentsWindow'
+import RequestCMEForm from './RequestCMEForm'
+import Request from './Request'
+import { IValues } from './RequestCMEForm'
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -122,13 +123,14 @@ const RequestsList = () => {
     documentsDialogClose()
   }
 
-  const handleSubmit = (values: any) => {
-    dispatch(
-      updateCMERequest({
-        ...values,
-        rowID: selectedRequest && selectedRequest.rowID,
-      })
-    )
+  const handleSubmit = (values: IValues) => {
+    if (selectedRequest)
+      dispatch(
+        updateCMERequest({
+          ...values,
+          rowID: selectedRequest.rowID,
+        })
+      )
     requestCMEDialogClose()
   }
 

@@ -273,7 +273,7 @@ export const coursesReducer = (state = initialState, action: coursesActionsTypes
               return null
             })
 
-            state.list
+            state.list.length && state.list
               .filter((item) => state.selectedCourse && item.ID === state.selectedCourse.ID)
               .map((searchingCourse) => {
                 searchingCourse.users.map((addedUser) => {

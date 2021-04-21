@@ -3,7 +3,7 @@ import { Field, InjectedFormProps, reduxForm } from 'redux-form'
 import { MaskedInput, Input } from '../Commons/FormsControls/FormsControls'
 import { required, isStringContainsUnderscore } from '../../utils/validate'
 
-interface IValues {
+export interface IValues {
   speciality: string
   number: string
 }

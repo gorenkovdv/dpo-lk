@@ -14,23 +14,25 @@ import {
   RadioGroup,
   GridDirection,
 } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
+  DatePickerView,
 } from '@material-ui/pickers'
-import MomentUtils from '@date-io/moment'
 import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   CloudUpload as CloudUploadIcon,
   HighlightOff as DropIcon,
 } from '@material-ui/icons'
+import { makeStyles } from '@material-ui/core/styles'
+import MomentUtils from '@date-io/moment'
 import { actions } from '../../../store/reducers/snackbar'
 import { red } from '@material-ui/core/colors'
+import { WrappedFieldProps } from 'redux-form'
+import { MarginType, VariantType } from '../../../types'
 import moment from 'moment'
 import 'moment/locale/ru'
-import { WrappedFieldProps } from 'redux-form'
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -54,9 +56,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 moment.locale('ru')
-
-type MarginType = 'dense' | 'none' | 'normal'
-
 interface IInputProps {
   margin?: MarginType,
   adornment?: JSX.Element,
@@ -131,7 +130,7 @@ export const Select: React.FC<WrappedFieldProps> = ({ input, children, ...props 
 
 interface IMaskedInputProps {
   fullWidth?: boolean
-  variant?: any
+  variant?: VariantType
   label: string
   adornment?: JSX.Element
   inputRef?: any
@@ -199,12 +198,16 @@ export const PasswordInput: React.FC<WrappedFieldProps & IPasswordInput> = ({ in
 }
 
 interface IDateInputProps {
-  maxDate?: string,
+  inputValue?: string
+  maxDate?: string
   minDate?: string
-  autoOk?: boolean,
-  classes?: any,
-  dateformat: string,
+  autoOk?: boolean
+  classes?: any
+  dateformat: string
   margin?: MarginType
+  views?: DatePickerView[]
+  placeholder?: string
+  label?: string
 }
 
 export const DateInput: React.FC<WrappedFieldProps & IDateInputProps> = ({ input, ...props }): JSX.Element => {
@@ -225,7 +228,7 @@ export const DateInput: React.FC<WrappedFieldProps & IDateInputProps> = ({ input
         autoOk={props.autoOk ? props.autoOk : true}
         variant="inline"
         openTo="year"
-        value={input.value || null}
+        value={(input && input.value) || null}
         className={props.classes ? props.classes : classes.textField}
         maskChar={'0'}
         format={props.dateformat}
@@ -328,7 +331,7 @@ export const Switcher: React.FC<WrappedFieldProps & ISwitcherProps> = ({ input, 
 
 interface IRadioGroupProps {
   direction?: GridDirection
-  radios: Array<any>
+  radios: { value: string, label: string }[]
 }
 
 export const RadioGroupContainer: React.FC<WrappedFieldProps & IRadioGroupProps> = ({ input, children, ...props }) => {

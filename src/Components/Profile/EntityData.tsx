@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const EntityData: React.FC<any> = (props) => {
+const EntityData: React.FC<{ pagesType: string }> = ({ pagesType }) => {
   const dispatch = useDispatch()
   const isLoading = useSelector(getIsLoading)
   const data = useSelector(getEntityData)
@@ -46,11 +46,11 @@ const EntityData: React.FC<any> = (props) => {
     dispatch(requestEntityData())
   }, [dispatch])
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: IEntityDataList) => {
     dispatch(updateEntityData(values))
   }
 
-  if (props.pagesType === 'listener') return <Redirect to="/listener/data" />
+  if (pagesType === 'listener') return <Redirect to="/listener/data" />
 
   if (isLoading) return null
 
@@ -59,12 +59,6 @@ const EntityData: React.FC<any> = (props) => {
   ) : (
     <Typography>У Вас нет прав на редактирование данной формы</Typography>
   )
-}
-
-interface IValues {
-  position: string
-  organization: string
-  CTMU: string
 }
 
 const EntityDataForm: React.FC<InjectedFormProps<IEntityDataList>> = ({ handleSubmit }) => {

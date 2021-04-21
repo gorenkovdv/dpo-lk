@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState, FC } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { compose } from 'redux'
 import {
@@ -10,7 +10,6 @@ import {
   Button,
   Checkbox,
   FormGroup,
-  CircularProgress,
   FormControlLabel,
   Box,
   Collapse,
@@ -24,15 +23,13 @@ import {
   useMediaQuery,
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
-import Autocomplete from '@material-ui/lab/Autocomplete'
-import { Check as CheckIcon } from '@material-ui/icons/'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import MainLayout from '../Main/MainLayout'
-import { DateInput } from '../Commons/FormsControls/FormsControls'
 import ListenersWindow from './ListenersWindow'
 import AddListenersWindow from './AddListenersWindow'
+import Autocomplete from '../Commons/FormsControls/Autocomplete'
 import withAuth from '../Authorization/withAuth'
 import {
   requestCourses,
@@ -40,8 +37,8 @@ import {
   createRequest,
   cancelRequest as cancelRequestAction,
   createListenersRequests,
-  getListenersOptions,
-  actions as coursesActions
+  actions as coursesActions,
+  getListenersOptions
 } from '../../store/reducers/courses'
 import Course from './Course'
 import CourseMobile from './CourseMobile'
@@ -61,7 +58,11 @@ import {
   getCoursesRoots
 } from '../../store/selectors/courses'
 import { ICourseFilters, ISelectedCourse, IUserOption } from '../../types'
-import { parseUserOption } from '../../utils/parse'
+import * as queryString from 'querystring'
+import history from '../../history'
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date'
+import MomentUtils from '@date-io/moment'
 
 const useStyles = makeStyles((theme) => ({
   inlineDateField: {
@@ -69,6 +70,10 @@ const useStyles = makeStyles((theme) => ({
     '&:first-child': {
       marginRight: 10,
     },
+  },
+  textField: {
+    boxSizing: 'border-box',
+    width: '100%',
   },
   filterPaper: {
     margin: theme.spacing(1, 0, 2, 0),
@@ -129,7 +134,7 @@ interface ICheckboxProps {
   label: string
 }
 
-const CheckboxInput: FC<ICheckboxProps> = ({ checked, onFilterChange, edited, label }): JSX.Element => {
+const CheckboxInput: React.FC<ICheckboxProps> = ({ checked, onFilterChange, edited, label }): JSX.Element => {
   const classes = useStyles()
   return (
     <FormControlLabel
@@ -147,11 +152,11 @@ const CheckboxInput: FC<ICheckboxProps> = ({ checked, onFilterChange, edited, la
   )
 }
 
-const CoursesList: FC = () => {
+const CoursesList: React.FC = () => {
   const classes = useStyles()
+  const dispatch = useDispatch()
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
-  const dispatch = useDispatch()
   const currentUserID = userAPI.getUID()
   const isLoading = useSelector(getIsLoading)
   const filters = useSelector(getCoursesFilters)
@@ -161,30 +166,53 @@ const CoursesList: FC = () => {
   const selectedCourse = useSelector(getSelectedCourse)
   const coursesList = useSelector(getCoursesList)
   const coursesRoots = useSelector(getCoursesRoots)
-  const [searchString, setSearchString] = useState(filters.searchString)
-  const [startDate, setStartDate] = useState(filters.startDate)
-  const [endDate, setEndDate] = useState(filters.endDate)
-  const [filtersOpen, setFiltersOpen] = useState(false)
-  const [isListenersWindowOpen, setListenersWindowOpen] = useState(false)
-  const [isAddListenersWindowOpen, setAddListenersWindowOpen] = useState(
-    false
-  )
+  const listenersAddition = useSelector(getListenersAddition)
   const pageCountVariants = [5, 10, 20, 50]
 
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [startDate, setStartDate] = useState(filters.startDate as string | null)
+  const [endDate, setEndDate] = useState(filters.endDate as string | null)
+  const [searchString, setSearchString] = useState(filters.searchString)
+  const [isListenersWindowOpen, setListenersWindowOpen] = useState(false)
+  const [isAddListenersWindowOpen, setAddListenersWindowOpen] = useState(false)
+  const [selectedFilter, setSelectedFilter] = React.useState('1')
+
+
+  const [inputValue, setInputValue] = React.useState('')
+  const [autocompleteOpen, setAutocompleteOpen] = React.useState(false)
+  const [autocompleteValue, setAutocompleteValue] = React.useState(null as IUserOption | null)
+
   React.useEffect(() => {
+    const parsedSearch = queryString.parse(history.location.search.substr(1))
+
+    if (parsedSearch.search && parsedSearch.search !== selectedFilter)
+      setSelectedFilter(parsedSearch.search as string)
+
     dispatch(requestCourses(currentPage, pageSize, filters))
     // eslint-disable-next-line
-  }, [dispatch])
+  }, [])
 
-  const handlePageChange = (event: ChangeEvent<unknown>, value: number) => {
+  React.useEffect(() => {
+    const query: { search: string } = { search: selectedFilter }
+    const searchString = queryString.stringify(query)
+
+    if (history.location.search.substr(1) !== searchString)
+      history.push({
+        pathname: '/courses',
+        search: queryString.stringify(query)
+      })
+  }, [selectedFilter, filters])
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     if (value !== currentPage)
       dispatch(changeListParams(value, pageSize, filters))
   }
 
-  const handlePageSizeChange = (event: any) => {
-    if (event.target.value !== pageSize)
+  const handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let curPageSize = parseInt(event.target.value)
+    if (curPageSize !== pageSize)
       dispatch(
-        changeListParams(currentPage, event.target.value, filters)
+        changeListParams(currentPage, curPageSize, filters)
       )
   }
 
@@ -315,38 +343,32 @@ const CoursesList: FC = () => {
     setAddListenersWindowOpen(false)
   }
 
-  const minDateLimits = (value: string) => {
-    if (value < filters.minStartDate || value > filters.maxEndDate) return filters.minStartDate
+  const minDateLimits = (value: string | null) => {
+    if (value !== null && (value < filters.minStartDate || value > filters.maxEndDate)) return filters.minStartDate
     return value
   }
 
-  const maxDateLimits = (value: string) => {
-    if (value > filters.maxEndDate || value < filters.minStartDate) return filters.maxEndDate
+  const maxDateLimits = (value: string | null) => {
+    if (value !== null && (value > filters.maxEndDate || value < filters.minStartDate)) return filters.maxEndDate
     return value
   }
 
-  const approveFilterDate = (value: string, minDate: string, maxDate: string, filter: keyof ICourseFilters) => {
+  const approveFilterDate = (value: string | null, minDate: string | null, maxDate: string | null, filter: keyof ICourseFilters) => {
     let currentDate = parseCourseDate(value, minDate, maxDate)
     if (currentDate && currentDate !== filters[filter])
       handleFilterChange(filter, currentDate)
   }
 
-  const [autocompleteOpen, setAutocompleteOpen] = React.useState(false)
-  const [autocompleteValue, setAutocompleteValue] = React.useState(null as IUserOption | null)
-  const [inputValue, setInputValue] = React.useState('')
-  const [selectedFilter, setSelectedFilter] = React.useState('0')
-  const listenersAddition = useSelector(getListenersAddition)
-  const loading = listenersAddition.isLoading
-
-  const onInputChange = (e: ChangeEvent<{}>, value: string) => {
-    setInputValue(value)
-    dispatch(getListenersOptions(value))
-  }
-
-  const onSelectedFilterChange = (e: any) => {
-    setSelectedFilter(e.target.value)
+  const onSelectedFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFilter(event.target.value)
     setSearchString('')
     setAutocompleteValue(null)
+  }
+
+  const onInputChange = (event: React.ChangeEvent<{}>, value: string) => {
+    if (value === '') setAutocompleteValue(null)
+    setInputValue(value)
+    dispatch(getListenersOptions(value))
   }
 
   const volumeList = useSelector(getVolumeList)
@@ -372,11 +394,7 @@ const CoursesList: FC = () => {
         >
           <Grid item>
             <IconButton size="small" className={classes.startIcon}>
-              {filtersOpen ? (
-                <KeyboardArrowUpIcon />
-              ) : (
-                <KeyboardArrowDownIcon />
-              )}
+              {filtersOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
           </Grid>
           <Grid>
@@ -471,68 +489,78 @@ const CoursesList: FC = () => {
           </Box>
         </Collapse>
         <Typography>Диапазон даты начала программы курса</Typography>
-        <Grid container direction="row" alignItems="flex-start">
-          <Grid item className={classes.inlineDateField}>
-            <DateInput
-              //@ts-ignore
-              input={{ value: startDate }}
-              name="startDate"
-              views={['year', 'date']}
-              minDate={filters.minStartDate}
-              maxDate={maxDateLimits(endDate)}
-              dateformat="DD-MM-YYYY"
-              placeholder="дд-мм-гггг"
-              label="Начало периода"
-              onChange={(value: string) => setStartDate(parseDate(value))}
-              onAccept={(value: string) =>
-                approveFilterDate(
-                  value,
-                  filters.minStartDate,
-                  maxDateLimits(endDate),
-                  'startDate'
-                )
-              }
-              onBlur={(e: any) =>
-                approveFilterDate(
-                  e.target.value,
-                  filters.minStartDate,
-                  endDate,
-                  'startDate'
-                )
-              }
-            />
+        <MuiPickersUtilsProvider utils={MomentUtils} locale={`ru`}>
+          <Grid container direction="row" alignItems="flex-start">
+            <Grid item className={classes.inlineDateField}>
+              <KeyboardDatePicker
+                autoOk
+                value={startDate}
+                views={['year', 'date']}
+                label="Окончание периода"
+                variant="inline"
+                maskChar={'0'}
+                format="DD-MM-YYYY"
+                placeholder="дд-мм-гггг"
+                className={classes.textField}
+                invalidDateMessage="Неверный формат даты"
+                inputVariant="outlined"
+                margin="dense"
+                InputAdornmentProps={{ position: 'start' }}
+                KeyboardButtonProps={{ size: 'small' }}
+                onChange={(date: MaterialUiPickersDate) => setStartDate(parseDate(date))}
+                onAccept={(date: MaterialUiPickersDate) => {
+                  approveFilterDate(
+                    String(date),
+                    filters.minStartDate,
+                    maxDateLimits(endDate),
+                    'startDate'
+                  )
+                }}
+                onBlur={(event: React.FocusEvent<HTMLInputElement>) => (endDate !== null) ?
+                  approveFilterDate(
+                    event.target.value,
+                    filters.minStartDate,
+                    endDate,
+                    'startDate'
+                  ) : null}
+              />
+            </Grid>
+            <Grid item className={classes.inlineDateField}>
+              <KeyboardDatePicker
+                autoOk
+                value={endDate}
+                views={['year', 'date']}
+                label="Окончание периода"
+                variant="inline"
+                maskChar={'0'}
+                format="DD-MM-YYYY"
+                placeholder="дд-мм-гггг"
+                className={classes.textField}
+                invalidDateMessage="Неверный формат даты"
+                inputVariant="outlined"
+                margin="dense"
+                InputAdornmentProps={{ position: 'start' }}
+                KeyboardButtonProps={{ size: 'small' }}
+                onChange={(date: MaterialUiPickersDate) => setEndDate(parseDate(date))}
+                onAccept={(date: MaterialUiPickersDate) => {
+                  approveFilterDate(
+                    String(date),
+                    minDateLimits(startDate),
+                    filters.maxEndDate,
+                    'endDate'
+                  )
+                }}
+                onBlur={(event: React.FocusEvent<HTMLInputElement>) => startDate !== null ?
+                  approveFilterDate(
+                    event.target.value,
+                    startDate,
+                    filters.maxEndDate,
+                    'endDate'
+                  ) : null}
+              />
+            </Grid>
           </Grid>
-          <Grid item className={classes.inlineDateField}>
-            <DateInput
-              //@ts-ignore
-              input={{ value: endDate }}
-              name="endDate"
-              views={['year', 'date']}
-              minDate={minDateLimits(startDate)}
-              maxDate={filters.maxEndDate}
-              dateformat="DD-MM-YYYY"
-              placeholder="дд-мм-гггг"
-              label="Окончание периода"
-              onChange={(value: string) => setEndDate(parseDate(value))}
-              onAccept={(value: string) =>
-                approveFilterDate(
-                  value,
-                  minDateLimits(startDate),
-                  filters.maxEndDate,
-                  'endDate'
-                )
-              }
-              onBlur={(e: any) =>
-                approveFilterDate(
-                  e.target.value,
-                  startDate,
-                  filters.maxEndDate,
-                  'endDate'
-                )
-              }
-            />
-          </Grid>
-        </Grid>
+        </MuiPickersUtilsProvider>
         <Grid container direction="column" alignItems="flex-start">
           <Grid container direction="row" alignItems="center">
             <Grid item>
@@ -561,9 +589,9 @@ const CoursesList: FC = () => {
                 className={classes.fullWidth}
                 value={searchString}
                 placeholder="Введите полностью или частично наименование специальности или программы"
-                onChange={(e) => setSearchString(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter')
+                onChange={(event) => setSearchString(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter')
                     handleFilterChange('searchString', searchString)
                 }}
               />
@@ -571,55 +599,15 @@ const CoursesList: FC = () => {
           ) : (
             <Grid className={classes.fullWidth}>
               <Autocomplete
-                open={autocompleteOpen}
+                isOpen={autocompleteOpen}
                 onOpen={() => setAutocompleteOpen(true)}
                 onClose={() => setAutocompleteOpen(false)}
-                noOptionsText="Список пуст"
-                getOptionSelected={(option, value) => option.name === value.name}
-                getOptionDisabled={(option) => option.isUserAdded}
-                getOptionLabel={parseUserOption}
                 options={listenersAddition.options}
-                loading={loading}
-                inputValue={inputValue}
+                isLoading={listenersAddition.isLoading}
                 value={autocompleteValue}
+                setValue={(value: IUserOption) => setAutocompleteValue(value)}
+                inputValue={inputValue}
                 onInputChange={onInputChange}
-                onChange={(e: ChangeEvent<{}>, value: IUserOption | null) => {
-                  if (value) setAutocompleteValue(value)
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && autocompleteValue) {
-                    handleFilterChange('searchUser', autocompleteValue.id)
-                  }
-                }}
-                classes={{
-                  option: classes.option,
-                  noOptions: classes.option,
-                }}
-                renderOption={(option) => (
-                  <>
-                    <span>{parseUserOption(option)}</span>
-                    {option.isUserAdded && (
-                      <CheckIcon className={classes.iconTitle} />
-                    )}
-                  </>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Введите полностью или частично ФИО слушателя"
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {loading && (
-                            <CircularProgress color="inherit" size={20} />
-                          )}
-                          {params.InputProps.endAdornment}
-                        </>
-                      ),
-                    }}
-                  />
-                )}
               />
             </Grid>
           )}

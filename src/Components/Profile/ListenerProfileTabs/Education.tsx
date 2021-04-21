@@ -10,7 +10,6 @@ import {
   MenuItem,
   Tooltip,
 } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
 import {
   Help as HelpIcon,
   Delete as DeleteIcon,
@@ -24,6 +23,7 @@ import {
   DateInput,
   FileInput,
 } from '../../Commons/FormsControls/FormsControls'
+import { makeStyles } from '@material-ui/core/styles'
 import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
 import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
 import { SAVE_FILES_DIRECTORY } from '../../../store/const'
@@ -40,7 +40,7 @@ import {
 } from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
 import { getIsLoading } from '../../../store/selectors/loader'
-import { getEducationData, getEducationTypes } from '../../../store/selectors/listener'
+import { getEducationData, getEducationTypes, getSelectedDocumentsTab } from '../../../store/selectors/listener'
 import { IDocument, IEducationType } from '../../../types'
 
 const useStyles = makeStyles((theme) => ({
@@ -139,6 +139,7 @@ const Education: React.FC<{ username: string }> = ({ username }) => {
   const isLoading = useSelector(getIsLoading)
   const data = useSelector(getEducationData)
   const educationTypes = useSelector(getEducationTypes)
+  const selectedTab = useSelector(getSelectedDocumentsTab)
   const level = data.currentLevel || 0
   const index = data.currentDocument || 0
   const currentData = data.levels
@@ -147,8 +148,8 @@ const Education: React.FC<{ username: string }> = ({ username }) => {
   const defaultFileURL = `education${level}${index}.pdf`
 
   React.useEffect(() => {
-    dispatch(requestListenerData(4))
-  }, [dispatch])
+    dispatch(requestListenerData(selectedTab))
+  }, [dispatch, selectedTab])
 
   const handleNewDocument = () => {
     let newDoc: IDocument = {
@@ -169,7 +170,7 @@ const Education: React.FC<{ username: string }> = ({ username }) => {
       isDocumentNew: true,
     }
 
-    dispatch(createNewDocumentAction(newDoc, 4))
+    dispatch(createNewDocumentAction(newDoc, selectedTab))
   }
 
   const confirmTransition = (value: number, type: string) => {
@@ -183,10 +184,11 @@ const Education: React.FC<{ username: string }> = ({ username }) => {
     )
   }
 
-  const handleLevelChange = (e: any) => {
-    if (e.target.value !== level) {
-      if (isDocumentNew) confirmTransition(e.target.value, 'level')
-      else goToLevel(e.target.value)
+  const handleLevelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let currentValue = parseInt(event.target.value)
+    if (currentValue !== level) {
+      if (isDocumentNew) confirmTransition(currentValue, 'level')
+      else goToLevel(currentValue)
     }
   }
 
@@ -195,13 +197,14 @@ const Education: React.FC<{ username: string }> = ({ username }) => {
   }
 
   const goToDocument = (index: number) => {
-    dispatch(selectDocumentAction(index, 4))
+    dispatch(selectDocumentAction(index, selectedTab))
   }
 
-  const selectDocument = (e: any) => {
-    if (e.target.value !== index) {
-      if (isDocumentNew) confirmTransition(e.target.value, 'document')
-      else goToDocument(e.target.value)
+  const selectDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let currentValue = parseInt(event.target.value)
+    if (currentValue !== index) {
+      if (isDocumentNew) confirmTransition(currentValue, 'document')
+      else goToDocument(currentValue)
     }
   }
 
@@ -214,7 +217,7 @@ const Education: React.FC<{ username: string }> = ({ username }) => {
     dispatch(dropNewEducationDocumentAction())
   }
 
-  const handleSubmit = (values: IValues) => {
+  const handleSubmit = (values: IDocument) => {
     dispatch(updateData(
       {
         ...values,
@@ -224,7 +227,7 @@ const Education: React.FC<{ username: string }> = ({ username }) => {
         newFile: values.newFile ? values.newFile.base64 : null,
         fileURL: values.newFile ? defaultFileURL : currentDocument && currentDocument.fileURL,
       },
-      4
+      selectedTab
     )
     )
   }
@@ -339,26 +342,27 @@ interface IProps {
   username: string
 }
 
-interface IValues {
-  organization: string
-  speciality: string
-  fullName?: string | null
-  firstDate: string | null
-  secondDate: string | null
-  hours?: string | null
-  serial: string
-  newFile: any
-}
-
-const EducationDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = (props) => {
+const EducationDataForm: React.FC<InjectedFormProps<IDocument, IProps> & IProps> = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const selectedTab = useSelector(getSelectedDocumentsTab)
   const level = props.level
   const username = props.username
 
+  const confirmCancel = () => {
+    dispatch(
+      confirmDialogActions.confirmDialogShow({
+        title: `Отмена`,
+        text: `Изменения не будут сохранены. Продолжить?`,
+        onApprove: () => cancelNewDocument(),
+      })
+    )
+  }
+
   const cancelNewDocument = () => {
-    dispatch(selectDocumentAction(0, 4))
+    dispatch(selectDocumentAction(0, selectedTab))
     dispatch(dropNewEducationDocumentAction())
+    dispatch(confirmDialogActions.confirmDialogClose())
   }
 
   // onDialogOpen
@@ -384,7 +388,7 @@ const EducationDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> =
 
   // onDialogApprove
   const deleteDocument = () => {
-    dispatch(documentDeleteAction(props.documentId, 4))
+    dispatch(documentDeleteAction(props.documentId, selectedTab))
     dispatch(confirmDialogActions.confirmDialogClose())
   }
 
@@ -495,7 +499,7 @@ const EducationDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> =
           className={classes.button}
           variant="contained"
           color="primary"
-          onClick={cancelNewDocument}
+          onClick={confirmCancel}
         >
           Отмена
         </Button>
@@ -504,7 +508,7 @@ const EducationDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> =
   )
 }
 
-const EducationDataReduxForm = reduxForm<IValues, IProps>({
+const EducationDataReduxForm = reduxForm<IDocument, IProps>({
   form: 'educationDataForm',
   enableReinitialize: true,
 })(EducationDataForm)

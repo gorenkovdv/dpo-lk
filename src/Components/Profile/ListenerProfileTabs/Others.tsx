@@ -10,7 +10,6 @@ import {
   MenuItem,
   Tooltip,
 } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
 import {
   Help as HelpIcon,
   Delete as DeleteIcon,
@@ -18,12 +17,13 @@ import {
   PostAdd as AddIcon,
   PictureAsPdf as PdfIcon,
 } from '@material-ui/icons'
-import { SAVE_FILES_DIRECTORY } from '../../../store/const'
 import {
   Input,
   Textarea,
   FileInput,
 } from '../../Commons/FormsControls/FormsControls'
+import { makeStyles } from '@material-ui/core/styles'
+import { SAVE_FILES_DIRECTORY } from '../../../store/const'
 import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
 import LoaderLayout from '../../Commons/Loader/LoaderLayout'
 import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
@@ -37,7 +37,7 @@ import {
   fileDeleteAction
 } from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
-import { getOtherData } from '../../../store/selectors/listener'
+import { getOtherData, getSelectedDocumentsTab } from '../../../store/selectors/listener'
 import { getIsLoading } from '../../../store/selectors/loader'
 import { IDocument } from '../../../types'
 
@@ -82,6 +82,7 @@ const Others: React.FC<{ username: string }> = ({ username }) => {
   const dispatch = useDispatch()
   const data = useSelector(getOtherData)
   const isLoading = useSelector(getIsLoading)
+  const selectedTab = useSelector(getSelectedDocumentsTab)
   const index = data.currentDocument || 0
   const currentData = data.documents
   const currentDocument = currentData ? currentData[index] : null
@@ -89,8 +90,8 @@ const Others: React.FC<{ username: string }> = ({ username }) => {
   const defaultFileURL = `sertificate${index}.pdf`
 
   React.useEffect(() => {
-    dispatch(requestListenerData(6))
-  }, [dispatch])
+    dispatch(requestListenerData(selectedTab))
+  }, [dispatch, selectedTab])
 
   const handleNewDocument = () => {
     let newDoc: IDocument = {
@@ -109,11 +110,11 @@ const Others: React.FC<{ username: string }> = ({ username }) => {
       isDocumentNew: true,
     }
 
-    dispatch(createNewDocumentAction(newDoc, 6))
+    dispatch(createNewDocumentAction(newDoc, selectedTab))
   }
 
   const goToDocument = (index: number) => {
-    dispatch(selectDocumentAction(index, 6))
+    dispatch(selectDocumentAction(index, selectedTab))
   }
 
   const confirmTransition = (value: number) => {
@@ -126,19 +127,20 @@ const Others: React.FC<{ username: string }> = ({ username }) => {
     )
   }
 
-  const selectDocument = (e: any) => {
-    if (e.target.value !== index) {
-      if (isDocumentNew) confirmTransition(e.target.value)
-      else goToDocument(e.target.value)
+  const selectDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let currentValue = parseInt(event.target.value)
+    if (currentValue !== index) {
+      if (isDocumentNew) confirmTransition(currentValue)
+      else goToDocument(currentValue)
     }
   }
 
   const handleDocumentRedirect = (value: number) => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(dropNewOtherDocumentAction(value))
+    dispatch(dropNewOtherDocumentAction())
   }
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: IDocument) => {
     dispatch(updateData(
       {
         ...values,
@@ -147,7 +149,7 @@ const Others: React.FC<{ username: string }> = ({ username }) => {
         newFile: values.newFile ? values.newFile.base64 : null,
         fileURL: values.newFile ? defaultFileURL : currentDocument && currentDocument.fileURL,
       },
-      6
+      selectedTab
     )
     )
   }
@@ -244,19 +246,25 @@ interface IProps {
   username: string
 }
 
-interface IValues {
-  documentName: string
-  comment: string
-  newFile: string | null
-}
-
-let OthersDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = ({ handleSubmit, ...props }) => {
+let OthersDataForm: React.FC<InjectedFormProps<IDocument, IProps> & IProps> = ({ handleSubmit, ...props }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const selectedTab = useSelector(getSelectedDocumentsTab)
   const username = props.username
 
+  const confirmCancel = () => {
+    dispatch(
+      confirmDialogActions.confirmDialogShow({
+        title: `Отмена`,
+        text: `Изменения не будут сохранены. Продолжить?`,
+        onApprove: () => cancelNewDocument(),
+      })
+    )
+  }
+
   const cancelNewDocument = () => {
-    dispatch(dropNewOtherDocumentAction(0))
+    dispatch(dropNewOtherDocumentAction())
+    dispatch(confirmDialogActions.confirmDialogClose())
   }
 
   // onDialogOpen
@@ -283,12 +291,12 @@ let OthersDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = ({ h
   // onDialogApprove
   const deleteDocument = () => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(documentDeleteAction(props.documentId, 6))
+    dispatch(documentDeleteAction(props.documentId, selectedTab))
   }
 
   const deleteFile = () => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(fileDeleteAction(props.documentId, 6))
+    dispatch(fileDeleteAction(props.documentId, selectedTab))
   }
 
   return (
@@ -356,7 +364,7 @@ let OthersDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = ({ h
           className={classes.button}
           variant="contained"
           color="primary"
-          onClick={cancelNewDocument}
+          onClick={confirmCancel}
         >
           Отмена
         </Button>
@@ -365,7 +373,7 @@ let OthersDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = ({ h
   )
 }
 
-const OthersDataReduxForm = reduxForm<IValues, IProps>({
+const OthersDataReduxForm = reduxForm<IDocument, IProps>({
   form: 'othersDataForm',
   enableReinitialize: true,
 })(OthersDataForm)

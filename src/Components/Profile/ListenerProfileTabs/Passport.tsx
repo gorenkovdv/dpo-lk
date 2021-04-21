@@ -41,7 +41,7 @@ const Passport: React.FC = () => {
     dispatch(requestListenerData(selectedTab))
   }, [dispatch, selectedTab])
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: IPassport) => {
     dispatch(updateData(values, selectedTab))
   }
 

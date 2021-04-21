@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import history from '../../history'
 import { CssBaseline } from '@material-ui/core'
 import LoaderLayout from '../Commons/Loader/LoaderLayout'
 import {
@@ -31,9 +31,6 @@ const MainLayout = (Component: React.ComponentType<any>): React.FC<any> => (prop
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [mobileOpen, setMobileOpen] = useState(false)
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const history = useHistory()
 
   const pagesType = sessionStorage.pagesType
   const username = userAPI.getUserName()

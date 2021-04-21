@@ -33,7 +33,7 @@ import {
 import LoaderLayout from '../../Commons/Loader/LoaderLayout'
 import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
 import { SAVE_FILES_DIRECTORY } from '../../../store/const'
-import { parseMonth } from '../../../utils/parse'
+import { parseMonth, formatMonth } from '../../../utils/parse'
 import { requestListenerData, updateData, workFileDelete } from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
 import { getWorkData, getSelectedTab } from '../../../store/selectors/listener'
@@ -261,9 +261,7 @@ const WorkDataForm: React.FC<InjectedFormProps<IWork, IProps> & IProps> = ({ han
       <Field
         name="accessionDate"
         label="Год, месяц вступления в должность"
-        format={(value: any) =>
-          value ? new Date(value.split('-')[1], value.split('-')[0] - 1) : null
-        }
+        format={formatMonth}
         parse={parseMonth}
         views={['year', 'month']}
         maxDate={new Date()}

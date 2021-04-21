@@ -27,7 +27,7 @@ export interface IEntityDataList {
 
 interface IState {
   list: IEntityDataList,
-  entities: Array<number>
+  entities: number[]
 }
 
 const initialState: IState = {

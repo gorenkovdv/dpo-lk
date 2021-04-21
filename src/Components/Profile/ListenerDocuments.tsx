@@ -49,7 +49,7 @@ interface IProps {
 const ListenerDocuments: React.FC<IProps> = ({ username, pagesType }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const selectedTab = useSelector(getSelectedDocumentsTab)
+  const selectedTab = useSelector(getSelectedDocumentsTab) - 4
 
   const TabPanel: React.FC<ITabPanel> = ({ children, value, index, ...props }) => {
 
@@ -69,7 +69,7 @@ const ListenerDocuments: React.FC<IProps> = ({ username, pagesType }) => {
   }
 
   const handleTabChange = (event: React.ChangeEvent<{}>, value: number) => {
-    dispatch(setDocumentsTabAction(value))
+    dispatch(setDocumentsTabAction(value + 4))
   }
 
   if (pagesType === 'entity') return <Redirect to="/entity/data" />

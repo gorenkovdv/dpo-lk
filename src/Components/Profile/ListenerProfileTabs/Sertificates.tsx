@@ -10,7 +10,6 @@ import {
   MenuItem,
   Tooltip,
 } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
 import {
   Help as HelpIcon,
   Delete as DeleteIcon,
@@ -18,14 +17,15 @@ import {
   PostAdd as AddIcon,
   PictureAsPdf as PdfIcon,
 } from '@material-ui/icons'
-import { SAVE_FILES_DIRECTORY } from '../../../store/const'
-import { parseDate } from '../../../utils/parse'
 import {
   Input,
   Textarea,
   DateInput,
   FileInput,
 } from '../../Commons/FormsControls/FormsControls'
+import { makeStyles } from '@material-ui/core/styles'
+import { SAVE_FILES_DIRECTORY } from '../../../store/const'
+import { parseDate } from '../../../utils/parse'
 import { loadFileTooltip } from '../../Commons/Tooltips/LoadFileTooltip'
 import LoaderLayout from '../../Commons/Loader/LoaderLayout'
 import HtmlTooltip from '../../Commons/Tooltips/HtmlTooltip'
@@ -39,7 +39,7 @@ import {
   fileDeleteAction
 } from '../../../store/reducers/listenerData'
 import { actions as confirmDialogActions } from '../../../store/reducers/confirmDialog'
-import { getSertificates, getSelectedTab } from '../../../store/selectors/listener'
+import { getSertificates, getSelectedDocumentsTab } from '../../../store/selectors/listener'
 import { getIsLoading } from '../../../store/selectors/loader'
 import { IDocument } from '../../../types'
 
@@ -82,7 +82,7 @@ const Sertificates: React.FC<{ username: string }> = ({ username }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const data = useSelector(getSertificates)
-  const selectedTab = useSelector(getSelectedTab)
+  const selectedTab = useSelector(getSelectedDocumentsTab)
   const isLoading = useSelector(getIsLoading)
   const index = data.currentDocument || 0
   const currentData = data.documents
@@ -90,13 +90,12 @@ const Sertificates: React.FC<{ username: string }> = ({ username }) => {
   const isDocumentNew = currentDocument ? currentDocument.isDocumentNew : false
   const defaultFileURL = `sertificate${index}.pdf`
 
-  console.log(selectedTab)
-
   React.useEffect(() => {
-    dispatch(requestListenerData(5))
-  }, [dispatch])
+    dispatch(requestListenerData(selectedTab))
+  }, [dispatch, selectedTab])
 
   const handleNewDocument = () => {
+
     let newDoc: IDocument = {
       id: 0,
       name: '',
@@ -113,11 +112,11 @@ const Sertificates: React.FC<{ username: string }> = ({ username }) => {
       isDocumentNew: true,
     }
 
-    dispatch(createNewDocumentAction(newDoc, 5))
+    dispatch(createNewDocumentAction(newDoc, selectedTab))
   }
 
   const goToDocument = (index: number) => {
-    dispatch(selectDocumentAction(index, 5))
+    dispatch(selectDocumentAction(index, selectedTab))
   }
 
   const confirmTransition = (value: number) => {
@@ -130,19 +129,20 @@ const Sertificates: React.FC<{ username: string }> = ({ username }) => {
     )
   }
 
-  const selectDocument = (e: any) => {
-    if (e.target.value !== index) {
-      if (isDocumentNew) confirmTransition(e.target.value)
-      else goToDocument(e.target.value)
+  const selectDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let currentValue = parseInt(event.target.value)
+    if (currentValue !== index) {
+      if (isDocumentNew) confirmTransition(currentValue)
+      else goToDocument(currentValue)
     }
   }
 
   const handleDocumentRedirect = (value: number) => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(dropNewSertificateAction(value))
+    dispatch(dropNewSertificateAction())
   }
 
-  const handleSubmit = (values: IValues) => {
+  const handleSubmit = (values: IDocument) => {
     dispatch(updateData(
       {
         ...values,
@@ -151,7 +151,7 @@ const Sertificates: React.FC<{ username: string }> = ({ username }) => {
         newFile: values.newFile ? values.newFile.base64 : null,
         fileURL: values.newFile ? defaultFileURL : currentDocument && currentDocument.fileURL,
       },
-      5
+      selectedTab
     )
     )
   }
@@ -242,14 +242,6 @@ const Sertificates: React.FC<{ username: string }> = ({ username }) => {
   )
 }
 
-interface IValues {
-  organization: string
-  speciality: string
-  firstDate: string | null
-  serial: string
-  newFile: any
-}
-
 interface IProps {
   index: number
   documentId: number
@@ -258,13 +250,25 @@ interface IProps {
   username: string
 }
 
-const SertificatesDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps> = (props) => {
+const SertificatesDataForm: React.FC<InjectedFormProps<IDocument, IProps> & IProps> = (props) => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const selectedTab = useSelector(getSelectedDocumentsTab)
   const username = props.username
 
+  const confirmCancel = () => {
+    dispatch(
+      confirmDialogActions.confirmDialogShow({
+        title: `Отмена`,
+        text: `Изменения не будут сохранены. Продолжить?`,
+        onApprove: () => cancelNewDocument(),
+      })
+    )
+  }
+
   const cancelNewDocument = () => {
-    dispatch(dropNewSertificateAction(0))
+    dispatch(dropNewSertificateAction())
+    dispatch(confirmDialogActions.confirmDialogClose())
   }
 
   // onDialogOpen
@@ -291,12 +295,12 @@ const SertificatesDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps
   // onDialogApprove
   const deleteDocument = () => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(documentDeleteAction(props.documentId, 5))
+    dispatch(documentDeleteAction(props.documentId, selectedTab))
   }
 
   const deleteFile = () => {
     dispatch(confirmDialogActions.confirmDialogClose())
-    dispatch(fileDeleteAction(props.documentId, 5))
+    dispatch(fileDeleteAction(props.documentId, selectedTab))
   }
 
   return (
@@ -388,7 +392,7 @@ const SertificatesDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps
           className={classes.button}
           variant="contained"
           color="primary"
-          onClick={cancelNewDocument}
+          onClick={confirmCancel}
         >
           Отмена
         </Button>
@@ -397,7 +401,7 @@ const SertificatesDataForm: React.FC<InjectedFormProps<IValues, IProps> & IProps
   )
 }
 
-const SertificatesDataReduxForm = reduxForm<IValues, IProps>({
+const SertificatesDataReduxForm = reduxForm<IDocument, IProps>({
   form: 'sertificatesDataForm',
   enableReinitialize: true,
 })(SertificatesDataForm)
